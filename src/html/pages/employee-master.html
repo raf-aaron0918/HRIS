@@ -16,6 +16,63 @@
       @@include('../layouts/breadcrumb.html', {'breadcrumb-item': 'HR Modules', 'breadcrumb-item-active': 'Employee Master'})
 
       <div class="row g-3">
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted d-block mb-2">Total Employees</small>
+              <div class="d-flex align-items-end justify-content-between">
+                <div>
+                  <h3 class="mb-1" id="overviewTotalEmployees">5</h3>
+                  <span class="text-muted small">Profiles in directory</span>
+                </div>
+                <span class="badge bg-light-primary text-primary">Masterlist</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted d-block mb-2">Active Access</small>
+              <div class="d-flex align-items-end justify-content-between">
+                <div>
+                  <h3 class="mb-1" id="overviewActiveAccounts">3</h3>
+                  <span class="text-muted small">Employees with HRIS access</span>
+                </div>
+                <span class="badge bg-light-success text-success">Access</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted d-block mb-2">In Onboarding</small>
+              <div class="d-flex align-items-end justify-content-between">
+                <div>
+                  <h3 class="mb-1" id="overviewOnboardingCount">1</h3>
+                  <span class="text-muted small">Employees not yet completed</span>
+                </div>
+                <span class="badge bg-light-warning text-warning">Lifecycle</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted d-block mb-2">Missing Documents</small>
+              <div class="d-flex align-items-end justify-content-between">
+                <div>
+                  <h3 class="mb-1" id="overviewDocumentGaps">2</h3>
+                  <span class="text-muted small">Records with incomplete files</span>
+                </div>
+                <span class="badge bg-light-danger text-danger">Compliance</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="col-lg-8">
           <div class="card h-100">
             <div class="card-header d-flex align-items-center justify-content-between">
@@ -347,15 +404,22 @@
             <div class="card-header d-flex flex-wrap gap-2 align-items-center justify-content-between">
               <div>
                 <h5 class="mb-0">Employee Directory</h5>
-                <small class="text-muted">See all employee records in one place.</small>
+                <small class="text-muted">Search, filter, and load employee records into the form.</small>
               </div>
-              <div class="d-flex align-items-center gap-2">
-                <input type="search" class="form-control" id="employeeSearch" placeholder="Search employee">
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <input type="search" class="form-control" id="employeeSearch" placeholder="Search employee" style="min-width: 220px;">
                 <span class="badge bg-light-secondary text-secondary" id="employeeCount">5 records</span>
               </div>
             </div>
             <div class="card-body p-0">
-              <div class="table-responsive">
+              <div class="px-3 pt-3 d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-sm btn-primary" data-directory-filter="all">All</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-directory-filter="active">Active Access</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-directory-filter="probationary">Probationary</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-directory-filter="separated">Separated</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-directory-filter="missing-docs">Missing Docs</button>
+              </div>
+              <div class="table-responsive mt-3">
                 <table class="table table-hover mb-0 align-middle">
                   <thead class="table-light">
                     <tr>
@@ -363,48 +427,60 @@
                       <th>Name</th>
                       <th>Department / Position / Branch</th>
                       <th>Status</th>
+                      <th>Lifecycle</th>
+                      <th>Documents</th>
                       <th>Email</th>
                       <th class="text-end">Action</th>
                     </tr>
                   </thead>
                   <tbody id="employeeDirectoryBody">
-                    <tr data-search="EMP-0001 Maria Santos Human Resources HR Manager Main Branch Active maria.santos@company.com">
+                    <tr data-search="EMP-0001 Maria Santos Human Resources HR Manager Main Branch Active Completed 4/4 maria.santos@company.com" data-account="active" data-employment="regular" data-lifecycle="completed" data-documents="4">
                       <td>EMP-0001</td>
                       <td>Maria Santos</td>
                       <td>Human Resources / HR Manager / Main Branch</td>
                       <td><span class="badge bg-light-success text-success">Active</span></td>
+                      <td><span class="badge bg-light-info text-info">Completed</span></td>
+                      <td>4 / 4</td>
                       <td>maria.santos@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                    <tr data-search="EMP-0002 James Reyes Finance Payroll Admin Main Branch Active james.reyes@company.com">
+                    <tr data-search="EMP-0002 James Reyes Finance Payroll Admin Main Branch Active Completed 4/4 james.reyes@company.com" data-account="active" data-employment="regular" data-lifecycle="completed" data-documents="4">
                       <td>EMP-0002</td>
                       <td>James Reyes</td>
                       <td>Finance / Payroll Admin / Main Branch</td>
                       <td><span class="badge bg-light-success text-success">Active</span></td>
+                      <td><span class="badge bg-light-info text-info">Completed</span></td>
+                      <td>4 / 4</td>
                       <td>james.reyes@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                    <tr data-search="EMP-0100 Anna Cruz Operations Immediate Supervisor Quezon Branch Probationary anna.cruz@company.com">
+                    <tr data-search="EMP-0100 Anna Cruz Operations Immediate Supervisor Quezon Branch Probationary Onboarding 3/4 anna.cruz@company.com" data-account="active" data-employment="probationary" data-lifecycle="onboarding" data-documents="3">
                       <td>EMP-0100</td>
                       <td>Anna Cruz</td>
                       <td>Operations / Immediate Supervisor / Quezon Branch</td>
                       <td><span class="badge bg-light-warning text-warning">Probationary</span></td>
+                      <td><span class="badge bg-light-warning text-warning">Onboarding</span></td>
+                      <td>3 / 4</td>
                       <td>anna.cruz@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                    <tr data-search="EMP-0200 Paolo Garcia Operations Attendance Clerk Cebu Branch Inactive paolo.garcia@company.com">
+                    <tr data-search="EMP-0200 Paolo Garcia Operations Attendance Clerk Cebu Branch Inactive Transfer 3/4 paolo.garcia@company.com" data-account="inactive" data-employment="contractual" data-lifecycle="transfer" data-documents="3">
                       <td>EMP-0200</td>
                       <td>Paolo Garcia</td>
                       <td>Operations / Attendance Clerk / Cebu Branch</td>
-                      <td><span class="badge bg-light-warning text-warning">Inactive</span></td>
+                      <td><span class="badge bg-light-secondary text-secondary">Inactive</span></td>
+                      <td><span class="badge bg-light-primary text-primary">Transfer</span></td>
+                      <td>3 / 4</td>
                       <td>paolo.garcia@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                    <tr data-search="EMP-0300 Liza Dela Cruz Human Resources HR Officer Davao Branch Separated liza.delacruz@company.com">
+                    <tr data-search="EMP-0300 Liza Dela Cruz Human Resources HR Officer Davao Branch Separated Offboarding 4/4 liza.delacruz@company.com" data-account="separated" data-employment="regular" data-lifecycle="offboarding" data-documents="4">
                       <td>EMP-0300</td>
                       <td>Liza Dela Cruz</td>
                       <td>Human Resources / HR Officer / Davao Branch</td>
                       <td><span class="badge bg-light-danger text-danger">Separated</span></td>
+                      <td><span class="badge bg-light-danger text-danger">Offboarding</span></td>
+                      <td>4 / 4</td>
                       <td>liza.delacruz@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
@@ -533,6 +609,18 @@
         movementSummary.textContent = movementType.value === 'None' ? 'None' : `${movementType.value}${movementEffectiveDate.value ? ` (${movementEffectiveDate.value})` : ''}`;
         employmentSummary.textContent = employmentStatus.value || '-';
         documentSummary.textContent = `${getDocumentCount()} / 4`;
+      }
+
+      function updateOverviewCards() {
+        const totalEmployees = employeeDirectoryRows.length;
+        const activeAccounts = employeeDirectoryRows.filter((row) => row.dataset.account === 'active').length;
+        const onboardingEmployees = employeeDirectoryRows.filter((row) => row.dataset.lifecycle === 'onboarding').length;
+        const missingDocuments = employeeDirectoryRows.filter((row) => Number(row.dataset.documents || 0) < 4).length;
+
+        overviewTotalEmployees.textContent = totalEmployees;
+        overviewActiveAccounts.textContent = activeAccounts;
+        overviewOnboardingCount.textContent = onboardingEmployees;
+        overviewDocumentGaps.textContent = missingDocuments;
       }
 
       function validateForm() {
@@ -710,6 +798,7 @@
       updateAccessPreview();
       updateOffboardingPanel();
       updateSummary();
+      updateOverviewCards();
       updateEmployeeDirectoryFilter();
     })();
   </script>
@@ -720,6 +809,7 @@
 <!-- [Body] end -->
 
 </html>
+
 
 
 
