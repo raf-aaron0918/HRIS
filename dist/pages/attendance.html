@@ -1,0 +1,717 @@
+<html lang="en">
+<!-- [Head] start -->
+
+<head>
+  <title>HRIS</title>
+  <!-- [Meta] -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="HRIS is made using Bootstrap 5 design framework. Download the free admin template & use it for your project.">
+  <meta name="keywords" content="HRIS, Dashboard UI Kit, Bootstrap 5, Admin Template, Admin Dashboard, CRM, CMS, Bootstrap Admin Template">
+  <meta name="author" content="CodedThemes">
+
+  <!-- [Favicon] icon -->
+  <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon">
+ <!-- [Google Font] Family -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
+<!-- [Tabler Icons] https://tablericons.com -->
+<link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" >
+<!-- [Feather Icons] https://feathericons.com -->
+<link rel="stylesheet" href="../assets/fonts/feather.css" >
+<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
+<link rel="stylesheet" href="../assets/fonts/fontawesome.css" >
+<!-- [Material Icons] https://fonts.google.com/icons -->
+<link rel="stylesheet" href="../assets/fonts/material.css" >
+<!-- [Template CSS Files] -->
+<link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" >
+<link rel="stylesheet" href="../assets/css/style-preset.css" >
+
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
+  <!-- [ Pre-loader ] start -->
+<div class="loader-bg">
+  <div class="loader-track">
+    <div class="loader-fill"></div>
+  </div>
+</div>
+<!-- [ Pre-loader ] End -->
+ <!-- [ Sidebar Menu ] start -->
+<nav class="pc-sidebar">
+  <div class="navbar-wrapper">
+    <div class="m-header text-center py-3">
+      <a href="../dashboard/index.html" class="b-brand text-primary d-block w-100 text-center py-2">
+        <span class="fw-bold fs-3 d-block">HRIS</span>
+      </a>
+    </div>
+    <div class="navbar-content">
+      <ul class="pc-navbar">
+        <li class="pc-item">
+          <a href="../dashboard/index.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+            <span class="pc-mtext">Dashboard</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Core Modules</label>
+          <i class="ti ti-layout-grid"></i>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/employee-master.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-users"></i></span>
+            <span class="pc-mtext">Employee Master</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/attendance.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-clock"></i></span>
+            <span class="pc-mtext">Time & Attendance</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/leave-management.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-calendar-event"></i></span>
+            <span class="pc-mtext">Leave Management</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/payroll.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-receipt-2"></i></span>
+            <span class="pc-mtext">Payroll</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/reports.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-chart-bar"></i></span>
+            <span class="pc-mtext">Reports</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Pages</label>
+          <i class="ti ti-news"></i>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/login.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-lock"></i></span>
+            <span class="pc-mtext">Login</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/register.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-user-plus"></i></span>
+            <span class="pc-mtext">Register</span>
+          </a>
+        </li>
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+<!-- [ Sidebar Menu ] end -->
+ <!-- [ Header Topbar ] start -->
+<header class="pc-header">
+  <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
+<div class="me-auto pc-mob-drp">
+  <ul class="list-unstyled">
+    <!-- ======= Menu collapse Icon ===== -->
+    <li class="pc-h-item pc-sidebar-collapse">
+      <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
+        <i class="ti ti-menu-2"></i>
+      </a>
+    </li>
+    <li class="pc-h-item pc-sidebar-popup">
+      <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
+        <i class="ti ti-menu-2"></i>
+      </a>
+    </li>
+    <li class="dropdown pc-h-item d-inline-flex d-md-none">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none m-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        aria-expanded="false"
+      >
+        <i class="ti ti-search"></i>
+      </a>
+      <div class="dropdown-menu pc-h-dropdown drp-search">
+        <form class="px-3">
+          <div class="form-group mb-0 d-flex align-items-center">
+            <i data-feather="search"></i>
+            <input type="search" class="form-control border-0 shadow-none" placeholder="Search here. . .">
+          </div>
+        </form>
+      </div>
+    </li>
+    <li class="pc-h-item d-none d-md-inline-flex">
+      <form class="header-search">
+        <i data-feather="search" class="icon-search"></i>
+        <input type="search" class="form-control" placeholder="Search here. . .">
+      </form>
+    </li>
+  </ul>
+</div>
+<!-- [Mobile Media Block end] -->
+<div class="ms-auto">
+  <ul class="list-unstyled">
+    <li class="dropdown pc-h-item">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none me-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        aria-expanded="false"
+      >
+        <i class="ti ti-mail"></i>
+      </a>
+      <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
+        <div class="dropdown-header d-flex align-items-center justify-content-between">
+          <h5 class="m-0">Message</h5>
+          <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-x text-danger"></i></a>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-header px-0 text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
+          <div class="list-group list-group-flush w-100">
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">3:00 AM</span>
+                  <p class="text-body mb-1">It's <b>Cristina danny's</b> birthday today.</p>
+                  <span class="text-muted">2 min ago</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">6:00 PM</span>
+                  <p class="text-body mb-1"><b>Aida Burg</b> commented your post.</p>
+                  <span class="text-muted">5 August</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">2:45 PM</span>
+                  <p class="text-body mb-1"><b>There was a failure to your setup.</b></p>
+                  <span class="text-muted">7 hours ago</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-4.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">9:10 PM</span>
+                  <p class="text-body mb-1"><b>Cristina Danny </b> invited to join <b> Meeting.</b></p>
+                  <span class="text-muted">Daily scrum meeting time</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="text-center py-2">
+          <a href="#!" class="link-primary">View all</a>
+        </div>
+      </div>
+    </li>
+    <li class="dropdown pc-h-item header-user-profile">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none me-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+      >
+        <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+        <span>Rafael Aaron</span>
+      </a>
+      <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+        <div class="dropdown-header">
+          <div class="d-flex mb-1">
+            <div class="flex-shrink-0">
+              <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="mb-1">Rafael Aaron</h6>
+              <span>UI/UX Designer</span>
+            </div>
+            <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
+          </div>
+        </div>
+        <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="drp-t1"
+              data-bs-toggle="tab"
+              data-bs-target="#drp-tab-1"
+              type="button"
+              role="tab"
+              aria-controls="drp-tab-1"
+              aria-selected="true"
+              ><i class="ti ti-user"></i> Profile</button
+            >
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="drp-t2"
+              data-bs-toggle="tab"
+              data-bs-target="#drp-tab-2"
+              type="button"
+              role="tab"
+              aria-controls="drp-tab-2"
+              aria-selected="false"
+              ><i class="ti ti-settings"></i> Setting</button
+            >
+          </li>
+        </ul>
+        <div class="tab-content" id="mysrpTabContent">
+          <div class="tab-pane fade show active" id="drp-tab-1" role="tabpanel" aria-labelledby="drp-t1" tabindex="0">
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-edit-circle"></i>
+              <span>Edit Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-user"></i>
+              <span>View Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-clipboard-list"></i>
+              <span>Social Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-wallet"></i>
+              <span>Billing</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-power"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+          <div class="tab-pane fade" id="drp-tab-2" role="tabpanel" aria-labelledby="drp-t2" tabindex="0">
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-help"></i>
+              <span>Support</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-user"></i>
+              <span>Account Settings</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-lock"></i>
+              <span>Privacy Center</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-messages"></i>
+              <span>Feedback</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-list"></i>
+              <span>History</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+ </div>
+</header>
+<!-- [ Header ] end -->
+
+
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      <!-- [ breadcrumb ] start -->
+      <div class="page-header">
+        <div class="page-block">
+          <div class="row align-items-center">
+            <div class="col-md-12">
+              <div class="page-header-title">
+                <h5 class="m-b-10">Time & Attendance</h5>
+              </div>
+              <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../dashboard/index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="javascript: void(0)">HR Modules</a></li>
+                <li class="breadcrumb-item" aria-current="page">Time & Attendance</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- [ breadcrumb ] end -->
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Attendance Log</h5>
+              <span class="badge bg-light-primary text-primary" id="adjustmentBadge">Original</span>
+            </div>
+            <div class="card-body">
+              <form id="attendanceForm" novalidate>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="logId">Log ID</label>
+                    <input type="text" class="form-control" id="logId" placeholder="LOG-0001" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="employeeId">Employee ID</label>
+                    <input type="text" class="form-control" id="employeeId" placeholder="EMP-0001" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="workDate">Date</label>
+                    <input type="date" class="form-control" id="workDate" required>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="logType">Log Type</label>
+                    <select class="form-select" id="logType" required>
+                      <option value="">Select type</option>
+                      <option value="clock-in">Clock In</option>
+                      <option value="clock-out">Clock Out</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="timestamp">Timestamp</label>
+                    <input type="time" class="form-control" id="timestamp" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="source">Source / Device</label>
+                    <select class="form-select" id="source" required>
+                      <option value="">Select source</option>
+                      <option>Web</option>
+                      <option>Mobile</option>
+                      <option>Biometric</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="adjustmentStatus">Adjustment Status</label>
+                    <select class="form-select" id="adjustmentStatus">
+                      <option>Original</option>
+                      <option>Pending Correction</option>
+                      <option>Corrected</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="shiftStart">Shift Start</label>
+                    <input type="time" class="form-control" id="shiftStart" value="09:00" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="shiftEnd">Shift End</label>
+                    <input type="time" class="form-control" id="shiftEnd" value="18:00" required>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="shiftSchedule">Shift Schedule</label>
+                    <select class="form-select" id="shiftSchedule">
+                      <option>Regular Day Shift</option>
+                      <option>Night Shift</option>
+                      <option>Compressed Schedule</option>
+                      <option>Flexible Schedule</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="restDayWork">Rest Day Work</label>
+                    <select class="form-select" id="restDayWork">
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="holidayWork">Holiday Work</label>
+                    <select class="form-select" id="holidayWork">
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label" for="adjustmentReason">Adjustment Request / Remarks</label>
+                    <textarea class="form-control" id="adjustmentReason" rows="3" placeholder="Use this for missing logs or correction requests."></textarea>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <button type="button" class="btn btn-outline-primary" id="saveDraftBtn">Save Draft</button>
+                  <button type="submit" class="btn btn-primary">Save Attendance Log</button>
+                </div>
+
+                <div class="alert alert-light-primary border-primary mt-3 mb-0" id="attendanceAlert" role="alert">
+                  Enter a log to calculate late, undertime, overtime, and night differential in real time.
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+
+  <script>
+    (function () {
+      const form = document.getElementById('attendanceForm');
+      const saveDraftBtn = document.getElementById('saveDraftBtn');
+      const attendanceAlert = document.getElementById('attendanceAlert');
+      const adjustmentBadge = document.getElementById('adjustmentBadge');
+
+      const logId = document.getElementById('logId');
+      const employeeId = document.getElementById('employeeId');
+      const workDate = document.getElementById('workDate');
+      const logType = document.getElementById('logType');
+      const timestamp = document.getElementById('timestamp');
+      const source = document.getElementById('source');
+      const adjustmentStatus = document.getElementById('adjustmentStatus');
+      const shiftStart = document.getElementById('shiftStart');
+      const shiftEnd = document.getElementById('shiftEnd');
+      const shiftSchedule = document.getElementById('shiftSchedule');
+      const restDayWork = document.getElementById('restDayWork');
+      const holidayWork = document.getElementById('holidayWork');
+      const adjustmentReason = document.getElementById('adjustmentReason');
+
+      const lateDisplay = document.getElementById('lateDisplay');
+      const undertimeDisplay = document.getElementById('undertimeDisplay');
+      const overtimeDisplay = document.getElementById('overtimeDisplay');
+      const nightDiffDisplay = document.getElementById('nightDiffDisplay');
+
+      const approvedOvertime = 0;
+      const duplicateWindowMinutes = 1;
+      let lastSubmission = null;
+
+      function toMinutes(timeValue) {
+        if (!timeValue) {
+          return null;
+        }
+        const [hours, minutes] = timeValue.split(':').map(Number);
+        return hours * 60 + minutes;
+      }
+
+      function minutesToLabel(value) {
+        return `${Math.max(0, value)} min`;
+      }
+
+      function setAlert(type, message) {
+        attendanceAlert.className = `alert alert-light-${type} border-${type} mt-3 mb-0`;
+        attendanceAlert.textContent = message;
+      }
+
+      function updateAdjustmentBadge() {
+        adjustmentBadge.textContent = adjustmentStatus.value;
+        adjustmentBadge.className = 'badge';
+        if (adjustmentStatus.value === 'Pending Correction') {
+          adjustmentBadge.classList.add('bg-light-warning', 'text-warning');
+        } else if (adjustmentStatus.value === 'Corrected') {
+          adjustmentBadge.classList.add('bg-light-success', 'text-success');
+        } else {
+          adjustmentBadge.classList.add('bg-light-primary', 'text-primary');
+        }
+      }
+
+      function calculateNightDifferential(startMin, endMin) {
+        if (startMin === null || endMin === null) {
+          return 0;
+        }
+
+        const normalizedEnd = endMin < startMin ? endMin + (24 * 60) : endMin;
+        let total = 0;
+        const start = startMin;
+        const end = normalizedEnd;
+
+        for (let minute = start; minute < end; minute += 1) {
+          const hour = Math.floor(minute / 60) % 24;
+          if (hour >= 22 || hour < 6) {
+            total += 1;
+          }
+        }
+
+        return total;
+      }
+
+      function updateMetrics() {
+        const shiftStartMin = toMinutes(shiftStart.value);
+        const shiftEndMin = toMinutes(shiftEnd.value);
+        const logTimeMin = toMinutes(timestamp.value);
+        const clockInWindow = logType.value === 'clock-in';
+        const clockOutWindow = logType.value === 'clock-out';
+
+        if (adjustmentStatus.value !== 'Original') {
+          updateAdjustmentBadge();
+        } else {
+          updateAdjustmentBadge();
+        }
+
+        if (shiftStartMin === null || shiftEndMin === null || logTimeMin === null) {
+          if (lateDisplay) lateDisplay.textContent = '0';
+          if (undertimeDisplay) undertimeDisplay.textContent = '0';
+          if (overtimeDisplay) overtimeDisplay.textContent = '0';
+          if (nightDiffDisplay) nightDiffDisplay.textContent = '0';
+          return;
+        }
+
+        const normalizedShiftEnd = shiftEndMin < shiftStartMin ? shiftEndMin + (24 * 60) : shiftEndMin;
+        const normalizedLogTime = ((clockOutWindow || clockInWindow) && shiftEndMin < shiftStartMin && logTimeMin < shiftStartMin)
+          ? logTimeMin + (24 * 60)
+          : logTimeMin;
+
+        const lateMinutes = clockInWindow && normalizedLogTime > shiftStartMin ? normalizedLogTime - shiftStartMin : 0;
+        const undertimeMinutes = clockOutWindow && normalizedLogTime < normalizedShiftEnd ? normalizedShiftEnd - normalizedLogTime : 0;
+        const overtimeMinutes = clockOutWindow && normalizedLogTime > normalizedShiftEnd ? normalizedLogTime - normalizedShiftEnd : approvedOvertime;
+
+        let nightDiffMinutes = 0;
+        if (clockInWindow || clockOutWindow) {
+          nightDiffMinutes = calculateNightDifferential(shiftStartMin, normalizedShiftEnd);
+        }
+
+        if (lateDisplay) lateDisplay.textContent = minutesToLabel(lateMinutes);
+        if (undertimeDisplay) undertimeDisplay.textContent = minutesToLabel(undertimeMinutes);
+        if (overtimeDisplay) overtimeDisplay.textContent = minutesToLabel(overtimeMinutes);
+        if (nightDiffDisplay) nightDiffDisplay.textContent = minutesToLabel(nightDiffMinutes);
+
+        if (clockOutWindow && logTimeMin < shiftStartMin && shiftEndMin >= shiftStartMin) {
+          setAlert('danger', 'Clock Out cannot occur before Clock In. Please verify the timestamp order.');
+          return;
+        }
+
+        if (duplicateWindowMinutes && lastSubmission && lastSubmission.employeeId === employeeId.value && lastSubmission.timestamp === timestamp.value && lastSubmission.workDate === workDate.value) {
+          setAlert('warning', 'This submission looks like a duplicate inside the same minute. Review before saving.');
+          return;
+        }
+
+        if (lateMinutes > 0) {
+          setAlert('warning', `Late arrival detected. ${minutesToLabel(lateMinutes)} will be deducted from payable hours.`);
+          return;
+        }
+
+        if (undertimeMinutes > 0) {
+          setAlert('warning', `Undertime detected. ${minutesToLabel(undertimeMinutes)} will reduce payable hours.`);
+          return;
+        }
+
+        if (nightDiffMinutes > 0) {
+          setAlert('info', 'Night differential hours detected for work inside the 10:00 PM to 6:00 AM window.');
+          return;
+        }
+
+        if (restDayWork.value === 'yes' || holidayWork.value === 'yes') {
+          setAlert('info', `${shiftSchedule.value} selected. Rest day or holiday work will be tagged for premium computation.`);
+          return;
+        }
+
+        setAlert('success', 'Attendance log looks valid and ready for payroll reconciliation.');
+      }
+
+      form.addEventListener('input', updateMetrics);
+      form.addEventListener('change', updateMetrics);
+
+      saveDraftBtn.addEventListener('click', function () {
+        updateAdjustmentBadge();
+        setAlert('primary', 'Attendance draft saved locally.');
+      });
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        updateMetrics();
+
+        if (!logId.value.trim() || !employeeId.value.trim() || !workDate.value || !logType.value || !timestamp.value || !source.value) {
+          setAlert('danger', 'Please complete the required attendance log fields.');
+          return;
+        }
+
+        if (logType.value === 'clock-out' && adjustmentStatus.value === 'Pending Correction') {
+          setAlert('warning', 'This log is pending correction and should be approved by a supervisor before payroll credit.');
+        } else {
+          setAlert('success', `${logId.value.trim()} saved. Payroll can now reconcile the log against the shift schedule.`);
+        }
+
+        lastSubmission = {
+          employeeId: employeeId.value.trim(),
+          timestamp: timestamp.value,
+          workDate: workDate.value
+        };
+      });
+
+      updateAdjustmentBadge();
+      updateMetrics();
+    })();
+  </script>
+
+  <footer class="pc-footer">
+    <div class="footer-wrapper container-fluid">
+      <div class="row">
+        <div class="col-sm my-1">
+          <p class="m-0"></p>
+        </div>
+        <div class="col-auto my-1">
+          <ul class="list-inline footer-link mb-0">
+            <li class="list-inline-item"><a href="../index.html">Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+ <!-- Required Js -->
+<script src="../assets/js/plugins/popper.min.js"></script>
+<script src="../assets/js/plugins/simplebar.min.js"></script>
+<script src="../assets/js/plugins/bootstrap.min.js"></script>
+<script src="../assets/js/fonts/custom-font.js"></script>
+<script src="../assets/js/pcoded.js"></script>
+<script src="../assets/js/plugins/feather.min.js"></script>
+
+
+
+
+
+<script>layout_change('light');</script>
+
+
+
+
+<script>change_box_container('false');</script>
+
+
+
+<script>layout_rtl_change('false');</script>
+
+
+<script>preset_change("preset-1");</script>
+
+
+<script>font_change("Public-Sans");</script>
+
+    
+
+
+</body>
+<!-- [Body] end -->
+
+</html>

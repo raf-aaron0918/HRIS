@@ -1,0 +1,468 @@
+<html lang="en">
+<!-- [Head] start -->
+
+<head>
+  @@include('../layouts/head-page-meta.html', {'title': 'Employee Master'}) @@include('../layouts/head-css.html')
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body @@bodySetup>
+  @@include('../layouts/layout-vertical.html')
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      @@include('../layouts/breadcrumb.html', {'breadcrumb-item': 'HR Modules', 'breadcrumb-item-active': 'Employee Master'})
+
+      <div class="row">
+        <div class="col-md-3 col-xl-3">
+          <div class="card bg-primary text-white mb-3">
+            <div class="card-body">
+              <p class="mb-1 opacity-75">Active Profiles</p>
+              <h3 class="mb-0 text-white">128</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-xl-3">
+          <div class="card bg-success text-white mb-3">
+            <div class="card-body">
+              <p class="mb-1 opacity-75">Onboarding</p>
+              <h3 class="mb-0 text-white">12</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-xl-3">
+          <div class="card bg-warning text-white mb-3">
+            <div class="card-body">
+              <p class="mb-1 opacity-75">Status Changes</p>
+              <h3 class="mb-0 text-white">7</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-xl-3">
+          <div class="card bg-info text-white mb-3">
+            <div class="card-body">
+              <p class="mb-1 opacity-75">Module Access</p>
+              <h3 class="mb-0 text-white" id="accessPreview">Active</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Employee Profile</h5>
+              <span class="badge bg-light-primary text-primary" id="profileStateBadge">Draft</span>
+            </div>
+            <div class="card-body">
+              <form id="employeeMasterForm" novalidate>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="employeeId">Employee ID</label>
+                    <input type="text" class="form-control" id="employeeId" placeholder="EMP-0001" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="dateHired">Date Hired</label>
+                    <input type="date" class="form-control" id="dateHired" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="employmentStatus">Employment Status</label>
+                    <select class="form-select" id="employmentStatus" required>
+                      <option value="">Select status</option>
+                      <option>Probationary</option>
+                      <option>Regular</option>
+                      <option>Contractual</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <input type="text" class="form-control" id="firstName" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="middleName">Middle Name</label>
+                    <input type="text" class="form-control" id="middleName">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" required>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="corporateEmail">Corporate Email</label>
+                    <input type="email" class="form-control" id="corporateEmail" placeholder="name@company.com" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="accountStatus">Account Status</label>
+                    <select class="form-select" id="accountStatus" required>
+                      <option>Active</option>
+                      <option>Inactive</option>
+                      <option>Separated</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-12 mb-2">
+                    <h6 class="mb-0">Onboarding / Offboarding</h6>
+                    <small class="text-muted">Track entry and exit actions for the employee lifecycle.</small>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="onboardingStage">Onboarding Stage</label>
+                    <select class="form-select" id="onboardingStage">
+                      <option>Pre-boarding</option>
+                      <option>Onboarding</option>
+                      <option>Completed</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="offboardingDate">Offboarding Date</label>
+                    <input type="date" class="form-control" id="offboardingDate">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="offboardingReason">Offboarding Reason</label>
+                    <select class="form-select" id="offboardingReason">
+                      <option value="">Select reason</option>
+                      <option>Resignation</option>
+                      <option>Transfer</option>
+                      <option>Retirement</option>
+                      <option>Termination</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-12 mb-2">
+                    <h6 class="mb-0">Employee Movement</h6>
+                    <small class="text-muted">Capture promotion, transfer, or resignation changes.</small>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="movementType">Movement Type</label>
+                    <select class="form-select" id="movementType">
+                      <option>None</option>
+                      <option>Promotion</option>
+                      <option>Transfer</option>
+                      <option>Resignation</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="movementEffectiveDate">Effective Date</label>
+                    <input type="date" class="form-control" id="movementEffectiveDate">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="movementRemarks">Movement Remarks</label>
+                    <input type="text" class="form-control" id="movementRemarks" placeholder="Promotion / transfer note">
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="department">Department</label>
+                    <input type="text" class="form-control" id="department" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="position">Position</label>
+                    <input type="text" class="form-control" id="position" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="branch">Branch</label>
+                    <input type="text" class="form-control" id="branch" required>
+                  </div>
+
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="sss">SSS</label>
+                    <input type="text" class="form-control" id="sss" placeholder="12-3456789-0">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="philhealth">PhilHealth</label>
+                    <input type="text" class="form-control" id="philhealth" placeholder="12-345678901-2">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="pagibig">Pag-IBIG</label>
+                    <input type="text" class="form-control" id="pagibig" placeholder="1234-5678-9012">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="tin">TIN</label>
+                    <input type="text" class="form-control" id="tin" placeholder="123-456-789-000">
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="bankAccount">Bank Account Details</label>
+                    <input type="text" class="form-control" id="bankAccount" placeholder="Bank name and account number" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="notes">Notes</label>
+                    <input type="text" class="form-control" id="notes" placeholder="Optional onboarding or audit notes">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="documentUpload">Document Management</label>
+                    <input type="file" class="form-control" id="documentUpload" multiple>
+                    <small class="text-muted">Upload IDs, contracts, forms, or clearance files.</small>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <button type="button" class="btn btn-outline-primary" id="saveEmployeeBtn">Save Draft</button>
+                  <button type="submit" class="btn btn-primary">Create Employee Profile</button>
+                </div>
+
+                <div class="alert alert-light-primary border-primary mt-3 mb-0" id="employeeAlert" role="alert">
+                  Fill out the profile to validate employee identity, statutory data, and account status.
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-12 mt-3">
+          <div class="card">
+            <div class="card-header d-flex flex-wrap gap-2 align-items-center justify-content-between">
+              <div>
+                <h5 class="mb-0">Employee Directory</h5>
+                <small class="text-muted">See all employee records in one place.</small>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <input type="search" class="form-control" id="employeeSearch" placeholder="Search employee">
+                <span class="badge bg-light-secondary text-secondary" id="employeeCount">5 records</span>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Employee ID</th>
+                      <th>Name</th>
+                      <th>Department / Position / Branch</th>
+                      <th>Status</th>
+                      <th>Email</th>
+                      <th class="text-end">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="employeeDirectoryBody">
+                    <tr data-search="EMP-0001 Maria Santos HR Manager Main Branch Active maria.santos@company.com">
+                      <td>EMP-0001</td>
+                      <td>Maria Santos</td>
+                      <td>HR / HR Manager / Main Branch</td>
+                      <td><span class="badge bg-light-success text-success">Active</span></td>
+                      <td>maria.santos@company.com</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="EMP-0002 James Reyes Payroll Admin Main Branch Active james.reyes@company.com">
+                      <td>EMP-0002</td>
+                      <td>James Reyes</td>
+                      <td>Finance / Payroll Admin / Main Branch</td>
+                      <td><span class="badge bg-light-success text-success">Active</span></td>
+                      <td>james.reyes@company.com</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="EMP-0100 Anna Cruz Supervisor Quezon Branch Probationary anna.cruz@company.com">
+                      <td>EMP-0100</td>
+                      <td>Anna Cruz</td>
+                      <td>Operations / Immediate Supervisor / Quezon Branch</td>
+                      <td><span class="badge bg-light-warning text-warning">Probationary</span></td>
+                      <td>anna.cruz@company.com</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="EMP-0200 Paolo Garcia Attendance Clerk Cebu Branch Inactive paolo.garcia@company.com">
+                      <td>EMP-0200</td>
+                      <td>Paolo Garcia</td>
+                      <td>Operations / Attendance Clerk / Cebu Branch</td>
+                      <td><span class="badge bg-light-warning text-warning">Inactive</span></td>
+                      <td>paolo.garcia@company.com</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="EMP-0300 Liza Dela Cruz HR Officer Davao Branch Separated liza.delacruz@company.com">
+                      <td>EMP-0300</td>
+                      <td>Liza Dela Cruz</td>
+                      <td>HR / HR Officer / Davao Branch</td>
+                      <td><span class="badge bg-light-danger text-danger">Separated</span></td>
+                      <td>liza.delacruz@company.com</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+
+  <script>
+    (function () {
+      const form = document.getElementById('employeeMasterForm');
+      const saveBtn = document.getElementById('saveEmployeeBtn');
+      const alertBox = document.getElementById('employeeAlert');
+      const accessPreview = document.getElementById('accessPreview');
+      const profileStateBadge = document.getElementById('profileStateBadge');
+
+      const employeeId = document.getElementById('employeeId');
+      const corporateEmail = document.getElementById('corporateEmail');
+      const firstName = document.getElementById('firstName');
+      const middleName = document.getElementById('middleName');
+      const lastName = document.getElementById('lastName');
+      const dateHired = document.getElementById('dateHired');
+      const employmentStatus = document.getElementById('employmentStatus');
+      const accountStatus = document.getElementById('accountStatus');
+      const department = document.getElementById('department');
+      const position = document.getElementById('position');
+      const branch = document.getElementById('branch');
+      const onboardingStage = document.getElementById('onboardingStage');
+      const offboardingDate = document.getElementById('offboardingDate');
+      const offboardingReason = document.getElementById('offboardingReason');
+      const movementType = document.getElementById('movementType');
+      const movementEffectiveDate = document.getElementById('movementEffectiveDate');
+      const movementRemarks = document.getElementById('movementRemarks');
+      const sss = document.getElementById('sss');
+      const philhealth = document.getElementById('philhealth');
+      const pagibig = document.getElementById('pagibig');
+      const tin = document.getElementById('tin');
+      const bankAccount = document.getElementById('bankAccount');
+      const documentUpload = document.getElementById('documentUpload');
+      const notes = document.getElementById('notes');
+      const employeeSearch = document.getElementById('employeeSearch');
+      const employeeCount = document.getElementById('employeeCount');
+      const employeeDirectoryBody = document.getElementById('employeeDirectoryBody');
+      const employeeDirectoryRows = Array.from(employeeDirectoryBody.querySelectorAll('tr'));
+
+      const existingEmployeeIds = ['EMP-0001', 'EMP-0002', 'EMP-0100'];
+      const existingEmails = ['maria.santos@company.com', 'james.reyes@company.com'];
+
+      function setAlert(type, message) {
+        alertBox.className = `alert alert-light-${type} border-${type} mt-3 mb-0`;
+        alertBox.textContent = message;
+      }
+
+      function updateAccessPreview() {
+        if (accountStatus.value === 'Active') {
+          accessPreview.textContent = 'Active';
+          profileStateBadge.textContent = 'Active';
+          profileStateBadge.className = 'badge bg-light-primary text-primary';
+        } else if (accountStatus.value === 'Inactive') {
+          accessPreview.textContent = 'Restricted';
+          profileStateBadge.textContent = 'Inactive';
+          profileStateBadge.className = 'badge bg-light-warning text-warning';
+        } else {
+          accessPreview.textContent = 'Severed';
+          profileStateBadge.textContent = 'Separated';
+          profileStateBadge.className = 'badge bg-light-danger text-danger';
+        }
+      }
+
+      function validStatutory(value, pattern) {
+        if (!value) {
+          return true;
+        }
+        return pattern.test(value.trim());
+      }
+
+      function validateForm() {
+        const idValue = employeeId.value.trim();
+        const emailValue = corporateEmail.value.trim().toLowerCase();
+        const fullName = [firstName.value, middleName.value, lastName.value].join(' ').trim();
+
+        if (!idValue || !emailValue || !firstName.value.trim() || !lastName.value.trim() || !dateHired.value || !employmentStatus.value || !department.value.trim() || !position.value.trim() || !branch.value.trim() || !bankAccount.value.trim()) {
+          setAlert('danger', 'Please complete the required employee profile fields.');
+          return false;
+        }
+
+        if (existingEmployeeIds.includes(idValue)) {
+          setAlert('danger', 'Employee ID already exists. Please use a globally unique value.');
+          return false;
+        }
+
+        if (existingEmails.includes(emailValue)) {
+          setAlert('danger', 'Corporate Email already exists. Please use a unique email address.');
+          return false;
+        }
+
+        if (!validStatutory(sss.value, /^\d{2}-\d{7}-\d{1}$/)) {
+          setAlert('danger', 'SSS must follow a valid Philippine format such as 12-3456789-0.');
+          return false;
+        }
+
+        if (!validStatutory(philhealth.value, /^\d{2}-\d{9}-\d{1}$/)) {
+          setAlert('danger', 'PhilHealth must follow a valid Philippine format such as 12-345678901-2.');
+          return false;
+        }
+
+        if (!validStatutory(pagibig.value, /^\d{4}-\d{4}-\d{4}$/)) {
+          setAlert('danger', 'Pag-IBIG must follow a valid Philippine format such as 1234-5678-9012.');
+          return false;
+        }
+
+        if (!validStatutory(tin.value, /^\d{3}-\d{3}-\d{3}-\d{3}$/)) {
+          setAlert('danger', 'TIN must follow a formatted numeric pattern such as 123-456-789-000.');
+          return false;
+        }
+
+        setAlert('success', `${fullName} is ready to be saved as a new employee profile.`);
+        return true;
+      }
+
+      function updateEmployeeDirectoryFilter() {
+        const query = employeeSearch.value.trim().toLowerCase();
+        let visibleRows = 0;
+
+        employeeDirectoryRows.forEach((row) => {
+          const haystack = (row.dataset.search || row.textContent || '').toLowerCase();
+          const showRow = !query || haystack.includes(query);
+          row.classList.toggle('d-none', !showRow);
+          if (showRow) {
+            visibleRows += 1;
+          }
+        });
+
+        employeeCount.textContent = `${visibleRows} record${visibleRows === 1 ? '' : 's'}`;
+      }
+
+      form.addEventListener('input', function () {
+        updateAccessPreview();
+        updateEmployeeDirectoryFilter();
+      });
+
+      accountStatus.addEventListener('change', updateAccessPreview);
+      employeeSearch.addEventListener('input', updateEmployeeDirectoryFilter);
+
+      saveBtn.addEventListener('click', function () {
+        profileStateBadge.textContent = 'Draft';
+        profileStateBadge.className = 'badge bg-light-primary text-primary';
+        setAlert('primary', 'Employee profile draft saved locally.');
+      });
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        updateAccessPreview();
+
+        if (!validateForm()) {
+          return;
+        }
+
+        profileStateBadge.textContent = 'Saved';
+        profileStateBadge.className = 'badge bg-light-success text-success';
+
+        setAlert('success', `${employeeId.value.trim()} saved successfully. Historical data protection remains enforced by policy.`);
+
+        const summary = [
+          `Name: ${[firstName.value, middleName.value, lastName.value].filter(Boolean).join(' ')}`,
+          `Department: ${department.value.trim()}`,
+          `Status: ${employmentStatus.value}`,
+          `Onboarding: ${onboardingStage.value}`,
+          `Movement: ${movementType.value}${movementEffectiveDate.value ? ` (${movementEffectiveDate.value})` : ''}`
+        ];
+
+        notes.value = summary.join(' | ');
+        if (offboardingReason.value) {
+          notes.value += ` | Offboarding: ${offboardingReason.value}${offboardingDate.value ? ` (${offboardingDate.value})` : ''}`;
+        }
+      });
+
+      updateAccessPreview();
+      updateEmployeeDirectoryFilter();
+    })();
+  </script>
+
+  @@include('../layouts/footer-block.html') @@include('../layouts/footer-js.html')
+
+</body>
+<!-- [Body] end -->
+
+</html>

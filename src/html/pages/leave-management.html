@@ -1,0 +1,291 @@
+<html lang="en">
+<!-- [Head] start -->
+
+<head>
+  @@include('../layouts/head-page-meta.html', {'title': 'Leave Management'}) @@include('../layouts/head-css.html')
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body @@bodySetup>
+  @@include('../layouts/layout-vertical.html')
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      @@include('../layouts/breadcrumb.html', {'breadcrumb-item': 'HR Modules', 'breadcrumb-item-active': 'Leave Management'})
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Leave Request Form</h5>
+              <span class="badge bg-light-primary text-primary" id="leaveStatusBadge">Draft</span>
+            </div>
+            <div class="card-body">
+              <form id="leaveRequestForm" novalidate>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="employee">Employee</label>
+                    <select class="form-select" id="employee" required>
+                      <option value="">Select employee</option>
+                      <option>Maria Santos</option>
+                      <option>James Reyes</option>
+                      <option>Anna Cruz</option>
+                      <option>Paolo Garcia</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="leaveType">Leave type</label>
+                    <select class="form-select" id="leaveType" required>
+                      <option value="">Select leave type</option>
+                      <option value="vacation" data-credit="1">Vacation Leave</option>
+                      <option value="sick" data-credit="1">Sick Leave</option>
+                      <option value="emergency" data-credit="1">Emergency Leave</option>
+                      <option value="maternity" data-credit="0">Maternity Leave</option>
+                      <option value="paternity" data-credit="0">Paternity Leave</option>
+                      <option value="unpaid" data-credit="0">Leave Without Pay</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="startDate">Start date</label>
+                    <input type="date" class="form-control" id="startDate" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="endDate">End date</label>
+                    <input type="date" class="form-control" id="endDate" required>
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label" for="leaveMode">Leave mode</label>
+                    <div class="d-flex flex-wrap gap-3">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="leaveMode" id="fullDay" value="full" checked>
+                        <label class="form-check-label" for="fullDay">Full day</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="leaveMode" id="halfDayAm" value="half-am">
+                        <label class="form-check-label" for="halfDayAm">Half-day AM</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="leaveMode" id="halfDayPm" value="half-pm">
+                        <label class="form-check-label" for="halfDayPm">Half-day PM</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label" for="reason">Reason</label>
+                    <textarea class="form-control" id="reason" rows="4" placeholder="Explain the reason for the leave..." required></textarea>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="attachment">Attachment</label>
+                    <input class="form-control" type="file" id="attachment" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx">
+                    <small class="text-muted">Required for some leave types like sick leave after policy threshold.</small>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="creditsUsed">Leave credits used</label>
+                    <input type="text" class="form-control" id="creditsUsed" value="0.0" readonly>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="status">Status</label>
+                    <select class="form-select" id="status">
+                      <option>Draft</option>
+                      <option>Pending</option>
+                      <option>For HR Review</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <button type="button" class="btn btn-outline-primary" id="saveDraftBtn">Save Draft</button>
+                  <button type="submit" class="btn btn-primary">Submit Leave Request</button>
+                </div>
+
+                <div class="alert alert-light-primary border-primary mt-3 mb-0" id="policyAlert" role="alert">
+                  Fill out the form to see balance checks, leave-day calculation, and policy warnings here.
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+
+  <script>
+    (function () {
+      const form = document.getElementById('leaveRequestForm');
+      const employee = document.getElementById('employee');
+      const leaveType = document.getElementById('leaveType');
+      const startDate = document.getElementById('startDate');
+      const endDate = document.getElementById('endDate');
+      const reason = document.getElementById('reason');
+      const attachment = document.getElementById('attachment');
+      const creditsUsed = document.getElementById('creditsUsed');
+      const status = document.getElementById('status');
+      const leaveStatusBadge = document.getElementById('leaveStatusBadge');
+      const policyAlert = document.getElementById('policyAlert');
+      const saveDraftBtn = document.getElementById('saveDraftBtn');
+      const availableCreditsDisplay = document.getElementById('availableCreditsDisplay');
+      const payrollImpactDisplay = document.getElementById('payrollImpactDisplay');
+      const leaveModeInputs = Array.from(document.querySelectorAll('input[name="leaveMode"]'));
+
+      let availableCredits = 18;
+
+      const holidaySet = new Set([
+        '2026-07-04',
+        '2026-12-25',
+        '2026-01-01'
+      ]);
+
+      function getLeaveModeFactor() {
+        const selected = leaveModeInputs.find((input) => input.checked);
+        return selected && selected.value.startsWith('half') ? 0.5 : 1;
+      }
+
+      function isWeekend(date) {
+        const day = date.getDay();
+        return day === 0 || day === 6;
+      }
+
+      function isHoliday(date) {
+        return holidaySet.has(date.toISOString().slice(0, 10));
+      }
+
+      function countLeaveDays() {
+        if (!startDate.value || !endDate.value) {
+          return 0;
+        }
+
+        const start = new Date(startDate.value + 'T00:00:00');
+        const end = new Date(endDate.value + 'T00:00:00');
+
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
+          return 0;
+        }
+
+        let total = 0;
+        const cursor = new Date(start);
+        while (cursor <= end) {
+          if (!isWeekend(cursor) && !isHoliday(cursor)) {
+            total += 1;
+          }
+          cursor.setDate(cursor.getDate() + 1);
+        }
+
+        return total * getLeaveModeFactor();
+      }
+
+      function updateStatusBadge() {
+        const value = status.value;
+        leaveStatusBadge.textContent = value;
+
+        leaveStatusBadge.className = 'badge';
+        if (value === 'Pending') {
+          leaveStatusBadge.classList.add('bg-light-warning', 'text-warning');
+        } else if (value === 'For HR Review') {
+          leaveStatusBadge.classList.add('bg-light-danger', 'text-danger');
+        } else {
+          leaveStatusBadge.classList.add('bg-light-primary', 'text-primary');
+        }
+      }
+
+      function updateCalculator() {
+        const days = countLeaveDays();
+        const leaveTypeOption = leaveType.options[leaveType.selectedIndex];
+        const leaveTypeRequiresCredits = leaveTypeOption && leaveTypeOption.dataset.credit === '1';
+        const credits = leaveTypeRequiresCredits ? days : 0;
+        const payrollImpact = leaveType.value === 'unpaid' ? days : 0;
+        const balanceAfter = availableCredits - credits;
+        const hasInvalidRange = startDate.value && endDate.value && new Date(endDate.value) < new Date(startDate.value);
+
+        creditsUsed.value = credits.toFixed(1);
+        if (payrollImpactDisplay) payrollImpactDisplay.textContent = payrollImpact.toFixed(1);
+        if (availableCreditsDisplay) availableCreditsDisplay.textContent = availableCredits.toFixed(1);
+        updateStatusBadge();
+
+        if (hasInvalidRange) {
+          policyAlert.className = 'alert alert-light-danger border-danger mb-0';
+          policyAlert.textContent = 'End date cannot be earlier than the start date.';
+          return;
+        }
+
+        if (!startDate.value || !endDate.value || !leaveType.value) {
+          policyAlert.className = 'alert alert-light-primary border-primary mb-0';
+          policyAlert.textContent = 'Fill out the form to see balance checks, leave-day calculation, and policy warnings here.';
+          return;
+        }
+
+        if (leaveType.value === 'sick' && !attachment.value) {
+          policyAlert.className = 'alert alert-light-warning border-warning mb-0';
+          policyAlert.textContent = 'Sick leave may need an attachment depending on company policy.';
+          return;
+        }
+
+        if (credits > availableCredits && leaveTypeRequiresCredits) {
+          policyAlert.className = 'alert alert-light-danger border-danger mb-0';
+          policyAlert.textContent = 'Not enough leave credits for this request. HR or policy override would be required.';
+          return;
+        }
+
+        if (isHoliday(new Date(startDate.value + 'T00:00:00')) || isHoliday(new Date(endDate.value + 'T00:00:00'))) {
+          policyAlert.className = 'alert alert-light-info border-info mb-0';
+          policyAlert.textContent = 'The selected range touches a holiday. The system should verify whether the holiday is chargeable.';
+          return;
+        }
+
+        policyAlert.className = 'alert alert-light-success border-success mb-0';
+        policyAlert.textContent = `Leave looks valid. Estimated credits used: ${credits.toFixed(1)}. Balance after request: ${Math.max(balanceAfter, 0).toFixed(1)}.`;
+      }
+
+      function handleSaveDraft() {
+        status.value = 'Draft';
+        updateCalculator();
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        updateCalculator();
+
+        if (!employee.value || !leaveType.value || !startDate.value || !endDate.value || !reason.value.trim()) {
+          policyAlert.className = 'alert alert-light-danger border-danger mb-0';
+          policyAlert.textContent = 'Please complete the required fields before submitting.';
+          return;
+        }
+
+        const leaveTypeOption = leaveType.options[leaveType.selectedIndex];
+        const leaveTypeRequiresCredits = leaveTypeOption && leaveTypeOption.dataset.credit === '1';
+
+        status.value = 'Pending';
+        updateStatusBadge();
+        policyAlert.className = 'alert alert-light-success border-success mb-0';
+        policyAlert.textContent = `${employee.value} leave request is ready for supervisor approval.`;
+
+        if (leaveTypeRequiresCredits) {
+          availableCredits = Math.max(0, availableCredits - countLeaveDays());
+        }
+
+        updateCalculator();
+      });
+
+      [employee, leaveType, startDate, endDate, reason, attachment, status].forEach(function (input) {
+        input.addEventListener('input', updateCalculator);
+        input.addEventListener('change', updateCalculator);
+      });
+
+      leaveModeInputs.forEach(function (input) {
+        input.addEventListener('change', updateCalculator);
+      });
+
+      saveDraftBtn.addEventListener('click', handleSaveDraft);
+
+      updateCalculator();
+    })();
+  </script>
+
+  @@include('../layouts/footer-block.html') @@include('../layouts/footer-js.html')
+
+</body>
+<!-- [Body] end -->
+
+</html>

@@ -1,0 +1,447 @@
+<html lang="en">
+<!-- [Head] start -->
+
+<head>
+  @@include('../layouts/head-page-meta.html', {'title': 'Reports'}) @@include('../layouts/head-css.html')
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body @@bodySetup>
+  @@include('../layouts/layout-vertical.html')
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      @@include('../layouts/breadcrumb.html', {'breadcrumb-item': 'HR Modules', 'breadcrumb-item-active': 'Reports'})
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Report Builder</h5>
+              <span class="badge bg-light-primary text-primary" id="reportStatusBadge">Draft</span>
+            </div>
+            <div class="card-body">
+              <form id="reportForm" novalidate>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="reportId">Report Identifier</label>
+                    <input type="text" class="form-control" id="reportId" placeholder="RPT-2026-001" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="reportType">Report Type</label>
+                    <select class="form-select" id="reportType" required>
+                      <option value="attendance">Attendance Report</option>
+                      <option value="lateUndertime">Late/Undertime Report</option>
+                      <option value="employee">Employee Masterlist</option>
+                      <option value="leave">Leave Report</option>
+                      <option value="payroll">Payroll Report</option>
+                      <option value="government">Government Contribution Report</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="operatorId">Authorized Operator ID</label>
+                    <input type="text" class="form-control" id="operatorId" placeholder="HR-ADMIN-01" required>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="dateFrom">Date Range Start</label>
+                    <input type="date" class="form-control" id="dateFrom">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="dateTo">Date Range End</label>
+                    <input type="date" class="form-control" id="dateTo">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="department">Department</label>
+                    <input type="text" class="form-control" id="department" placeholder="Optional">
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="branch">Branch</label>
+                    <input type="text" class="form-control" id="branch" placeholder="Optional">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="exportTarget">Export Target</label>
+                    <select class="form-select" id="exportTarget" required>
+                      <option value="xlsx">Excel (.xlsx)</option>
+                      <option value="csv">CSV (.csv)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="previewMode">Preview Mode</label>
+                    <select class="form-select" id="previewMode">
+                      <option value="standard">Standard</option>
+                      <option value="compact">Compact</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <button type="button" class="btn btn-outline-primary" id="previewBtn">Refresh Preview</button>
+                  <button type="button" class="btn btn-outline-success" id="exportBtn">Export Report</button>
+                  <button type="button" class="btn btn-outline-secondary" id="loadExampleBtn">Load Example Scope</button>
+                  <button type="submit" class="btn btn-primary">Generate Report</button>
+                </div>
+
+                <div class="alert alert-light-primary border-primary mt-3 mb-0" id="reportAlert" role="alert">
+                  Select a report type, apply filters, and generate a preview before exporting.
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="card mt-3">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Preview Grid</h5>
+              <span class="text-muted small" id="previewHint">Dynamic columns based on report selection</span>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle mb-0">
+                  <thead id="previewHead"></thead>
+                  <tbody id="previewBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+
+  <script src="../assets/js/plugins/jszip.min.js"></script>
+  <script>
+    (function () {
+      const reportDefinitions = {
+        attendance: {
+          label: 'Attendance Report',
+          columns: ['Date', 'Employee', 'Late', 'Undertime', 'Overtime', 'Night Diff', 'Department'],
+          rows: [
+            ['2026-06-01', 'Ana Lopez', '15', '0', '2', '120', 'HR'],
+            ['2026-06-01', 'Jose Munoz', '0', '30', '0', '0', 'Operations'],
+            ['2026-06-02', 'Maria Santos', '5', '10', '1', '45', 'Finance'],
+            ['2026-06-02', 'James Reyes', '0', '0', '3', '0', 'IT']
+          ]
+        },
+        lateUndertime: {
+          label: 'Late/Undertime Report',
+          columns: ['Date', 'Employee', 'Late', 'Undertime', 'Department', 'Branch'],
+          rows: [
+            ['2026-06-01', 'Ana Lopez', '15', '0', 'HR', 'Manila'],
+            ['2026-06-01', 'Jose Munoz', '0', '30', 'Operations', 'Cebu'],
+            ['2026-06-02', 'Maria Santos', '5', '10', 'Finance', 'Manila'],
+            ['2026-06-02', 'James Reyes', '0', '0', 'IT', 'Davao']
+          ]
+        },
+        employee: {
+          label: 'Employee Masterlist',
+          columns: ['Employee ID', 'Employee Name', 'Department', 'Branch', 'Status', 'Corporate Email'],
+          rows: [
+            ['EMP-0001', 'Maria Santos', 'Finance', 'Manila', 'Active', 'maria.santos@company.com'],
+            ['EMP-0002', 'Jose Munoz', 'Operations', 'Cebu', 'Active', 'jose.munoz@company.com'],
+            ['EMP-0100', 'Anna Cruz', 'HR', 'Davao', 'Inactive', 'anna.cruz@company.com']
+          ]
+        },
+        payroll: {
+          label: 'Payroll Report',
+          columns: ['Payroll Run', 'Employee', 'Gross Pay', 'Deductions', 'Net Pay', 'Payslip Status'],
+          rows: [
+            ['PR-2026-001', 'Maria Santos', '45000.00', '7200.00', '37800.00', 'Published'],
+            ['PR-2026-001', 'Jose Munoz', '38000.00', '5100.00', '32900.00', 'Published'],
+            ['PR-2026-001', 'Anna Cruz', '30000.00', '4300.00', '25700.00', 'Draft']
+          ]
+        },
+        leave: {
+          label: 'Leave Report',
+          columns: ['Employee', 'Leave Type', 'Start Date', 'End Date', 'Status', 'Credits Used'],
+          rows: [
+            ['Maria Santos', 'Vacation', '2026-06-10', '2026-06-12', 'Approved', '3.0'],
+            ['Jose Munoz', 'Sick', '2026-06-15', '2026-06-16', 'Pending', '2.0'],
+            ['Anna Cruz', 'LWOP', '2026-06-20', '2026-06-20', 'Approved', '0.0']
+          ]
+        },
+        government: {
+          label: 'Government Contribution Report',
+          columns: ['Employee', 'SSS', 'PhilHealth', 'Pag-IBIG', 'Withholding Tax', 'Payroll Period'],
+          rows: [
+            ['Maria Santos', '540.00', '450.00', '200.00', '1,200.00', '2026-06'],
+            ['Jose Munoz', '490.00', '425.00', '200.00', '950.00', '2026-06'],
+            ['Anna Cruz', '360.00', '400.00', '200.00', '650.00', '2026-06']
+          ]
+        }
+      };
+
+      const form = document.getElementById('reportForm');
+      const previewBtn = document.getElementById('previewBtn');
+      const exportBtn = document.getElementById('exportBtn');
+      const loadExampleBtn = document.getElementById('loadExampleBtn');
+      const reportAlert = document.getElementById('reportAlert');
+      const reportStatusBadge = document.getElementById('reportStatusBadge');
+      const reportType = document.getElementById('reportType');
+      const reportId = document.getElementById('reportId');
+      const operatorId = document.getElementById('operatorId');
+      const dateFrom = document.getElementById('dateFrom');
+      const dateTo = document.getElementById('dateTo');
+      const department = document.getElementById('department');
+      const branch = document.getElementById('branch');
+      const exportTarget = document.getElementById('exportTarget');
+      const previewMode = document.getElementById('previewMode');
+      const reportTypeDisplay = document.getElementById('reportTypeDisplay');
+      const rowCountDisplay = document.getElementById('rowCountDisplay');
+      const filterScopeDisplay = document.getElementById('filterScopeDisplay');
+      const generatedDisplay = document.getElementById('generatedDisplay');
+      const previewHead = document.getElementById('previewHead');
+      const previewBody = document.getElementById('previewBody');
+
+      function setAlert(type, message) {
+        reportAlert.className = `alert alert-light-${type} border-${type} mt-3 mb-0`;
+        reportAlert.textContent = message;
+      }
+
+      function updateBadge(status, type) {
+        reportStatusBadge.textContent = status;
+        reportStatusBadge.className = 'badge';
+        reportStatusBadge.classList.add(`bg-light-${type}`, `text-${type}`);
+      }
+
+      function escapeXml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&apos;');
+      }
+
+      function getSelectedDefinition() {
+        return reportDefinitions[reportType.value];
+      }
+
+      function matchesFilter(row, definition) {
+        const scopeDepartment = department.value.trim().toLowerCase();
+        const scopeBranch = branch.value.trim().toLowerCase();
+        const from = dateFrom.value ? new Date(dateFrom.value) : null;
+        const to = dateTo.value ? new Date(dateTo.value) : null;
+
+        if (definition === reportDefinitions.attendance) {
+          const rowDate = new Date(row[0]);
+          const rowDepartment = row[6].toLowerCase();
+          if (from && rowDate < from) return false;
+          if (to && rowDate > to) return false;
+          if (scopeDepartment && rowDepartment.indexOf(scopeDepartment) === -1) return false;
+          return true;
+        }
+
+        if (definition === reportDefinitions.employee) {
+          const rowDepartment = row[2].toLowerCase();
+          const rowBranch = row[3].toLowerCase();
+          if (scopeDepartment && rowDepartment.indexOf(scopeDepartment) === -1) return false;
+          if (scopeBranch && rowBranch.indexOf(scopeBranch) === -1) return false;
+          return true;
+        }
+
+        if (definition === reportDefinitions.lateUndertime) {
+          const rowDate = new Date(row[0]);
+          const rowDepartment = row[4].toLowerCase();
+          const rowBranch = row[5].toLowerCase();
+          if (from && rowDate < from) return false;
+          if (to && rowDate > to) return false;
+          if (scopeDepartment && rowDepartment.indexOf(scopeDepartment) === -1) return false;
+          if (scopeBranch && rowBranch.indexOf(scopeBranch) === -1) return false;
+          return true;
+        }
+
+        if (definition === reportDefinitions.payroll) {
+          const rowDate = new Date('2026-06-01');
+          if (from && rowDate < from) return false;
+          if (to && rowDate > to) return false;
+          return true;
+        }
+
+        if (definition === reportDefinitions.leave) {
+          const rowDate = new Date(row[2]);
+          if (from && rowDate < from) return false;
+          if (to && rowDate > to) return false;
+          return true;
+        }
+
+        if (definition === reportDefinitions.government) {
+          const rowPayrollPeriod = row[5];
+          if (scopeDepartment || scopeBranch) {
+            return true;
+          }
+          if (from || to) {
+            const periodDate = new Date(`${rowPayrollPeriod}-01`);
+            if (from && periodDate < from) return false;
+            if (to && periodDate > to) return false;
+          }
+          return true;
+        }
+
+        return true;
+      }
+
+      function buildPreview() {
+        const definition = getSelectedDefinition();
+        const filteredRows = definition.rows.filter((row) => matchesFilter(row, definition));
+        const compact = previewMode.value === 'compact';
+
+        if (reportTypeDisplay) reportTypeDisplay.textContent = definition.label;
+        if (rowCountDisplay) rowCountDisplay.textContent = filteredRows.length.toString();
+        if (filterScopeDisplay) filterScopeDisplay.textContent = [department.value.trim(), branch.value.trim()].filter(Boolean).join(' / ') || 'All Records';
+        if (generatedDisplay) generatedDisplay.textContent = new Date().toLocaleString();
+
+        previewHead.innerHTML = `<tr>${definition.columns.map((column) => `<th>${escapeXml(column)}</th>`).join('')}</tr>`;
+        previewBody.innerHTML = filteredRows.map((row) => `<tr>${row.map((cell) => `<td>${escapeXml(cell)}</td>`).join('')}</tr>`).join('');
+
+        if (compact) {
+          previewHead.classList.add('table-light');
+        } else {
+          previewHead.classList.remove('table-light');
+        }
+
+        setAlert('success', `${definition.label} preview generated with ${filteredRows.length} row(s).`);
+        updateBadge('Generated', 'success');
+        return { definition, rows: filteredRows };
+      }
+
+      function downloadBlob(blob, fileName) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function exportCsv(definition, rows) {
+        const lines = [definition.columns.join(',')].concat(rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')));
+        const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        downloadBlob(blob, `${reportType.value}-report.csv`);
+      }
+
+      function createXlsxPackage(definition, rows) {
+        const zip = new JSZip();
+        const sheetRows = [
+          `<row r="1">${definition.columns.map((column, index) => `<c r="${String.fromCharCode(65 + index)}1" t="inlineStr"><is><t>${escapeXml(column)}</t></is></c>`).join('')}</row>`
+        ].concat(rows.map((row, rowIndex) => {
+          const rowNumber = rowIndex + 2;
+          return `<row r="${rowNumber}">${row.map((cell, cellIndex) => {
+            const cellRef = `${String.fromCharCode(65 + cellIndex)}${rowNumber}`;
+            return `<c r="${cellRef}" t="inlineStr"><is><t>${escapeXml(cell)}</t></is></c>`;
+          }).join('')}</row>`;
+        }));
+
+        const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="${escapeXml(definition.label)}" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>`;
+        const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+        const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`;
+        const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+        const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>
+  <fills count="1"><fill><patternFill patternType="none"/></fill></fills>
+  <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>
+</styleSheet>`;
+        const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>
+    ${sheetRows.join('')}
+  </sheetData>
+</worksheet>`;
+
+        zip.file('[Content_Types].xml', contentTypesXml);
+        zip.folder('_rels').file('.rels', rootRelsXml);
+        zip.folder('xl').file('workbook.xml', workbookXml);
+        zip.folder('xl').folder('_rels').file('workbook.xml.rels', relsXml);
+        zip.folder('xl').file('styles.xml', stylesXml);
+        zip.folder('xl').folder('worksheets').file('sheet1.xml', sheetXml);
+
+        return zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      }
+
+      function exportXlsx(definition, rows) {
+        createXlsxPackage(definition, rows).then((blob) => {
+          downloadBlob(blob, `${reportType.value}-report.xlsx`);
+        });
+      }
+
+      function exportCurrent() {
+        const { definition, rows } = buildPreview();
+        if (exportTarget.value === 'csv') {
+          exportCsv(definition, rows);
+          setAlert('success', `${definition.label} exported as CSV.`);
+          return;
+        }
+
+        exportXlsx(definition, rows);
+        setAlert('success', `${definition.label} export started as XLSX.`);
+      }
+
+      previewBtn.addEventListener('click', buildPreview);
+      exportBtn.addEventListener('click', exportCurrent);
+      loadExampleBtn.addEventListener('click', function () {
+        dateFrom.value = '2026-06-01';
+        dateTo.value = '2026-06-30';
+        department.value = 'HR';
+        branch.value = 'Manila';
+        reportType.value = 'attendance';
+        buildPreview();
+        setAlert('info', 'Example scope loaded for a scoped preview.');
+      });
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (!reportId.value.trim() || !operatorId.value.trim()) {
+          setAlert('danger', 'Report Identifier and Authorized Operator ID are required.');
+          updateBadge('Draft', 'primary');
+          return;
+        }
+
+        const result = buildPreview();
+        updateBadge('Generated', 'success');
+        setAlert('success', `${reportId.value.trim()} generated by ${operatorId.value.trim()} with ${result.rows.length} visible row(s).`);
+      });
+
+      reportType.addEventListener('change', buildPreview);
+      [dateFrom, dateTo, department, branch, previewMode].forEach(function (input) {
+        input.addEventListener('change', buildPreview);
+        input.addEventListener('input', buildPreview);
+      });
+
+      buildPreview();
+    })();
+  </script>
+
+  @@include('../layouts/footer-block.html') @@include('../layouts/footer-js.html')
+
+</body>
+<!-- [Body] end -->
+
+</html>

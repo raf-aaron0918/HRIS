@@ -1,0 +1,686 @@
+<html lang="en">
+<!-- [Head] start -->
+
+<head>
+  <title>HRIS</title>
+  <!-- [Meta] -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="HRIS is made using Bootstrap 5 design framework. Download the free admin template & use it for your project.">
+  <meta name="keywords" content="HRIS, Dashboard UI Kit, Bootstrap 5, Admin Template, Admin Dashboard, CRM, CMS, Bootstrap Admin Template">
+  <meta name="author" content="CodedThemes">
+
+  <!-- [Favicon] icon -->
+  <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon">
+ <!-- [Google Font] Family -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
+<!-- [Tabler Icons] https://tablericons.com -->
+<link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" >
+<!-- [Feather Icons] https://feathericons.com -->
+<link rel="stylesheet" href="../assets/fonts/feather.css" >
+<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
+<link rel="stylesheet" href="../assets/fonts/fontawesome.css" >
+<!-- [Material Icons] https://fonts.google.com/icons -->
+<link rel="stylesheet" href="../assets/fonts/material.css" >
+<!-- [Template CSS Files] -->
+<link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" >
+<link rel="stylesheet" href="../assets/css/style-preset.css" >
+
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
+  <!-- [ Pre-loader ] start -->
+<div class="loader-bg">
+  <div class="loader-track">
+    <div class="loader-fill"></div>
+  </div>
+</div>
+<!-- [ Pre-loader ] End -->
+ <!-- [ Sidebar Menu ] start -->
+<nav class="pc-sidebar">
+  <div class="navbar-wrapper">
+    <div class="m-header text-center py-3">
+      <a href="../dashboard/index.html" class="b-brand text-primary d-block w-100 text-center py-2">
+        <span class="fw-bold fs-3 d-block">HRIS</span>
+      </a>
+    </div>
+    <div class="navbar-content">
+      <ul class="pc-navbar">
+        <li class="pc-item">
+          <a href="../dashboard/index.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+            <span class="pc-mtext">Dashboard</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Core Modules</label>
+          <i class="ti ti-layout-grid"></i>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/employee-master.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-users"></i></span>
+            <span class="pc-mtext">Employee Master</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/attendance.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-clock"></i></span>
+            <span class="pc-mtext">Time & Attendance</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/leave-management.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-calendar-event"></i></span>
+            <span class="pc-mtext">Leave Management</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/payroll.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-receipt-2"></i></span>
+            <span class="pc-mtext">Payroll</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/reports.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-chart-bar"></i></span>
+            <span class="pc-mtext">Reports</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Pages</label>
+          <i class="ti ti-news"></i>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/login.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-lock"></i></span>
+            <span class="pc-mtext">Login</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/register.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-user-plus"></i></span>
+            <span class="pc-mtext">Register</span>
+          </a>
+        </li>
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+<!-- [ Sidebar Menu ] end -->
+ <!-- [ Header Topbar ] start -->
+<header class="pc-header">
+  <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
+<div class="me-auto pc-mob-drp">
+  <ul class="list-unstyled">
+    <!-- ======= Menu collapse Icon ===== -->
+    <li class="pc-h-item pc-sidebar-collapse">
+      <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
+        <i class="ti ti-menu-2"></i>
+      </a>
+    </li>
+    <li class="pc-h-item pc-sidebar-popup">
+      <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
+        <i class="ti ti-menu-2"></i>
+      </a>
+    </li>
+    <li class="dropdown pc-h-item d-inline-flex d-md-none">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none m-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        aria-expanded="false"
+      >
+        <i class="ti ti-search"></i>
+      </a>
+      <div class="dropdown-menu pc-h-dropdown drp-search">
+        <form class="px-3">
+          <div class="form-group mb-0 d-flex align-items-center">
+            <i data-feather="search"></i>
+            <input type="search" class="form-control border-0 shadow-none" placeholder="Search here. . .">
+          </div>
+        </form>
+      </div>
+    </li>
+    <li class="pc-h-item d-none d-md-inline-flex">
+      <form class="header-search">
+        <i data-feather="search" class="icon-search"></i>
+        <input type="search" class="form-control" placeholder="Search here. . .">
+      </form>
+    </li>
+  </ul>
+</div>
+<!-- [Mobile Media Block end] -->
+<div class="ms-auto">
+  <ul class="list-unstyled">
+    <li class="dropdown pc-h-item">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none me-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        aria-expanded="false"
+      >
+        <i class="ti ti-mail"></i>
+      </a>
+      <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
+        <div class="dropdown-header d-flex align-items-center justify-content-between">
+          <h5 class="m-0">Message</h5>
+          <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-x text-danger"></i></a>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-header px-0 text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
+          <div class="list-group list-group-flush w-100">
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">3:00 AM</span>
+                  <p class="text-body mb-1">It's <b>Cristina danny's</b> birthday today.</p>
+                  <span class="text-muted">2 min ago</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">6:00 PM</span>
+                  <p class="text-body mb-1"><b>Aida Burg</b> commented your post.</p>
+                  <span class="text-muted">5 August</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">2:45 PM</span>
+                  <p class="text-body mb-1"><b>There was a failure to your setup.</b></p>
+                  <span class="text-muted">7 hours ago</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-4.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">9:10 PM</span>
+                  <p class="text-body mb-1"><b>Cristina Danny </b> invited to join <b> Meeting.</b></p>
+                  <span class="text-muted">Daily scrum meeting time</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="text-center py-2">
+          <a href="#!" class="link-primary">View all</a>
+        </div>
+      </div>
+    </li>
+    <li class="dropdown pc-h-item header-user-profile">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none me-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+      >
+        <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+        <span>Rafael Aaron</span>
+      </a>
+      <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+        <div class="dropdown-header">
+          <div class="d-flex mb-1">
+            <div class="flex-shrink-0">
+              <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="mb-1">Rafael Aaron</h6>
+              <span>UI/UX Designer</span>
+            </div>
+            <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
+          </div>
+        </div>
+        <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="drp-t1"
+              data-bs-toggle="tab"
+              data-bs-target="#drp-tab-1"
+              type="button"
+              role="tab"
+              aria-controls="drp-tab-1"
+              aria-selected="true"
+              ><i class="ti ti-user"></i> Profile</button
+            >
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="drp-t2"
+              data-bs-toggle="tab"
+              data-bs-target="#drp-tab-2"
+              type="button"
+              role="tab"
+              aria-controls="drp-tab-2"
+              aria-selected="false"
+              ><i class="ti ti-settings"></i> Setting</button
+            >
+          </li>
+        </ul>
+        <div class="tab-content" id="mysrpTabContent">
+          <div class="tab-pane fade show active" id="drp-tab-1" role="tabpanel" aria-labelledby="drp-t1" tabindex="0">
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-edit-circle"></i>
+              <span>Edit Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-user"></i>
+              <span>View Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-clipboard-list"></i>
+              <span>Social Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-wallet"></i>
+              <span>Billing</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-power"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+          <div class="tab-pane fade" id="drp-tab-2" role="tabpanel" aria-labelledby="drp-t2" tabindex="0">
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-help"></i>
+              <span>Support</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-user"></i>
+              <span>Account Settings</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-lock"></i>
+              <span>Privacy Center</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-messages"></i>
+              <span>Feedback</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-list"></i>
+              <span>History</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+ </div>
+</header>
+<!-- [ Header ] end -->
+
+
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      <!-- [ breadcrumb ] start -->
+      <div class="page-header">
+        <div class="page-block">
+          <div class="row align-items-center">
+            <div class="col-md-12">
+              <div class="page-header-title">
+                <h5 class="m-b-10">Payroll</h5>
+              </div>
+              <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../dashboard/index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="javascript: void(0)">HR Modules</a></li>
+                <li class="breadcrumb-item" aria-current="page">Payroll</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- [ breadcrumb ] end -->
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Payroll Run</h5>
+              <span class="badge bg-light-primary text-primary" id="runBadge">Draft</span>
+            </div>
+            <div class="card-body">
+              <form id="payrollForm" novalidate>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="payrollRunId">Payroll Run ID</label>
+                    <input type="text" class="form-control" id="payrollRunId" placeholder="PR-2026-001" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="cutoffStart">Cutoff Start</label>
+                    <input type="date" class="form-control" id="cutoffStart" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="cutoffEnd">Cutoff End</label>
+                    <input type="date" class="form-control" id="cutoffEnd" required>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="employeeId">Employee ID</label>
+                    <input type="text" class="form-control" id="employeeId" placeholder="EMP-0001" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="payslipStatus">Payslip Status</label>
+                    <select class="form-select" id="payslipStatus" required>
+                      <option>Draft</option>
+                      <option>Published</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="payrollMode">Payroll Mode</label>
+                    <select class="form-select" id="payrollMode">
+                      <option value="regular">Regular</option>
+                      <option value="final">Final Pay</option>
+                      <option value="retro">Retro Adjustment</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="basePay">Base Pay</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="basePay" value="0">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="dailyRate">Daily Rate</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="dailyRate" value="0">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="hourlyRate">Hourly Rate</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="hourlyRate" value="0">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="otPay">OT Pay</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="otPay" value="0">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="holidayPay">Holiday Pay</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="holidayPay" value="0">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="nightDiffPay">Night Differential</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="nightDiffPay" value="0">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="allowances">Allowances</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="allowances" value="0">
+                  </div>
+
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="sssDeduction">SSS</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="sssDeduction" value="0">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="philhealthDeduction">PhilHealth</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="philhealthDeduction" value="0">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="pagibigDeduction">Pag-IBIG</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="pagibigDeduction" value="0">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="taxDeduction">Tax</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="taxDeduction" value="0">
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="totalDeductions">Total Deductions</label>
+                    <input type="text" class="form-control" id="totalDeductions" readonly value="0.00">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="netPay">Net Pay</label>
+                    <input type="text" class="form-control" id="netPay" readonly value="0.00">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="releaseAmount">Release Amount</label>
+                    <input type="text" class="form-control" id="releaseAmount" readonly value="0.00">
+                  </div>
+
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label" for="remarks">Remarks</label>
+                    <textarea class="form-control" id="remarks" rows="3" placeholder="Use this for retro adjustments, final pay notes, or payroll comments."></textarea>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <button type="button" class="btn btn-outline-primary" id="saveDraftBtn">Save Draft</button>
+                  <button type="button" class="btn btn-outline-success" id="applySampleRatesBtn">Apply Sample Rates</button>
+                  <button type="submit" class="btn btn-primary">Finalize Payroll Batch</button>
+                </div>
+
+                <div class="alert alert-light-primary border-primary mt-3 mb-0" id="payrollAlert" role="alert">
+                  Enter the payroll components to calculate gross earnings, deductions, and net pay.
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+
+  <script>
+    (function () {
+      const form = document.getElementById('payrollForm');
+      const saveDraftBtn = document.getElementById('saveDraftBtn');
+      const applySampleRatesBtn = document.getElementById('applySampleRatesBtn');
+      const payrollAlert = document.getElementById('payrollAlert');
+      const runBadge = document.getElementById('runBadge');
+      const payslipStatusDisplay = document.getElementById('payslipStatusDisplay');
+
+      const payrollRunId = document.getElementById('payrollRunId');
+      const cutoffStart = document.getElementById('cutoffStart');
+      const cutoffEnd = document.getElementById('cutoffEnd');
+      const employeeId = document.getElementById('employeeId');
+      const payslipStatus = document.getElementById('payslipStatus');
+      const payrollMode = document.getElementById('payrollMode');
+      const basePay = document.getElementById('basePay');
+      const dailyRate = document.getElementById('dailyRate');
+      const hourlyRate = document.getElementById('hourlyRate');
+      const otPay = document.getElementById('otPay');
+      const holidayPay = document.getElementById('holidayPay');
+      const nightDiffPay = document.getElementById('nightDiffPay');
+      const allowances = document.getElementById('allowances');
+      const sssDeduction = document.getElementById('sssDeduction');
+      const philhealthDeduction = document.getElementById('philhealthDeduction');
+      const pagibigDeduction = document.getElementById('pagibigDeduction');
+      const taxDeduction = document.getElementById('taxDeduction');
+      const totalDeductions = document.getElementById('totalDeductions');
+      const netPay = document.getElementById('netPay');
+      const releaseAmount = document.getElementById('releaseAmount');
+      const remarks = document.getElementById('remarks');
+      const grossDisplay = document.getElementById('grossDisplay');
+      const deductionsDisplay = document.getElementById('deductionsDisplay');
+      const netPayDisplay = document.getElementById('netPayDisplay');
+
+      function money(value) {
+        return Number(value || 0).toFixed(2);
+      }
+
+      function setAlert(type, message) {
+        payrollAlert.className = `alert alert-light-${type} border-${type} mt-3 mb-0`;
+        payrollAlert.textContent = message;
+      }
+
+      function updateBadge() {
+        runBadge.textContent = payslipStatus.value;
+        if (payslipStatusDisplay) payslipStatusDisplay.textContent = payslipStatus.value;
+        runBadge.className = 'badge';
+        if (payslipStatus.value === 'Published') {
+          runBadge.classList.add('bg-light-success', 'text-success');
+        } else {
+          runBadge.classList.add('bg-light-primary', 'text-primary');
+        }
+      }
+
+      function calculate() {
+        const gross = Number(basePay.value || 0)
+          + Number(otPay.value || 0)
+          + Number(holidayPay.value || 0)
+          + Number(nightDiffPay.value || 0)
+          + Number(allowances.value || 0);
+        const deductions = Number(sssDeduction.value || 0) + Number(philhealthDeduction.value || 0) + Number(pagibigDeduction.value || 0) + Number(taxDeduction.value || 0);
+        const net = gross - deductions;
+        const release = Math.max(net, 0);
+
+        if (grossDisplay) grossDisplay.textContent = money(gross);
+        if (deductionsDisplay) deductionsDisplay.textContent = money(deductions);
+        if (netPayDisplay) netPayDisplay.textContent = money(net);
+        totalDeductions.value = money(deductions);
+        netPay.value = money(net);
+        releaseAmount.value = money(release);
+        updateBadge();
+
+        if (net < 0) {
+          setAlert('danger', 'Total deductions exceed gross earnings. Net pay is negative, so the release amount is capped at zero.');
+          return;
+        }
+
+        if (net === 0 && gross > 0) {
+          setAlert('warning', 'Gross earnings are fully offset by deductions. Review the batch before publishing.');
+          return;
+        }
+
+        setAlert('success', 'Payroll batch is balanced and ready for review.');
+      }
+
+      function applySampleRates() {
+        const gross = Number(basePay.value || 0)
+          + Number(otPay.value || 0)
+          + Number(holidayPay.value || 0)
+          + Number(nightDiffPay.value || 0)
+          + Number(allowances.value || 0);
+        dailyRate.value = money(Number(basePay.value || 0) / 22);
+        hourlyRate.value = money(Number(basePay.value || 0) / 176);
+        holidayPay.value = money(gross * 0.1);
+        nightDiffPay.value = money(gross * 0.05);
+        sssDeduction.value = money(gross * 0.045);
+        philhealthDeduction.value = money(gross * 0.05);
+        pagibigDeduction.value = money(Math.min(100, gross * 0.02));
+        taxDeduction.value = money(gross * 0.1);
+        calculate();
+        setAlert('info', 'Sample statutory and tax rates applied. Adjust values to match your configured payroll tables.');
+      }
+
+      form.addEventListener('input', calculate);
+      form.addEventListener('change', calculate);
+
+      saveDraftBtn.addEventListener('click', function () {
+        payslipStatus.value = 'Draft';
+        updateBadge();
+        setAlert('primary', 'Payroll draft saved locally.');
+      });
+
+      applySampleRatesBtn.addEventListener('click', applySampleRates);
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        if (!payrollRunId.value.trim() || !cutoffStart.value || !cutoffEnd.value || !employeeId.value.trim()) {
+          setAlert('danger', 'Please complete the required payroll run, cutoff, and employee fields.');
+          return;
+        }
+
+        if (new Date(cutoffEnd.value) < new Date(cutoffStart.value)) {
+          setAlert('danger', 'Cutoff end cannot be earlier than cutoff start.');
+          return;
+        }
+
+        updateBadge();
+        payslipStatus.value = 'Published';
+        updateBadge();
+        remarks.value = `${payrollMode.value} payroll for ${employeeId.value.trim()} published from ${cutoffStart.value} to ${cutoffEnd.value}.`;
+        setAlert('success', `${payrollRunId.value.trim()} finalized. Payslip is ready for employee access.`);
+      });
+
+      updateBadge();
+      calculate();
+    })();
+  </script>
+
+  <footer class="pc-footer">
+    <div class="footer-wrapper container-fluid">
+      <div class="row">
+        <div class="col-sm my-1">
+          <p class="m-0"></p>
+        </div>
+        <div class="col-auto my-1">
+          <ul class="list-inline footer-link mb-0">
+            <li class="list-inline-item"><a href="../index.html">Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+ <!-- Required Js -->
+<script src="../assets/js/plugins/popper.min.js"></script>
+<script src="../assets/js/plugins/simplebar.min.js"></script>
+<script src="../assets/js/plugins/bootstrap.min.js"></script>
+<script src="../assets/js/fonts/custom-font.js"></script>
+<script src="../assets/js/pcoded.js"></script>
+<script src="../assets/js/plugins/feather.min.js"></script>
+
+
+
+
+
+<script>layout_change('light');</script>
+
+
+
+
+<script>change_box_container('false');</script>
+
+
+
+<script>layout_rtl_change('false');</script>
+
+
+<script>preset_change("preset-1");</script>
+
+
+<script>font_change("Public-Sans");</script>
+
+    
+
+
+</body>
+<!-- [Body] end -->
+
+</html>

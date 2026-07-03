@@ -1,0 +1,688 @@
+<html lang="en">
+<!-- [Head] start -->
+
+<head>
+  <title>HRIS</title>
+  <!-- [Meta] -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="HRIS is made using Bootstrap 5 design framework. Download the free admin template & use it for your project.">
+  <meta name="keywords" content="HRIS, Dashboard UI Kit, Bootstrap 5, Admin Template, Admin Dashboard, CRM, CMS, Bootstrap Admin Template">
+  <meta name="author" content="CodedThemes">
+
+  <!-- [Favicon] icon -->
+  <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon">
+ <!-- [Google Font] Family -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
+<!-- [Tabler Icons] https://tablericons.com -->
+<link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" >
+<!-- [Feather Icons] https://feathericons.com -->
+<link rel="stylesheet" href="../assets/fonts/feather.css" >
+<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
+<link rel="stylesheet" href="../assets/fonts/fontawesome.css" >
+<!-- [Material Icons] https://fonts.google.com/icons -->
+<link rel="stylesheet" href="../assets/fonts/material.css" >
+<!-- [Template CSS Files] -->
+<link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" >
+<link rel="stylesheet" href="../assets/css/style-preset.css" >
+
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
+  <!-- [ Pre-loader ] start -->
+<div class="loader-bg">
+  <div class="loader-track">
+    <div class="loader-fill"></div>
+  </div>
+</div>
+<!-- [ Pre-loader ] End -->
+ <!-- [ Sidebar Menu ] start -->
+<nav class="pc-sidebar">
+  <div class="navbar-wrapper">
+    <div class="m-header text-center py-3">
+      <a href="../dashboard/index.html" class="b-brand text-primary d-block w-100 text-center py-2">
+        <span class="fw-bold fs-3 d-block">HRIS</span>
+      </a>
+    </div>
+    <div class="navbar-content">
+      <ul class="pc-navbar">
+        <li class="pc-item">
+          <a href="../dashboard/index.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+            <span class="pc-mtext">Dashboard</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Core Modules</label>
+          <i class="ti ti-layout-grid"></i>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/employee-master.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-users"></i></span>
+            <span class="pc-mtext">Employee Master</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/attendance.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-clock"></i></span>
+            <span class="pc-mtext">Time & Attendance</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/leave-management.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-calendar-event"></i></span>
+            <span class="pc-mtext">Leave Management</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/payroll.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-receipt-2"></i></span>
+            <span class="pc-mtext">Payroll</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/reports.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-chart-bar"></i></span>
+            <span class="pc-mtext">Reports</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Pages</label>
+          <i class="ti ti-news"></i>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/login.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-lock"></i></span>
+            <span class="pc-mtext">Login</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../pages/register.html" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-user-plus"></i></span>
+            <span class="pc-mtext">Register</span>
+          </a>
+        </li>
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+<!-- [ Sidebar Menu ] end -->
+ <!-- [ Header Topbar ] start -->
+<header class="pc-header">
+  <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
+<div class="me-auto pc-mob-drp">
+  <ul class="list-unstyled">
+    <!-- ======= Menu collapse Icon ===== -->
+    <li class="pc-h-item pc-sidebar-collapse">
+      <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
+        <i class="ti ti-menu-2"></i>
+      </a>
+    </li>
+    <li class="pc-h-item pc-sidebar-popup">
+      <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
+        <i class="ti ti-menu-2"></i>
+      </a>
+    </li>
+    <li class="dropdown pc-h-item d-inline-flex d-md-none">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none m-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        aria-expanded="false"
+      >
+        <i class="ti ti-search"></i>
+      </a>
+      <div class="dropdown-menu pc-h-dropdown drp-search">
+        <form class="px-3">
+          <div class="form-group mb-0 d-flex align-items-center">
+            <i data-feather="search"></i>
+            <input type="search" class="form-control border-0 shadow-none" placeholder="Search here. . .">
+          </div>
+        </form>
+      </div>
+    </li>
+    <li class="pc-h-item d-none d-md-inline-flex">
+      <form class="header-search">
+        <i data-feather="search" class="icon-search"></i>
+        <input type="search" class="form-control" placeholder="Search here. . .">
+      </form>
+    </li>
+  </ul>
+</div>
+<!-- [Mobile Media Block end] -->
+<div class="ms-auto">
+  <ul class="list-unstyled">
+    <li class="dropdown pc-h-item">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none me-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        aria-expanded="false"
+      >
+        <i class="ti ti-mail"></i>
+      </a>
+      <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
+        <div class="dropdown-header d-flex align-items-center justify-content-between">
+          <h5 class="m-0">Message</h5>
+          <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-x text-danger"></i></a>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-header px-0 text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
+          <div class="list-group list-group-flush w-100">
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">3:00 AM</span>
+                  <p class="text-body mb-1">It's <b>Cristina danny's</b> birthday today.</p>
+                  <span class="text-muted">2 min ago</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">6:00 PM</span>
+                  <p class="text-body mb-1"><b>Aida Burg</b> commented your post.</p>
+                  <span class="text-muted">5 August</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">2:45 PM</span>
+                  <p class="text-body mb-1"><b>There was a failure to your setup.</b></p>
+                  <span class="text-muted">7 hours ago</span>
+                </div>
+              </div>
+            </a>
+            <a class="list-group-item list-group-item-action">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-4.jpg" alt="user-image" class="user-avtar">
+                </div>
+                <div class="flex-grow-1 ms-1">
+                  <span class="float-end text-muted">9:10 PM</span>
+                  <p class="text-body mb-1"><b>Cristina Danny </b> invited to join <b> Meeting.</b></p>
+                  <span class="text-muted">Daily scrum meeting time</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="text-center py-2">
+          <a href="#!" class="link-primary">View all</a>
+        </div>
+      </div>
+    </li>
+    <li class="dropdown pc-h-item header-user-profile">
+      <a
+        class="pc-head-link dropdown-toggle arrow-none me-0"
+        data-bs-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="false"
+        data-bs-auto-close="outside"
+        aria-expanded="false"
+      >
+        <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+        <span>Rafael Aaron</span>
+      </a>
+      <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+        <div class="dropdown-header">
+          <div class="d-flex mb-1">
+            <div class="flex-shrink-0">
+              <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="mb-1">Rafael Aaron</h6>
+              <span>UI/UX Designer</span>
+            </div>
+            <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
+          </div>
+        </div>
+        <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="drp-t1"
+              data-bs-toggle="tab"
+              data-bs-target="#drp-tab-1"
+              type="button"
+              role="tab"
+              aria-controls="drp-tab-1"
+              aria-selected="true"
+              ><i class="ti ti-user"></i> Profile</button
+            >
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="drp-t2"
+              data-bs-toggle="tab"
+              data-bs-target="#drp-tab-2"
+              type="button"
+              role="tab"
+              aria-controls="drp-tab-2"
+              aria-selected="false"
+              ><i class="ti ti-settings"></i> Setting</button
+            >
+          </li>
+        </ul>
+        <div class="tab-content" id="mysrpTabContent">
+          <div class="tab-pane fade show active" id="drp-tab-1" role="tabpanel" aria-labelledby="drp-t1" tabindex="0">
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-edit-circle"></i>
+              <span>Edit Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-user"></i>
+              <span>View Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-clipboard-list"></i>
+              <span>Social Profile</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-wallet"></i>
+              <span>Billing</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-power"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+          <div class="tab-pane fade" id="drp-tab-2" role="tabpanel" aria-labelledby="drp-t2" tabindex="0">
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-help"></i>
+              <span>Support</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-user"></i>
+              <span>Account Settings</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-lock"></i>
+              <span>Privacy Center</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-messages"></i>
+              <span>Feedback</span>
+            </a>
+            <a href="#!" class="dropdown-item">
+              <i class="ti ti-list"></i>
+              <span>History</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+ </div>
+</header>
+<!-- [ Header ] end -->
+
+
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      <!-- [ breadcrumb ] start -->
+      <div class="page-header">
+        <div class="page-block">
+          <div class="row align-items-center">
+            <div class="col-md-12">
+              <div class="page-header-title">
+                <h5 class="m-b-10">Leave Management</h5>
+              </div>
+              <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../dashboard/index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="javascript: void(0)">HR Modules</a></li>
+                <li class="breadcrumb-item" aria-current="page">Leave Management</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- [ breadcrumb ] end -->
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Leave Request Form</h5>
+              <span class="badge bg-light-primary text-primary" id="leaveStatusBadge">Draft</span>
+            </div>
+            <div class="card-body">
+              <form id="leaveRequestForm" novalidate>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="employee">Employee</label>
+                    <select class="form-select" id="employee" required>
+                      <option value="">Select employee</option>
+                      <option>Maria Santos</option>
+                      <option>James Reyes</option>
+                      <option>Anna Cruz</option>
+                      <option>Paolo Garcia</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="leaveType">Leave type</label>
+                    <select class="form-select" id="leaveType" required>
+                      <option value="">Select leave type</option>
+                      <option value="vacation" data-credit="1">Vacation Leave</option>
+                      <option value="sick" data-credit="1">Sick Leave</option>
+                      <option value="emergency" data-credit="1">Emergency Leave</option>
+                      <option value="maternity" data-credit="0">Maternity Leave</option>
+                      <option value="paternity" data-credit="0">Paternity Leave</option>
+                      <option value="unpaid" data-credit="0">Leave Without Pay</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="startDate">Start date</label>
+                    <input type="date" class="form-control" id="startDate" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="endDate">End date</label>
+                    <input type="date" class="form-control" id="endDate" required>
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label" for="leaveMode">Leave mode</label>
+                    <div class="d-flex flex-wrap gap-3">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="leaveMode" id="fullDay" value="full" checked>
+                        <label class="form-check-label" for="fullDay">Full day</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="leaveMode" id="halfDayAm" value="half-am">
+                        <label class="form-check-label" for="halfDayAm">Half-day AM</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="leaveMode" id="halfDayPm" value="half-pm">
+                        <label class="form-check-label" for="halfDayPm">Half-day PM</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label" for="reason">Reason</label>
+                    <textarea class="form-control" id="reason" rows="4" placeholder="Explain the reason for the leave..." required></textarea>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="attachment">Attachment</label>
+                    <input class="form-control" type="file" id="attachment" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx">
+                    <small class="text-muted">Required for some leave types like sick leave after policy threshold.</small>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="creditsUsed">Leave credits used</label>
+                    <input type="text" class="form-control" id="creditsUsed" value="0.0" readonly>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="status">Status</label>
+                    <select class="form-select" id="status">
+                      <option>Draft</option>
+                      <option>Pending</option>
+                      <option>For HR Review</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <button type="button" class="btn btn-outline-primary" id="saveDraftBtn">Save Draft</button>
+                  <button type="submit" class="btn btn-primary">Submit Leave Request</button>
+                </div>
+
+                <div class="alert alert-light-primary border-primary mt-3 mb-0" id="policyAlert" role="alert">
+                  Fill out the form to see balance checks, leave-day calculation, and policy warnings here.
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+
+  <script>
+    (function () {
+      const form = document.getElementById('leaveRequestForm');
+      const employee = document.getElementById('employee');
+      const leaveType = document.getElementById('leaveType');
+      const startDate = document.getElementById('startDate');
+      const endDate = document.getElementById('endDate');
+      const reason = document.getElementById('reason');
+      const attachment = document.getElementById('attachment');
+      const creditsUsed = document.getElementById('creditsUsed');
+      const status = document.getElementById('status');
+      const leaveStatusBadge = document.getElementById('leaveStatusBadge');
+      const policyAlert = document.getElementById('policyAlert');
+      const saveDraftBtn = document.getElementById('saveDraftBtn');
+      const availableCreditsDisplay = document.getElementById('availableCreditsDisplay');
+      const payrollImpactDisplay = document.getElementById('payrollImpactDisplay');
+      const leaveModeInputs = Array.from(document.querySelectorAll('input[name="leaveMode"]'));
+
+      let availableCredits = 18;
+
+      const holidaySet = new Set([
+        '2026-07-04',
+        '2026-12-25',
+        '2026-01-01'
+      ]);
+
+      function getLeaveModeFactor() {
+        const selected = leaveModeInputs.find((input) => input.checked);
+        return selected && selected.value.startsWith('half') ? 0.5 : 1;
+      }
+
+      function isWeekend(date) {
+        const day = date.getDay();
+        return day === 0 || day === 6;
+      }
+
+      function isHoliday(date) {
+        return holidaySet.has(date.toISOString().slice(0, 10));
+      }
+
+      function countLeaveDays() {
+        if (!startDate.value || !endDate.value) {
+          return 0;
+        }
+
+        const start = new Date(startDate.value + 'T00:00:00');
+        const end = new Date(endDate.value + 'T00:00:00');
+
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
+          return 0;
+        }
+
+        let total = 0;
+        const cursor = new Date(start);
+        while (cursor <= end) {
+          if (!isWeekend(cursor) && !isHoliday(cursor)) {
+            total += 1;
+          }
+          cursor.setDate(cursor.getDate() + 1);
+        }
+
+        return total * getLeaveModeFactor();
+      }
+
+      function updateStatusBadge() {
+        const value = status.value;
+        leaveStatusBadge.textContent = value;
+
+        leaveStatusBadge.className = 'badge';
+        if (value === 'Pending') {
+          leaveStatusBadge.classList.add('bg-light-warning', 'text-warning');
+        } else if (value === 'For HR Review') {
+          leaveStatusBadge.classList.add('bg-light-danger', 'text-danger');
+        } else {
+          leaveStatusBadge.classList.add('bg-light-primary', 'text-primary');
+        }
+      }
+
+      function updateCalculator() {
+        const days = countLeaveDays();
+        const leaveTypeOption = leaveType.options[leaveType.selectedIndex];
+        const leaveTypeRequiresCredits = leaveTypeOption && leaveTypeOption.dataset.credit === '1';
+        const credits = leaveTypeRequiresCredits ? days : 0;
+        const payrollImpact = leaveType.value === 'unpaid' ? days : 0;
+        const balanceAfter = availableCredits - credits;
+        const hasInvalidRange = startDate.value && endDate.value && new Date(endDate.value) < new Date(startDate.value);
+
+        creditsUsed.value = credits.toFixed(1);
+        if (payrollImpactDisplay) payrollImpactDisplay.textContent = payrollImpact.toFixed(1);
+        if (availableCreditsDisplay) availableCreditsDisplay.textContent = availableCredits.toFixed(1);
+        updateStatusBadge();
+
+        if (hasInvalidRange) {
+          policyAlert.className = 'alert alert-light-danger border-danger mb-0';
+          policyAlert.textContent = 'End date cannot be earlier than the start date.';
+          return;
+        }
+
+        if (!startDate.value || !endDate.value || !leaveType.value) {
+          policyAlert.className = 'alert alert-light-primary border-primary mb-0';
+          policyAlert.textContent = 'Fill out the form to see balance checks, leave-day calculation, and policy warnings here.';
+          return;
+        }
+
+        if (leaveType.value === 'sick' && !attachment.value) {
+          policyAlert.className = 'alert alert-light-warning border-warning mb-0';
+          policyAlert.textContent = 'Sick leave may need an attachment depending on company policy.';
+          return;
+        }
+
+        if (credits > availableCredits && leaveTypeRequiresCredits) {
+          policyAlert.className = 'alert alert-light-danger border-danger mb-0';
+          policyAlert.textContent = 'Not enough leave credits for this request. HR or policy override would be required.';
+          return;
+        }
+
+        if (isHoliday(new Date(startDate.value + 'T00:00:00')) || isHoliday(new Date(endDate.value + 'T00:00:00'))) {
+          policyAlert.className = 'alert alert-light-info border-info mb-0';
+          policyAlert.textContent = 'The selected range touches a holiday. The system should verify whether the holiday is chargeable.';
+          return;
+        }
+
+        policyAlert.className = 'alert alert-light-success border-success mb-0';
+        policyAlert.textContent = `Leave looks valid. Estimated credits used: ${credits.toFixed(1)}. Balance after request: ${Math.max(balanceAfter, 0).toFixed(1)}.`;
+      }
+
+      function handleSaveDraft() {
+        status.value = 'Draft';
+        updateCalculator();
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        updateCalculator();
+
+        if (!employee.value || !leaveType.value || !startDate.value || !endDate.value || !reason.value.trim()) {
+          policyAlert.className = 'alert alert-light-danger border-danger mb-0';
+          policyAlert.textContent = 'Please complete the required fields before submitting.';
+          return;
+        }
+
+        const leaveTypeOption = leaveType.options[leaveType.selectedIndex];
+        const leaveTypeRequiresCredits = leaveTypeOption && leaveTypeOption.dataset.credit === '1';
+
+        status.value = 'Pending';
+        updateStatusBadge();
+        policyAlert.className = 'alert alert-light-success border-success mb-0';
+        policyAlert.textContent = `${employee.value} leave request is ready for supervisor approval.`;
+
+        if (leaveTypeRequiresCredits) {
+          availableCredits = Math.max(0, availableCredits - countLeaveDays());
+        }
+
+        updateCalculator();
+      });
+
+      [employee, leaveType, startDate, endDate, reason, attachment, status].forEach(function (input) {
+        input.addEventListener('input', updateCalculator);
+        input.addEventListener('change', updateCalculator);
+      });
+
+      leaveModeInputs.forEach(function (input) {
+        input.addEventListener('change', updateCalculator);
+      });
+
+      saveDraftBtn.addEventListener('click', handleSaveDraft);
+
+      updateCalculator();
+    })();
+  </script>
+
+  <footer class="pc-footer">
+    <div class="footer-wrapper container-fluid">
+      <div class="row">
+        <div class="col-sm my-1">
+          <p class="m-0"></p>
+        </div>
+        <div class="col-auto my-1">
+          <ul class="list-inline footer-link mb-0">
+            <li class="list-inline-item"><a href="../index.html">Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+ <!-- Required Js -->
+<script src="../assets/js/plugins/popper.min.js"></script>
+<script src="../assets/js/plugins/simplebar.min.js"></script>
+<script src="../assets/js/plugins/bootstrap.min.js"></script>
+<script src="../assets/js/fonts/custom-font.js"></script>
+<script src="../assets/js/pcoded.js"></script>
+<script src="../assets/js/plugins/feather.min.js"></script>
+
+
+
+
+
+<script>layout_change('light');</script>
+
+
+
+
+<script>change_box_container('false');</script>
+
+
+
+<script>layout_rtl_change('false');</script>
+
+
+<script>preset_change("preset-1");</script>
+
+
+<script>font_change("Public-Sans");</script>
+
+    
+
+
+</body>
+<!-- [Body] end -->
+
+</html>

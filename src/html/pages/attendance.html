@@ -1,0 +1,320 @@
+<html lang="en">
+<!-- [Head] start -->
+
+<head>
+  @@include('../layouts/head-page-meta.html', {'title': 'Time & Attendance'}) @@include('../layouts/head-css.html')
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body @@bodySetup>
+  @@include('../layouts/layout-vertical.html')
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      @@include('../layouts/breadcrumb.html', {'breadcrumb-item': 'HR Modules', 'breadcrumb-item-active': 'Time & Attendance'})
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Attendance Log</h5>
+              <span class="badge bg-light-primary text-primary" id="adjustmentBadge">Original</span>
+            </div>
+            <div class="card-body">
+              <form id="attendanceForm" novalidate>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="logId">Log ID</label>
+                    <input type="text" class="form-control" id="logId" placeholder="LOG-0001" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="employeeId">Employee ID</label>
+                    <input type="text" class="form-control" id="employeeId" placeholder="EMP-0001" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="workDate">Date</label>
+                    <input type="date" class="form-control" id="workDate" required>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="logType">Log Type</label>
+                    <select class="form-select" id="logType" required>
+                      <option value="">Select type</option>
+                      <option value="clock-in">Clock In</option>
+                      <option value="clock-out">Clock Out</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="timestamp">Timestamp</label>
+                    <input type="time" class="form-control" id="timestamp" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="source">Source / Device</label>
+                    <select class="form-select" id="source" required>
+                      <option value="">Select source</option>
+                      <option>Web</option>
+                      <option>Mobile</option>
+                      <option>Biometric</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="adjustmentStatus">Adjustment Status</label>
+                    <select class="form-select" id="adjustmentStatus">
+                      <option>Original</option>
+                      <option>Pending Correction</option>
+                      <option>Corrected</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="shiftStart">Shift Start</label>
+                    <input type="time" class="form-control" id="shiftStart" value="09:00" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="shiftEnd">Shift End</label>
+                    <input type="time" class="form-control" id="shiftEnd" value="18:00" required>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="shiftSchedule">Shift Schedule</label>
+                    <select class="form-select" id="shiftSchedule">
+                      <option>Regular Day Shift</option>
+                      <option>Night Shift</option>
+                      <option>Compressed Schedule</option>
+                      <option>Flexible Schedule</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="restDayWork">Rest Day Work</label>
+                    <select class="form-select" id="restDayWork">
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="holidayWork">Holiday Work</label>
+                    <select class="form-select" id="holidayWork">
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label" for="adjustmentReason">Adjustment Request / Remarks</label>
+                    <textarea class="form-control" id="adjustmentReason" rows="3" placeholder="Use this for missing logs or correction requests."></textarea>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <button type="button" class="btn btn-outline-primary" id="saveDraftBtn">Save Draft</button>
+                  <button type="submit" class="btn btn-primary">Save Attendance Log</button>
+                </div>
+
+                <div class="alert alert-light-primary border-primary mt-3 mb-0" id="attendanceAlert" role="alert">
+                  Enter a log to calculate late, undertime, overtime, and night differential in real time.
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+
+  <script>
+    (function () {
+      const form = document.getElementById('attendanceForm');
+      const saveDraftBtn = document.getElementById('saveDraftBtn');
+      const attendanceAlert = document.getElementById('attendanceAlert');
+      const adjustmentBadge = document.getElementById('adjustmentBadge');
+
+      const logId = document.getElementById('logId');
+      const employeeId = document.getElementById('employeeId');
+      const workDate = document.getElementById('workDate');
+      const logType = document.getElementById('logType');
+      const timestamp = document.getElementById('timestamp');
+      const source = document.getElementById('source');
+      const adjustmentStatus = document.getElementById('adjustmentStatus');
+      const shiftStart = document.getElementById('shiftStart');
+      const shiftEnd = document.getElementById('shiftEnd');
+      const shiftSchedule = document.getElementById('shiftSchedule');
+      const restDayWork = document.getElementById('restDayWork');
+      const holidayWork = document.getElementById('holidayWork');
+      const adjustmentReason = document.getElementById('adjustmentReason');
+
+      const lateDisplay = document.getElementById('lateDisplay');
+      const undertimeDisplay = document.getElementById('undertimeDisplay');
+      const overtimeDisplay = document.getElementById('overtimeDisplay');
+      const nightDiffDisplay = document.getElementById('nightDiffDisplay');
+
+      const approvedOvertime = 0;
+      const duplicateWindowMinutes = 1;
+      let lastSubmission = null;
+
+      function toMinutes(timeValue) {
+        if (!timeValue) {
+          return null;
+        }
+        const [hours, minutes] = timeValue.split(':').map(Number);
+        return hours * 60 + minutes;
+      }
+
+      function minutesToLabel(value) {
+        return `${Math.max(0, value)} min`;
+      }
+
+      function setAlert(type, message) {
+        attendanceAlert.className = `alert alert-light-${type} border-${type} mt-3 mb-0`;
+        attendanceAlert.textContent = message;
+      }
+
+      function updateAdjustmentBadge() {
+        adjustmentBadge.textContent = adjustmentStatus.value;
+        adjustmentBadge.className = 'badge';
+        if (adjustmentStatus.value === 'Pending Correction') {
+          adjustmentBadge.classList.add('bg-light-warning', 'text-warning');
+        } else if (adjustmentStatus.value === 'Corrected') {
+          adjustmentBadge.classList.add('bg-light-success', 'text-success');
+        } else {
+          adjustmentBadge.classList.add('bg-light-primary', 'text-primary');
+        }
+      }
+
+      function calculateNightDifferential(startMin, endMin) {
+        if (startMin === null || endMin === null) {
+          return 0;
+        }
+
+        const normalizedEnd = endMin < startMin ? endMin + (24 * 60) : endMin;
+        let total = 0;
+        const start = startMin;
+        const end = normalizedEnd;
+
+        for (let minute = start; minute < end; minute += 1) {
+          const hour = Math.floor(minute / 60) % 24;
+          if (hour >= 22 || hour < 6) {
+            total += 1;
+          }
+        }
+
+        return total;
+      }
+
+      function updateMetrics() {
+        const shiftStartMin = toMinutes(shiftStart.value);
+        const shiftEndMin = toMinutes(shiftEnd.value);
+        const logTimeMin = toMinutes(timestamp.value);
+        const clockInWindow = logType.value === 'clock-in';
+        const clockOutWindow = logType.value === 'clock-out';
+
+        if (adjustmentStatus.value !== 'Original') {
+          updateAdjustmentBadge();
+        } else {
+          updateAdjustmentBadge();
+        }
+
+        if (shiftStartMin === null || shiftEndMin === null || logTimeMin === null) {
+          if (lateDisplay) lateDisplay.textContent = '0';
+          if (undertimeDisplay) undertimeDisplay.textContent = '0';
+          if (overtimeDisplay) overtimeDisplay.textContent = '0';
+          if (nightDiffDisplay) nightDiffDisplay.textContent = '0';
+          return;
+        }
+
+        const normalizedShiftEnd = shiftEndMin < shiftStartMin ? shiftEndMin + (24 * 60) : shiftEndMin;
+        const normalizedLogTime = ((clockOutWindow || clockInWindow) && shiftEndMin < shiftStartMin && logTimeMin < shiftStartMin)
+          ? logTimeMin + (24 * 60)
+          : logTimeMin;
+
+        const lateMinutes = clockInWindow && normalizedLogTime > shiftStartMin ? normalizedLogTime - shiftStartMin : 0;
+        const undertimeMinutes = clockOutWindow && normalizedLogTime < normalizedShiftEnd ? normalizedShiftEnd - normalizedLogTime : 0;
+        const overtimeMinutes = clockOutWindow && normalizedLogTime > normalizedShiftEnd ? normalizedLogTime - normalizedShiftEnd : approvedOvertime;
+
+        let nightDiffMinutes = 0;
+        if (clockInWindow || clockOutWindow) {
+          nightDiffMinutes = calculateNightDifferential(shiftStartMin, normalizedShiftEnd);
+        }
+
+        if (lateDisplay) lateDisplay.textContent = minutesToLabel(lateMinutes);
+        if (undertimeDisplay) undertimeDisplay.textContent = minutesToLabel(undertimeMinutes);
+        if (overtimeDisplay) overtimeDisplay.textContent = minutesToLabel(overtimeMinutes);
+        if (nightDiffDisplay) nightDiffDisplay.textContent = minutesToLabel(nightDiffMinutes);
+
+        if (clockOutWindow && logTimeMin < shiftStartMin && shiftEndMin >= shiftStartMin) {
+          setAlert('danger', 'Clock Out cannot occur before Clock In. Please verify the timestamp order.');
+          return;
+        }
+
+        if (duplicateWindowMinutes && lastSubmission && lastSubmission.employeeId === employeeId.value && lastSubmission.timestamp === timestamp.value && lastSubmission.workDate === workDate.value) {
+          setAlert('warning', 'This submission looks like a duplicate inside the same minute. Review before saving.');
+          return;
+        }
+
+        if (lateMinutes > 0) {
+          setAlert('warning', `Late arrival detected. ${minutesToLabel(lateMinutes)} will be deducted from payable hours.`);
+          return;
+        }
+
+        if (undertimeMinutes > 0) {
+          setAlert('warning', `Undertime detected. ${minutesToLabel(undertimeMinutes)} will reduce payable hours.`);
+          return;
+        }
+
+        if (nightDiffMinutes > 0) {
+          setAlert('info', 'Night differential hours detected for work inside the 10:00 PM to 6:00 AM window.');
+          return;
+        }
+
+        if (restDayWork.value === 'yes' || holidayWork.value === 'yes') {
+          setAlert('info', `${shiftSchedule.value} selected. Rest day or holiday work will be tagged for premium computation.`);
+          return;
+        }
+
+        setAlert('success', 'Attendance log looks valid and ready for payroll reconciliation.');
+      }
+
+      form.addEventListener('input', updateMetrics);
+      form.addEventListener('change', updateMetrics);
+
+      saveDraftBtn.addEventListener('click', function () {
+        updateAdjustmentBadge();
+        setAlert('primary', 'Attendance draft saved locally.');
+      });
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        updateMetrics();
+
+        if (!logId.value.trim() || !employeeId.value.trim() || !workDate.value || !logType.value || !timestamp.value || !source.value) {
+          setAlert('danger', 'Please complete the required attendance log fields.');
+          return;
+        }
+
+        if (logType.value === 'clock-out' && adjustmentStatus.value === 'Pending Correction') {
+          setAlert('warning', 'This log is pending correction and should be approved by a supervisor before payroll credit.');
+        } else {
+          setAlert('success', `${logId.value.trim()} saved. Payroll can now reconcile the log against the shift schedule.`);
+        }
+
+        lastSubmission = {
+          employeeId: employeeId.value.trim(),
+          timestamp: timestamp.value,
+          workDate: workDate.value
+        };
+      });
+
+      updateAdjustmentBadge();
+      updateMetrics();
+    })();
+  </script>
+
+  @@include('../layouts/footer-block.html') @@include('../layouts/footer-js.html')
+
+</body>
+<!-- [Body] end -->
+
+</html>
