@@ -16,6 +16,63 @@
       @@include('../layouts/breadcrumb.html', {'breadcrumb-item': 'HR Modules', 'breadcrumb-item-active': 'Time & Attendance'})
 
       <div class="row g-3">
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted d-block mb-2">Present Today</small>
+              <div class="d-flex align-items-end justify-content-between">
+                <div>
+                  <h3 class="mb-1" id="overviewPresentCount">18</h3>
+                  <span class="text-muted small">Employees with valid logs</span>
+                </div>
+                <span class="badge bg-light-success text-success">Live</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted d-block mb-2">Late Cases</small>
+              <div class="d-flex align-items-end justify-content-between">
+                <div>
+                  <h3 class="mb-1" id="overviewLateCount">6</h3>
+                  <span class="text-muted small">Need monitoring today</span>
+                </div>
+                <span class="badge bg-light-warning text-warning">Late</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted d-block mb-2">Correction Queue</small>
+              <div class="d-flex align-items-end justify-content-between">
+                <div>
+                  <h3 class="mb-1" id="overviewCorrectionCount">3</h3>
+                  <span class="text-muted small">Pending supervisor action</span>
+                </div>
+                <span class="badge bg-light-info text-info">Queue</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted d-block mb-2">Premium Work</small>
+              <div class="d-flex align-items-end justify-content-between">
+                <div>
+                  <h3 class="mb-1" id="overviewPremiumCount">4</h3>
+                  <span class="text-muted small">OT, holiday, or night diff</span>
+                </div>
+                <span class="badge bg-light-danger text-danger">Payroll</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="col-lg-8">
           <div class="card h-100">
             <div class="card-header d-flex align-items-center justify-content-between">
@@ -235,9 +292,108 @@
                 </div>
               </div>
 
-              <div class="mt-3 p-3 rounded bg-light-primary border border-primary-subtle">
-                <strong class="d-block text-primary mb-1">Payroll impact</strong>
-                <small class="text-muted d-block">Late and undertime reduce payable hours. Overtime, rest day work, holiday work, and night differential are tagged for payroll review.</small>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header d-flex flex-wrap gap-2 align-items-center justify-content-between">
+              <div>
+                <h5 class="mb-0">Recent Attendance Logs</h5>
+                <small class="text-muted">Review live logs, premium work, and correction items in one list.</small>
+              </div>
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <input type="search" class="form-control" id="attendanceSearch" placeholder="Search employee or log" style="min-width: 220px;">
+                <span class="badge bg-light-secondary text-secondary" id="attendanceCount">6 records</span>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="px-3 pt-3 d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-sm btn-primary" data-attendance-filter="all">All</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-attendance-filter="late">Late</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-attendance-filter="correction">Correction</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-attendance-filter="night">Night Shift</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-attendance-filter="premium">Premium Work</button>
+              </div>
+              <div class="table-responsive mt-3">
+                <table class="table table-hover mb-0 align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Log ID</th>
+                      <th>Employee</th>
+                      <th>Shift</th>
+                      <th>Status</th>
+                      <th>Late / OT</th>
+                      <th>Payable</th>
+                      <th>Source</th>
+                      <th class="text-end">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="attendanceDirectoryBody">
+                    <tr data-search="LOG-20260703-A1B2 Rafael Aaron Day Shift Present Web" data-filter-status="present" data-filter-shift="day" data-filter-premium="no">
+                      <td>LOG-20260703-A1B2</td>
+                      <td>Rafael Aaron</td>
+                      <td>Day Shift</td>
+                      <td><span class="badge bg-light-success text-success">Present</span></td>
+                      <td>0 min / 0 min</td>
+                      <td>8.00 hrs</td>
+                      <td>Web</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="LOG-20260703-C3D4 Maria Santos Late Mobile" data-filter-status="late" data-filter-shift="day" data-filter-premium="no">
+                      <td>LOG-20260703-C3D4</td>
+                      <td>Maria Santos</td>
+                      <td>Day Shift</td>
+                      <td><span class="badge bg-light-warning text-warning">Late</span></td>
+                      <td>18 min / 0 min</td>
+                      <td>7.70 hrs</td>
+                      <td>Mobile</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="LOG-20260703-E5F6 John Cruz Pending Correction Biometric" data-filter-status="correction" data-filter-shift="day" data-filter-premium="no">
+                      <td>LOG-20260703-E5F6</td>
+                      <td>John Cruz</td>
+                      <td>Day Shift</td>
+                      <td><span class="badge bg-light-info text-info">Correction</span></td>
+                      <td>0 min / 0 min</td>
+                      <td>Pending</td>
+                      <td>Biometric</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="LOG-20260703-G7H8 Paolo Garcia Night Shift Overtime Biometric" data-filter-status="night" data-filter-shift="night" data-filter-premium="yes">
+                      <td>LOG-20260703-G7H8</td>
+                      <td>Paolo Garcia</td>
+                      <td>Night Shift</td>
+                      <td><span class="badge bg-light-primary text-primary">OT</span></td>
+                      <td>0 min / 90 min</td>
+                      <td>9.50 hrs</td>
+                      <td>Biometric</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="LOG-20260703-I9J0 Anna Cruz Holiday Work Web" data-filter-status="premium" data-filter-shift="day" data-filter-premium="yes">
+                      <td>LOG-20260703-I9J0</td>
+                      <td>Anna Cruz</td>
+                      <td>Holiday Shift</td>
+                      <td><span class="badge bg-light-danger text-danger">Holiday</span></td>
+                      <td>0 min / 120 min</td>
+                      <td>10.00 hrs</td>
+                      <td>Web</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    <tr data-search="LOG-20260703-K1L2 Liza Dela Cruz Late Correction Mobile" data-filter-status="late" data-filter-shift="day" data-filter-premium="no">
+                      <td>LOG-20260703-K1L2</td>
+                      <td>Liza Dela Cruz</td>
+                      <td>Day Shift</td>
+                      <td><span class="badge bg-light-warning text-warning">Late</span></td>
+                      <td>12 min / 0 min</td>
+                      <td>7.80 hrs</td>
+                      <td>Mobile</td>
+                      <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -259,6 +415,10 @@
       const scheduleSummary = document.getElementById('scheduleSummary');
       const approvalDisplay = document.getElementById('approvalDisplay');
       const correctionPanel = document.getElementById('correctionPanel');
+      const overviewPresentCount = document.getElementById('overviewPresentCount');
+      const overviewLateCount = document.getElementById('overviewLateCount');
+      const overviewCorrectionCount = document.getElementById('overviewCorrectionCount');
+      const overviewPremiumCount = document.getElementById('overviewPremiumCount');
 
       const employeeSelect = document.getElementById('employeeSelect');
       const employeeId = document.getElementById('employeeId');
@@ -283,6 +443,13 @@
       const nightDiffDisplay = document.getElementById('nightDiffDisplay');
       const totalHoursDisplay = document.getElementById('totalHoursDisplay');
       const payableHoursDisplay = document.getElementById('payableHoursDisplay');
+
+      const attendanceSearch = document.getElementById('attendanceSearch');
+      const attendanceCount = document.getElementById('attendanceCount');
+      const attendanceDirectoryBody = document.getElementById('attendanceDirectoryBody');
+      const attendanceRows = Array.from(attendanceDirectoryBody.querySelectorAll('tr'));
+      const attendanceFilterButtons = Array.from(document.querySelectorAll('[data-attendance-filter]'));
+      let activeAttendanceFilter = 'all';
 
       const duplicateWindowMinutes = 1;
       let lastSubmission = null;
@@ -362,6 +529,51 @@
         const normalizedBreakOut = breakOutMin < clockInMin ? breakOutMin + (24 * 60) : breakOutMin;
         const normalizedBreakIn = breakInMin < normalizedBreakOut ? breakInMin + (24 * 60) : breakInMin;
         return normalizedBreakIn - normalizedBreakOut;
+      }
+
+      function updateOverviewCards() {
+        const presentCount = attendanceRows.filter((row) => row.dataset.filterStatus === 'present').length;
+        const lateCount = attendanceRows.filter((row) => row.dataset.filterStatus === 'late').length;
+        const correctionCount = attendanceRows.filter((row) => row.dataset.filterStatus === 'correction').length;
+        const premiumCount = attendanceRows.filter((row) => row.dataset.filterPremium === 'yes').length;
+
+        overviewPresentCount.textContent = presentCount;
+        overviewLateCount.textContent = lateCount;
+        overviewCorrectionCount.textContent = correctionCount;
+        overviewPremiumCount.textContent = premiumCount;
+      }
+
+      function matchesAttendanceFilter(row) {
+        if (activeAttendanceFilter === 'all') return true;
+        if (activeAttendanceFilter === 'late') return row.dataset.filterStatus === 'late';
+        if (activeAttendanceFilter === 'correction') return row.dataset.filterStatus === 'correction';
+        if (activeAttendanceFilter === 'night') return row.dataset.filterShift === 'night';
+        if (activeAttendanceFilter === 'premium') return row.dataset.filterPremium === 'yes';
+        return true;
+      }
+
+      function updateAttendanceFilterButtons() {
+        attendanceFilterButtons.forEach((button) => {
+          const isActive = button.dataset.attendanceFilter === activeAttendanceFilter;
+          button.className = tn btn-sm ;
+        });
+      }
+
+      function updateAttendanceDirectoryFilter() {
+        const query = attendanceSearch.value.trim().toLowerCase();
+        let visibleRows = 0;
+
+        attendanceRows.forEach((row) => {
+          const haystack = (row.dataset.search || row.textContent || '').toLowerCase();
+          const passesSearch = !query || haystack.includes(query);
+          const passesFilter = matchesAttendanceFilter(row);
+          const showRow = passesSearch && passesFilter;
+          row.classList.toggle('d-none', !showRow);
+          if (showRow) visibleRows += 1;
+        });
+
+        attendanceCount.textContent = ${visibleRows} of  records;
+        updateAttendanceFilterButtons();
       }
 
       function updateEmployee() {
@@ -477,20 +689,26 @@
           shiftStart.value = preset.start;
           shiftEnd.value = preset.end;
         }
-        updateMetrics();
+        updateOverviewCards();
+      updateAttendanceDirectoryFilter();
+      updateMetrics();
       });
 
       form.addEventListener('input', updateMetrics);
       form.addEventListener('change', updateMetrics);
 
       saveDraftBtn.addEventListener('click', function () {
-        updateMetrics();
+        updateOverviewCards();
+      updateAttendanceDirectoryFilter();
+      updateMetrics();
         setAlert('primary', 'Attendance draft saved locally.');
       });
 
       form.addEventListener('submit', function (event) {
         event.preventDefault();
-        updateMetrics();
+        updateOverviewCards();
+      updateAttendanceDirectoryFilter();
+      updateMetrics();
 
         if (!employeeSelect.value || !workDate.value || !clockIn.value || !clockOut.value || !source.value) {
           setAlert('danger', 'Please complete the employee, date, clock in, clock out, and source fields.');
@@ -518,6 +736,8 @@
         }
       });
 
+      updateOverviewCards();
+      updateAttendanceDirectoryFilter();
       updateMetrics();
     })();
   </script>
@@ -528,5 +748,9 @@
 <!-- [Body] end -->
 
 </html>
+
+
+
+
 
 
