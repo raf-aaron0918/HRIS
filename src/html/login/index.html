@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- [Head] start -->
+
+<head>
+  @@include('../layouts/head-page-meta.html', {'title': 'Sign In to HRIS'}) @@include('../layouts/head-css.html')
+</head>
+<!-- [Head] end -->
+<!-- [Body] Start -->
+
+<body>
+  @@include('../layouts/loader.html')
+  <div class="auth-main">
+    <div class="auth-wrapper v3">
+      <div class="auth-form">
+
+        <div class="card my-5">
+          <div class="card-body">
+            <div class="mb-4">
+              <h3 class="mb-2"><b>Sign in to HRIS</b></h3>
+              <p class="text-muted mb-0">Use your company account to access employee records, attendance, leave, payroll, and reports.</p>
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label">Email or Employee ID</label>
+              <input type="text" class="form-control" placeholder="Enter your email or employee ID">
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-control" placeholder="Enter your password">
+            </div>
+            <div class="d-flex mt-1 justify-content-between align-items-center">
+              <div class="form-check">
+                <input class="form-check-input input-primary" type="checkbox" id="customCheckc1" checked>
+                <label class="form-check-label text-muted" for="customCheckc1">Remember me</label>
+              </div>
+              <a href="#" class="link-primary">Forgot Password?</a>
+            </div>
+            <div class="d-grid mt-4">
+              <button type="button" class="btn btn-primary">Sign In</button>
+            </div>
+            <div class="saprator mt-3">
+              <span>Or continue with</span>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="d-grid">
+                  <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
+                    <img src="../assets/images/authentication/google.svg" alt="Google"> <span class="d-none d-sm-inline-block">Google</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 p-3 rounded bg-light">
+              <strong class="d-block mb-1">Demo access</strong>
+              <small class="text-muted d-block">Available roles: HR Admin, Immediate Supervisor, Payroll Admin.</small>
+              <small class="text-muted d-block">Authorized HRIS users only.</small>
+            </div>
+          </div>
+        </div>
+        <div class="auth-footer row">
+          <div class="col my-1">
+            <p class="m-0 text-muted">Secure access for authorized HRIS users and administrators.</p>
+          </div>
+          <div class="col-auto my-1">
+            <ul class="list-inline footer-link mb-0">
+              <li class="list-inline-item"><a href="#">Help Center</a></li>
+              <li class="list-inline-item"><a href="#">Data Privacy</a></li>
+              <li class="list-inline-item"><a href="#">IT Support</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- [ Main Content ] end -->
+  @@include('../layouts/footer-js.html') 
+</body>
+<!-- [Body] end -->
+
+</html>
+
+

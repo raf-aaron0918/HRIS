@@ -30,6 +30,11 @@ function send(res, code, body, type) {
   res.end(body);
 }
 
+function redirect(res, location) {
+  res.writeHead(302, { Location: location });
+  res.end();
+}
+
 function resolveFile(urlPath) {
   let cleanPath = decodeURIComponent(urlPath.split('?')[0]);
   if (cleanPath === '/') cleanPath = '/index.html';
@@ -74,6 +79,11 @@ function openBrowser(url) {
 }
 
 const server = http.createServer((req, res) => {
+  const requestPath = decodeURIComponent((req.url || '/').split('?')[0]);
+  if (requestPath === '/register' || requestPath === '/pages/register.html') {
+    redirect(res, '/login');
+    return;
+  }
   const filePath = resolveFile(req.url || '/');
   if (!filePath) {
     send(res, 404, 'Not found');
@@ -96,3 +106,4 @@ server.listen(port, host, () => {
   console.log(`Serving ${root} at ${url}`);
   openBrowser(url);
 });
+
