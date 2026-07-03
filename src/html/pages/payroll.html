@@ -15,19 +15,30 @@
     <div class="pc-content">
       @@include('../layouts/breadcrumb.html', {'breadcrumb-item': 'HR Modules', 'breadcrumb-item-active': 'Payroll'})
 
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="card">
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="card h-100">
             <div class="card-header d-flex align-items-center justify-content-between">
-              <h5 class="mb-0">Payroll Run</h5>
+              <div>
+                <h5 class="mb-0">Payroll Run</h5>
+                <small class="text-muted">Keep the essentials in the form and let the system calculate the rest.</small>
+              </div>
               <span class="badge bg-light-primary text-primary" id="runBadge">Draft</span>
             </div>
             <div class="card-body">
               <form id="payrollForm" novalidate>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h6 class="mb-1">1. Payroll details</h6>
+                    <p class="text-muted mb-0 small">Start with the cutoff, mode, and document status.</p>
+                  </div>
+                </div>
+
                 <div class="row">
                   <div class="col-md-4 mb-3">
-                    <label class="form-label" for="payrollRunId">Payroll Run ID</label>
+                    <label class="form-label" for="payrollRunId">Payroll ID</label>
                     <input type="text" class="form-control" id="payrollRunId" placeholder="PR-2026-001" required>
+
                   </div>
                   <div class="col-md-4 mb-3">
                     <label class="form-label" for="cutoffStart">Cutoff Start</label>
@@ -37,19 +48,7 @@
                     <label class="form-label" for="cutoffEnd">Cutoff End</label>
                     <input type="date" class="form-control" id="cutoffEnd" required>
                   </div>
-
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="employeeId">Employee ID</label>
-                    <input type="text" class="form-control" id="employeeId" placeholder="EMP-0001" required>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="payslipStatus">Payslip Status</label>
-                    <select class="form-select" id="payslipStatus" required>
-                      <option>Draft</option>
-                      <option>Published</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4 mb-3">
+                  <div class="col-md-6 mb-3">
                     <label class="form-label" for="payrollMode">Payroll Mode</label>
                     <select class="form-select" id="payrollMode">
                       <option value="regular">Regular</option>
@@ -57,18 +56,65 @@
                       <option value="retro">Retro Adjustment</option>
                     </select>
                   </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="payslipStatus">Payslip Status</label>
+                    <select class="form-select" id="payslipStatus" required>
+                      <option>Draft</option>
+                      <option>Published</option>
+                    </select>
+                  </div>
+                </div>
 
+                <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
+                  <div>
+                    <h6 class="mb-1">2. Employee context</h6>
+                    <p class="text-muted mb-0 small">Pick the employee once and the panel fills the profile fields.</p>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label" for="employeeSelect">Employee</label>
+                    <select class="form-select" id="employeeSelect" required>
+                      <option value="">Select employee</option>
+                      <option value="EMP-0001">Rafael Aaron</option>
+                      <option value="EMP-0002">Mia Santos</option>
+                      <option value="EMP-0003">Juan Dela Cruz</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="employeeId">Employee ID</label>
+                    <input type="text" class="form-control" id="employeeId" readonly placeholder="EMP-0001">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="position">Position</label>
+                    <input type="text" class="form-control" id="position" readonly placeholder="HR Officer">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="employeeName">Employee Name</label>
+                    <input type="text" class="form-control" id="employeeName" readonly placeholder="Auto-filled from employee master">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="department">Department</label>
+                    <input type="text" class="form-control" id="department" readonly placeholder="Administration">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="branch">Branch</label>
+                    <input type="text" class="form-control" id="branch" readonly placeholder="Main Branch">
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
+                  <div>
+                    <h6 class="mb-1">3. Earnings and deductions</h6>
+                    <p class="text-muted mb-0 small">Use only the values that need review; the summary updates automatically.</p>
+                  </div>
+                </div>
+
+                <div class="row">
                   <div class="col-md-4 mb-3">
                     <label class="form-label" for="basePay">Base Pay</label>
                     <input type="number" step="0.01" min="0" class="form-control" id="basePay" value="0">
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="dailyRate">Daily Rate</label>
-                    <input type="number" step="0.01" min="0" class="form-control" id="dailyRate" value="0">
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="hourlyRate">Hourly Rate</label>
-                    <input type="number" step="0.01" min="0" class="form-control" id="hourlyRate" value="0">
                   </div>
                   <div class="col-md-4 mb-3">
                     <label class="form-label" for="otPay">OT Pay</label>
@@ -86,6 +132,10 @@
                     <label class="form-label" for="allowances">Allowances</label>
                     <input type="number" step="0.01" min="0" class="form-control" id="allowances" value="0">
                   </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label" for="taxDeduction">Withholding Tax</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="taxDeduction" value="0">
+                  </div>
 
                   <div class="col-md-3 mb-3">
                     <label class="form-label" for="sssDeduction">SSS</label>
@@ -100,26 +150,8 @@
                     <input type="number" step="0.01" min="0" class="form-control" id="pagibigDeduction" value="0">
                   </div>
                   <div class="col-md-3 mb-3">
-                    <label class="form-label" for="taxDeduction">Tax</label>
-                    <input type="number" step="0.01" min="0" class="form-control" id="taxDeduction" value="0">
-                  </div>
-
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="totalDeductions">Total Deductions</label>
-                    <input type="text" class="form-control" id="totalDeductions" readonly value="0.00">
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="netPay">Net Pay</label>
-                    <input type="text" class="form-control" id="netPay" readonly value="0.00">
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="releaseAmount">Release Amount</label>
-                    <input type="text" class="form-control" id="releaseAmount" readonly value="0.00">
-                  </div>
-
-                  <div class="col-md-12 mb-3">
                     <label class="form-label" for="remarks">Remarks</label>
-                    <textarea class="form-control" id="remarks" rows="3" placeholder="Use this for retro adjustments, final pay notes, or payroll comments."></textarea>
+                    <input type="text" class="form-control" id="remarks" placeholder="Retro, final pay, adjustment notes">
                   </div>
                 </div>
 
@@ -130,13 +162,81 @@
                 </div>
 
                 <div class="alert alert-light-primary border-primary mt-3 mb-0" id="payrollAlert" role="alert">
-                  Enter the payroll components to calculate gross earnings, deductions, and net pay.
+                  Select an employee and review the earnings before publishing the payroll batch.
                 </div>
               </form>
             </div>
           </div>
         </div>
 
+        <div class="col-lg-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light-primary border-0">
+              <h5 class="mb-0 text-primary">Payroll Summary</h5>
+              <small class="text-muted">Calculated live from the form values.</small>
+            </div>
+            <div class="card-body">
+              <div class="mb-3 p-3 rounded bg-light">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                  	<span class="text-muted">Payslip Status</span>
+                  	<span class="badge bg-light-primary text-primary" id="payslipStatusDisplay">Draft</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="text-muted">Payroll ID</span>
+                  <strong id="runIdSummary">-</strong>
+
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="text-muted">Employee</span>
+                  <strong id="employeeSummary">No employee selected</strong>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted">Cutoff</span>
+                  <strong id="periodSummary">-</strong>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="border rounded p-3 h-100">
+                    <small class="text-muted d-block mb-1">Gross Pay</small>
+                    <h4 class="mb-0 text-primary" id="grossDisplay">0.00</h4>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-3 h-100">
+                    <small class="text-muted d-block mb-1">Deductions</small>
+                    <h4 class="mb-0 text-danger" id="deductionsDisplay">0.00</h4>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="border rounded p-3">
+                    <small class="text-muted d-block mb-1">Net Pay</small>
+                    <h2 class="mb-0 text-success" id="netPayDisplay">0.00</h2>
+                    <small class="text-muted">Release amount: <strong id="releaseAmountDisplay">0.00</strong></small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-3 h-100">
+                    <small class="text-muted d-block mb-1">Daily Rate</small>
+                    <h5 class="mb-0" id="dailyRateDisplay">0.00</h5>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-3 h-100">
+                    <small class="text-muted d-block mb-1">Hourly Rate</small>
+                    <h5 class="mb-0" id="hourlyRateDisplay">0.00</h5>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 p-3 rounded bg-light-primary border border-primary-subtle">
+                <strong class="d-block text-primary mb-1">What stays manual?</strong>
+                <small class="text-muted d-block">Only review fields that may vary by cutoff: allowances, OT, holiday pay, night differential, and deductions that need approval.</small>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -150,16 +250,28 @@
       const payrollAlert = document.getElementById('payrollAlert');
       const runBadge = document.getElementById('runBadge');
       const payslipStatusDisplay = document.getElementById('payslipStatusDisplay');
+      const employeeSummary = document.getElementById('employeeSummary');
+      const periodSummary = document.getElementById('periodSummary');
+      const grossDisplay = document.getElementById('grossDisplay');
+      const deductionsDisplay = document.getElementById('deductionsDisplay');
+      const netPayDisplay = document.getElementById('netPayDisplay');
+      const releaseAmountDisplay = document.getElementById('releaseAmountDisplay');
+      const dailyRateDisplay = document.getElementById('dailyRateDisplay');
+      const hourlyRateDisplay = document.getElementById('hourlyRateDisplay');
 
       const payrollRunId = document.getElementById('payrollRunId');
+      const runIdSummary = document.getElementById('runIdSummary');
       const cutoffStart = document.getElementById('cutoffStart');
       const cutoffEnd = document.getElementById('cutoffEnd');
+      const employeeSelect = document.getElementById('employeeSelect');
       const employeeId = document.getElementById('employeeId');
+      const employeeName = document.getElementById('employeeName');
+      const department = document.getElementById('department');
+      const branch = document.getElementById('branch');
+      const position = document.getElementById('position');
       const payslipStatus = document.getElementById('payslipStatus');
       const payrollMode = document.getElementById('payrollMode');
       const basePay = document.getElementById('basePay');
-      const dailyRate = document.getElementById('dailyRate');
-      const hourlyRate = document.getElementById('hourlyRate');
       const otPay = document.getElementById('otPay');
       const holidayPay = document.getElementById('holidayPay');
       const nightDiffPay = document.getElementById('nightDiffPay');
@@ -168,18 +280,62 @@
       const philhealthDeduction = document.getElementById('philhealthDeduction');
       const pagibigDeduction = document.getElementById('pagibigDeduction');
       const taxDeduction = document.getElementById('taxDeduction');
+      const remarks = document.getElementById('remarks');
       const totalDeductions = document.getElementById('totalDeductions');
       const netPay = document.getElementById('netPay');
       const releaseAmount = document.getElementById('releaseAmount');
-      const remarks = document.getElementById('remarks');
-      const grossDisplay = document.getElementById('grossDisplay');
-      const deductionsDisplay = document.getElementById('deductionsDisplay');
-      const netPayDisplay = document.getElementById('netPayDisplay');
+      const employeeData = {
+        'EMP-0001': {
+          name: 'Rafael Aaron',
+          department: 'Human Resources',
+          branch: 'Main Branch',
+          position: 'HR Officer',
+          basePay: 42000,
+        },
+        'EMP-0002': {
+          name: 'Mia Santos',
+          department: 'Finance',
+          branch: 'North Branch',
+          position: 'Payroll Analyst',
+          basePay: 38000,
+        },
+        'EMP-0003': {
+          name: 'Juan Dela Cruz',
+          department: 'Operations',
+          branch: 'South Branch',
+          position: 'Supervisor',
+          basePay: 45000,
+        },
+      };
 
       function money(value) {
         return Number(value || 0).toFixed(2);
       }
 
+      function generatePayrollRunId() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const randomPart = Math.random().toString(36).slice(2, 6).toUpperCase();
+        return `PR-${year}${month}${day}-${randomPart}`;
+      }
+
+
+      function ensurePayrollRunId() {
+        if (!payrollRunId.value.trim()) {
+          payrollRunId.value = generatePayrollRunId();
+        }
+
+        // Lock run id so it can't be changed after generation
+        payrollRunId.setAttribute('readonly', 'readonly');
+        payrollRunId.readOnly = true;
+        payrollRunId.style.cursor = 'not-allowed';
+
+        if (runIdSummary) {
+          runIdSummary.textContent = payrollRunId.value.trim();
+        }
+      }
       function setAlert(type, message) {
         payrollAlert.className = `alert alert-light-${type} border-${type} mt-3 mb-0`;
         payrollAlert.textContent = message;
@@ -191,9 +347,51 @@
         runBadge.className = 'badge';
         if (payslipStatus.value === 'Published') {
           runBadge.classList.add('bg-light-success', 'text-success');
+          if (payslipStatusDisplay) {
+            payslipStatusDisplay.className = 'badge bg-light-success text-success';
+          }
         } else {
           runBadge.classList.add('bg-light-primary', 'text-primary');
+          if (payslipStatusDisplay) {
+            payslipStatusDisplay.className = 'badge bg-light-primary text-primary';
+          }
         }
+      }
+
+      function updatePeriodSummary() {
+        if (!cutoffStart.value || !cutoffEnd.value) {
+          periodSummary.textContent = '-';
+          return;
+        }
+        periodSummary.textContent = `${cutoffStart.value} to ${cutoffEnd.value}`;
+      }
+
+      function populateEmployee(selectedValue) {
+        const data = employeeData[selectedValue];
+        if (!data) {
+          employeeId.value = '';
+          employeeName.value = '';
+          department.value = '';
+          branch.value = '';
+          position.value = '';
+          employeeSummary.textContent = 'No employee selected';
+          basePay.value = '0';
+          calculate();
+          return;
+        }
+
+        employeeId.value = selectedValue;
+        employeeName.value = data.name;
+        department.value = data.department;
+        branch.value = data.branch;
+        position.value = data.position;
+        employeeSummary.textContent = `${data.name} - ${data.position}`;
+
+        if (!Number(basePay.value || 0)) {
+          basePay.value = money(data.basePay);
+        }
+
+        calculate();
       }
 
       function calculate() {
@@ -202,25 +400,34 @@
           + Number(holidayPay.value || 0)
           + Number(nightDiffPay.value || 0)
           + Number(allowances.value || 0);
-        const deductions = Number(sssDeduction.value || 0) + Number(philhealthDeduction.value || 0) + Number(pagibigDeduction.value || 0) + Number(taxDeduction.value || 0);
+        const deductions = Number(sssDeduction.value || 0)
+          + Number(philhealthDeduction.value || 0)
+          + Number(pagibigDeduction.value || 0)
+          + Number(taxDeduction.value || 0);
         const net = gross - deductions;
         const release = Math.max(net, 0);
+        const dailyRate = Number(basePay.value || 0) / 22;
+        const hourlyRate = Number(basePay.value || 0) / 176;
 
-        if (grossDisplay) grossDisplay.textContent = money(gross);
-        if (deductionsDisplay) deductionsDisplay.textContent = money(deductions);
-        if (netPayDisplay) netPayDisplay.textContent = money(net);
+        grossDisplay.textContent = money(gross);
+        deductionsDisplay.textContent = money(deductions);
+        netPayDisplay.textContent = money(net);
+        releaseAmountDisplay.textContent = money(release);
         totalDeductions.value = money(deductions);
         netPay.value = money(net);
         releaseAmount.value = money(release);
+        dailyRateDisplay.textContent = money(dailyRate);
+        hourlyRateDisplay.textContent = money(hourlyRate);
         updateBadge();
+        updatePeriodSummary();
 
         if (net < 0) {
-          setAlert('danger', 'Total deductions exceed gross earnings. Net pay is negative, so the release amount is capped at zero.');
+          setAlert('danger', 'Total deductions exceed gross earnings. Review the batch before publishing.');
           return;
         }
 
         if (net === 0 && gross > 0) {
-          setAlert('warning', 'Gross earnings are fully offset by deductions. Review the batch before publishing.');
+          setAlert('warning', 'Gross earnings are fully offset by deductions. Double-check the statutory values before publishing.');
           return;
         }
 
@@ -228,13 +435,18 @@
       }
 
       function applySampleRates() {
+        const selected = employeeData[employeeSelect.value] || null;
+
+        if (selected && !Number(basePay.value || 0)) {
+          basePay.value = money(selected.basePay);
+        }
+
         const gross = Number(basePay.value || 0)
           + Number(otPay.value || 0)
           + Number(holidayPay.value || 0)
           + Number(nightDiffPay.value || 0)
           + Number(allowances.value || 0);
-        dailyRate.value = money(Number(basePay.value || 0) / 22);
-        hourlyRate.value = money(Number(basePay.value || 0) / 176);
+
         holidayPay.value = money(gross * 0.1);
         nightDiffPay.value = money(gross * 0.05);
         sssDeduction.value = money(gross * 0.045);
@@ -242,11 +454,17 @@
         pagibigDeduction.value = money(Math.min(100, gross * 0.02));
         taxDeduction.value = money(gross * 0.1);
         calculate();
-        setAlert('info', 'Sample statutory and tax rates applied. Adjust values to match your configured payroll tables.');
+        setAlert('info', 'Sample payroll values applied. Adjust them to match your configured payroll tables.');
       }
 
       form.addEventListener('input', calculate);
-      form.addEventListener('change', calculate);
+      form.addEventListener('change', function (event) {
+        if (event.target === employeeSelect) {
+          populateEmployee(employeeSelect.value);
+          return;
+        }
+        calculate();
+      });
 
       saveDraftBtn.addEventListener('click', function () {
         payslipStatus.value = 'Draft';
@@ -259,8 +477,17 @@
       form.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        if (!payrollRunId.value.trim() || !cutoffStart.value || !cutoffEnd.value || !employeeId.value.trim()) {
-          setAlert('danger', 'Please complete the required payroll run, cutoff, and employee fields.');
+        // Always generate a new Payroll ID on finalize
+        if (payrollRunId) {
+          payrollRunId.removeAttribute('readonly');
+          payrollRunId.readOnly = false;
+        }
+        payrollRunId.value = generatePayrollRunId();
+        ensurePayrollRunId();
+
+        if (!payrollRunId.value.trim() || !cutoffStart.value || !cutoffEnd.value || !employeeSelect.value) {
+
+          setAlert('danger', 'Please complete the payroll run, cutoff, and employee fields.');
           return;
         }
 
@@ -269,15 +496,19 @@
           return;
         }
 
-        updateBadge();
         payslipStatus.value = 'Published';
         updateBadge();
-        remarks.value = `${payrollMode.value} payroll for ${employeeId.value.trim()} published from ${cutoffStart.value} to ${cutoffEnd.value}.`;
+        remarks.value = `${payrollMode.value} payroll for ${employeeName.value || employeeSelect.value} published from ${cutoffStart.value} to ${cutoffEnd.value}.`;
         setAlert('success', `${payrollRunId.value.trim()} finalized. Payslip is ready for employee access.`);
       });
 
+      ensurePayrollRunId();
       updateBadge();
       calculate();
+      // Ensure summary has the run id even when generated on load
+      if (runIdSummary) {
+        runIdSummary.textContent = payrollRunId.value.trim();
+      }
     })();
   </script>
 
@@ -287,3 +518,5 @@
 <!-- [Body] end -->
 
 </html>
+
+

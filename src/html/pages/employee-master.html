@@ -15,52 +15,29 @@
     <div class="pc-content">
       @@include('../layouts/breadcrumb.html', {'breadcrumb-item': 'HR Modules', 'breadcrumb-item-active': 'Employee Master'})
 
-      <div class="row">
-        <div class="col-md-3 col-xl-3">
-          <div class="card bg-primary text-white mb-3">
-            <div class="card-body">
-              <p class="mb-1 opacity-75">Active Profiles</p>
-              <h3 class="mb-0 text-white">128</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-xl-3">
-          <div class="card bg-success text-white mb-3">
-            <div class="card-body">
-              <p class="mb-1 opacity-75">Onboarding</p>
-              <h3 class="mb-0 text-white">12</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-xl-3">
-          <div class="card bg-warning text-white mb-3">
-            <div class="card-body">
-              <p class="mb-1 opacity-75">Status Changes</p>
-              <h3 class="mb-0 text-white">7</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-xl-3">
-          <div class="card bg-info text-white mb-3">
-            <div class="card-body">
-              <p class="mb-1 opacity-75">Module Access</p>
-              <h3 class="mb-0 text-white" id="accessPreview">Active</h3>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-12">
-          <div class="card">
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="card h-100">
             <div class="card-header d-flex align-items-center justify-content-between">
-              <h5 class="mb-0">Employee Profile</h5>
+              <div>
+                <h5 class="mb-0">Employee Profile</h5>
+                <small class="text-muted">Create and maintain the core employee record used by all other HR modules.</small>
+              </div>
               <span class="badge bg-light-primary text-primary" id="profileStateBadge">Draft</span>
             </div>
             <div class="card-body">
               <form id="employeeMasterForm" novalidate>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h6 class="mb-1">1. Basic profile</h6>
+                    <p class="text-muted mb-0 small">Capture identity, hiring, and access-related details first.</p>
+                  </div>
+                </div>
+
                 <div class="row">
                   <div class="col-md-4 mb-3">
                     <label class="form-label" for="employeeId">Employee ID</label>
-                    <input type="text" class="form-control" id="employeeId" placeholder="EMP-0001" required>
+                    <input type="text" class="form-control" id="employeeId" placeholder="EMP-0401" required>
                   </div>
                   <div class="col-md-4 mb-3">
                     <label class="form-label" for="dateHired">Date Hired</label>
@@ -93,7 +70,20 @@
                     <label class="form-label" for="corporateEmail">Corporate Email</label>
                     <input type="email" class="form-control" id="corporateEmail" placeholder="name@company.com" required>
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="contactNumber">Contact Number</label>
+                    <input type="text" class="form-control" id="contactNumber" placeholder="0917-123-4567">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="birthDate">Birth Date</label>
+                    <input type="date" class="form-control" id="birthDate">
+                  </div>
+
+                  <div class="col-md-8 mb-3">
+                    <label class="form-label" for="address">Address</label>
+                    <input type="text" class="form-control" id="address" placeholder="City, province, and street address">
+                  </div>
+                  <div class="col-md-4 mb-3">
                     <label class="form-label" for="accountStatus">Account Status</label>
                     <select class="form-select" id="accountStatus" required>
                       <option>Active</option>
@@ -101,11 +91,66 @@
                       <option>Separated</option>
                     </select>
                   </div>
+                </div>
 
-                  <div class="col-md-12 mb-2">
-                    <h6 class="mb-0">Onboarding / Offboarding</h6>
-                    <small class="text-muted">Track entry and exit actions for the employee lifecycle.</small>
+                <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
+                  <div>
+                    <h6 class="mb-1">2. Employment details</h6>
+                    <p class="text-muted mb-0 small">Use controlled fields to keep department, position, branch, and manager records consistent.</p>
                   </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="department">Department</label>
+                    <select class="form-select" id="department" required>
+                      <option value="">Select department</option>
+                      <option>Human Resources</option>
+                      <option>Finance</option>
+                      <option>Operations</option>
+                      <option>IT</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="position">Position</label>
+                    <select class="form-select" id="position" required>
+                      <option value="">Select position</option>
+                      <option>HR Officer</option>
+                      <option>HR Manager</option>
+                      <option>Payroll Admin</option>
+                      <option>Immediate Supervisor</option>
+                      <option>Attendance Clerk</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="branch">Branch</label>
+                    <select class="form-select" id="branch" required>
+                      <option value="">Select branch</option>
+                      <option>Main Branch</option>
+                      <option>Quezon Branch</option>
+                      <option>Cebu Branch</option>
+                      <option>Davao Branch</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label" for="manager">Immediate Supervisor</label>
+                    <select class="form-select" id="manager">
+                      <option value="">Select manager</option>
+                      <option>Maria Santos</option>
+                      <option>James Reyes</option>
+                      <option>Anna Cruz</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
+                  <div>
+                    <h6 class="mb-1">3. Lifecycle and movement</h6>
+                    <p class="text-muted mb-0 small">Show onboarding by default, and reveal offboarding only for separated or resigned employees.</p>
+                  </div>
+                </div>
+
+                <div class="row">
                   <div class="col-md-4 mb-3">
                     <label class="form-label" for="onboardingStage">Onboarding Stage</label>
                     <select class="form-select" id="onboardingStage">
@@ -113,25 +158,6 @@
                       <option>Onboarding</option>
                       <option>Completed</option>
                     </select>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="offboardingDate">Offboarding Date</label>
-                    <input type="date" class="form-control" id="offboardingDate">
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="offboardingReason">Offboarding Reason</label>
-                    <select class="form-select" id="offboardingReason">
-                      <option value="">Select reason</option>
-                      <option>Resignation</option>
-                      <option>Transfer</option>
-                      <option>Retirement</option>
-                      <option>Termination</option>
-                    </select>
-                  </div>
-
-                  <div class="col-md-12 mb-2">
-                    <h6 class="mb-0">Employee Movement</h6>
-                    <small class="text-muted">Capture promotion, transfer, or resignation changes.</small>
                   </div>
                   <div class="col-md-4 mb-3">
                     <label class="form-label" for="movementType">Movement Type</label>
@@ -143,27 +169,48 @@
                     </select>
                   </div>
                   <div class="col-md-4 mb-3">
-                    <label class="form-label" for="movementEffectiveDate">Effective Date</label>
+                    <label class="form-label" for="movementEffectiveDate">Movement Effective Date</label>
                     <input type="date" class="form-control" id="movementEffectiveDate">
                   </div>
-                  <div class="col-md-4 mb-3">
+                  <div class="col-md-12 mb-3">
                     <label class="form-label" for="movementRemarks">Movement Remarks</label>
-                    <input type="text" class="form-control" id="movementRemarks" placeholder="Promotion / transfer note">
+                    <input type="text" class="form-control" id="movementRemarks" placeholder="Promotion, transfer, or resignation note">
                   </div>
+                </div>
 
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="department">Department</label>
-                    <input type="text" class="form-control" id="department" required>
+                <div class="border rounded p-3 mb-3 d-none" id="offboardingPanel">
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div>
+                      <h6 class="mb-1">Offboarding details</h6>
+                      <p class="text-muted mb-0 small">Required only when the employee is separated or has a resignation movement.</p>
+                    </div>
+                    <span class="badge bg-light-danger text-danger">Exit Process</span>
                   </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="position">Position</label>
-                    <input type="text" class="form-control" id="position" required>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label" for="offboardingDate">Offboarding Date</label>
+                      <input type="date" class="form-control" id="offboardingDate">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label" for="offboardingReason">Offboarding Reason</label>
+                      <select class="form-select" id="offboardingReason">
+                        <option value="">Select reason</option>
+                        <option>Resignation</option>
+                        <option>Transfer</option>
+                        <option>Retirement</option>
+                        <option>Termination</option>
+                      </select>
+                    </div>
                   </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label" for="branch">Branch</label>
-                    <input type="text" class="form-control" id="branch" required>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
+                  <div>
+                    <h6 class="mb-1">4. Statutory, banking, and documents</h6>
+                    <p class="text-muted mb-0 small">Validate government identifiers and track required file submissions.</p>
                   </div>
+                </div>
 
+                <div class="row">
                   <div class="col-md-3 mb-3">
                     <label class="form-label" for="sss">SSS</label>
                     <input type="text" class="form-control" id="sss" placeholder="12-3456789-0">
@@ -186,13 +233,38 @@
                     <input type="text" class="form-control" id="bankAccount" placeholder="Bank name and account number" required>
                   </div>
                   <div class="col-md-6 mb-3">
-                    <label class="form-label" for="notes">Notes</label>
-                    <input type="text" class="form-control" id="notes" placeholder="Optional onboarding or audit notes">
+                    <label class="form-label" for="emergencyContact">Emergency Contact</label>
+                    <input type="text" class="form-control" id="emergencyContact" placeholder="Name and contact number">
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label d-block">Document Checklist</label>
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" id="docContract">
+                      <label class="form-check-label" for="docContract">Employment Contract</label>
+                    </div>
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" id="docGovIds">
+                      <label class="form-check-label" for="docGovIds">Government IDs</label>
+                    </div>
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" id="docBankForm">
+                      <label class="form-check-label" for="docBankForm">Bank Enrollment Form</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="docClearance">
+                      <label class="form-check-label" for="docClearance">Clearance / Exit Documents</label>
+                    </div>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label class="form-label" for="documentUpload">Document Management</label>
                     <input type="file" class="form-control" id="documentUpload" multiple>
-                    <small class="text-muted">Upload IDs, contracts, forms, or clearance files.</small>
+                    <small class="text-muted">Upload contracts, IDs, forms, or clearance files.</small>
+                  </div>
+
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label" for="notes">Notes</label>
+                    <input type="text" class="form-control" id="notes" placeholder="Optional audit or HR notes">
                   </div>
                 </div>
 
@@ -202,14 +274,75 @@
                 </div>
 
                 <div class="alert alert-light-primary border-primary mt-3 mb-0" id="employeeAlert" role="alert">
-                  Fill out the profile to validate employee identity, statutory data, and account status.
+                  Fill out the profile to validate identity, employment setup, statutory data, and account access.
                 </div>
               </form>
             </div>
           </div>
         </div>
 
-        <div class="col-lg-12 mt-3">
+        <div class="col-lg-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light-primary border-0">
+              <h5 class="mb-0 text-primary">Profile Summary</h5>
+              <small class="text-muted">Read-only preview of the employee record.</small>
+            </div>
+            <div class="card-body">
+              <div class="mb-3 p-3 rounded bg-light">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="text-muted">Account Access</span>
+                  <span class="badge bg-light-primary text-primary" id="accessPreview">Active</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="text-muted">Employee</span>
+                  <strong id="employeeSummary">No employee profile yet</strong>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="text-muted">Assignment</span>
+                  <strong id="assignmentSummary">Department / Position / Branch</strong>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted">Manager</span>
+                  <strong id="managerSummary">Not assigned</strong>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="border rounded p-3 h-100">
+                    <small class="text-muted d-block mb-1">Onboarding</small>
+                    <h5 class="mb-0" id="onboardingSummary">Pre-boarding</h5>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-3 h-100">
+                    <small class="text-muted d-block mb-1">Movement</small>
+                    <h5 class="mb-0" id="movementSummary">None</h5>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-3 h-100">
+                    <small class="text-muted d-block mb-1">Employment</small>
+                    <h5 class="mb-0" id="employmentSummary">-</h5>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-3 h-100">
+                    <small class="text-muted d-block mb-1">Documents</small>
+                    <h5 class="mb-0 text-success" id="documentSummary">0 / 4</h5>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 p-3 rounded bg-light-primary border border-primary-subtle">
+                <strong class="d-block text-primary mb-1">Access rule</strong>
+                <small class="text-muted d-block">Changing account status immediately updates whether the employee should have active HRIS access.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-12">
           <div class="card">
             <div class="card-header d-flex flex-wrap gap-2 align-items-center justify-content-between">
               <div>
@@ -235,15 +368,15 @@
                     </tr>
                   </thead>
                   <tbody id="employeeDirectoryBody">
-                    <tr data-search="EMP-0001 Maria Santos HR Manager Main Branch Active maria.santos@company.com">
+                    <tr data-search="EMP-0001 Maria Santos Human Resources HR Manager Main Branch Active maria.santos@company.com">
                       <td>EMP-0001</td>
                       <td>Maria Santos</td>
-                      <td>HR / HR Manager / Main Branch</td>
+                      <td>Human Resources / HR Manager / Main Branch</td>
                       <td><span class="badge bg-light-success text-success">Active</span></td>
                       <td>maria.santos@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                    <tr data-search="EMP-0002 James Reyes Payroll Admin Main Branch Active james.reyes@company.com">
+                    <tr data-search="EMP-0002 James Reyes Finance Payroll Admin Main Branch Active james.reyes@company.com">
                       <td>EMP-0002</td>
                       <td>James Reyes</td>
                       <td>Finance / Payroll Admin / Main Branch</td>
@@ -251,7 +384,7 @@
                       <td>james.reyes@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                    <tr data-search="EMP-0100 Anna Cruz Supervisor Quezon Branch Probationary anna.cruz@company.com">
+                    <tr data-search="EMP-0100 Anna Cruz Operations Immediate Supervisor Quezon Branch Probationary anna.cruz@company.com">
                       <td>EMP-0100</td>
                       <td>Anna Cruz</td>
                       <td>Operations / Immediate Supervisor / Quezon Branch</td>
@@ -259,7 +392,7 @@
                       <td>anna.cruz@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                    <tr data-search="EMP-0200 Paolo Garcia Attendance Clerk Cebu Branch Inactive paolo.garcia@company.com">
+                    <tr data-search="EMP-0200 Paolo Garcia Operations Attendance Clerk Cebu Branch Inactive paolo.garcia@company.com">
                       <td>EMP-0200</td>
                       <td>Paolo Garcia</td>
                       <td>Operations / Attendance Clerk / Cebu Branch</td>
@@ -267,10 +400,10 @@
                       <td>paolo.garcia@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                    <tr data-search="EMP-0300 Liza Dela Cruz HR Officer Davao Branch Separated liza.delacruz@company.com">
+                    <tr data-search="EMP-0300 Liza Dela Cruz Human Resources HR Officer Davao Branch Separated liza.delacruz@company.com">
                       <td>EMP-0300</td>
                       <td>Liza Dela Cruz</td>
-                      <td>HR / HR Officer / Davao Branch</td>
+                      <td>Human Resources / HR Officer / Davao Branch</td>
                       <td><span class="badge bg-light-danger text-danger">Separated</span></td>
                       <td>liza.delacruz@company.com</td>
                       <td class="text-end"><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
@@ -293,6 +426,14 @@
       const alertBox = document.getElementById('employeeAlert');
       const accessPreview = document.getElementById('accessPreview');
       const profileStateBadge = document.getElementById('profileStateBadge');
+      const employeeSummary = document.getElementById('employeeSummary');
+      const assignmentSummary = document.getElementById('assignmentSummary');
+      const managerSummary = document.getElementById('managerSummary');
+      const onboardingSummary = document.getElementById('onboardingSummary');
+      const movementSummary = document.getElementById('movementSummary');
+      const employmentSummary = document.getElementById('employmentSummary');
+      const documentSummary = document.getElementById('documentSummary');
+      const offboardingPanel = document.getElementById('offboardingPanel');
 
       const employeeId = document.getElementById('employeeId');
       const corporateEmail = document.getElementById('corporateEmail');
@@ -302,22 +443,30 @@
       const dateHired = document.getElementById('dateHired');
       const employmentStatus = document.getElementById('employmentStatus');
       const accountStatus = document.getElementById('accountStatus');
+      const contactNumber = document.getElementById('contactNumber');
+      const birthDate = document.getElementById('birthDate');
+      const address = document.getElementById('address');
       const department = document.getElementById('department');
       const position = document.getElementById('position');
       const branch = document.getElementById('branch');
+      const manager = document.getElementById('manager');
       const onboardingStage = document.getElementById('onboardingStage');
       const offboardingDate = document.getElementById('offboardingDate');
       const offboardingReason = document.getElementById('offboardingReason');
       const movementType = document.getElementById('movementType');
       const movementEffectiveDate = document.getElementById('movementEffectiveDate');
-      const movementRemarks = document.getElementById('movementRemarks');
       const sss = document.getElementById('sss');
       const philhealth = document.getElementById('philhealth');
       const pagibig = document.getElementById('pagibig');
       const tin = document.getElementById('tin');
       const bankAccount = document.getElementById('bankAccount');
-      const documentUpload = document.getElementById('documentUpload');
+      const emergencyContact = document.getElementById('emergencyContact');
+      const movementRemarks = document.getElementById('movementRemarks');
       const notes = document.getElementById('notes');
+      const docContract = document.getElementById('docContract');
+      const docGovIds = document.getElementById('docGovIds');
+      const docBankForm = document.getElementById('docBankForm');
+      const docClearance = document.getElementById('docClearance');
       const employeeSearch = document.getElementById('employeeSearch');
       const employeeCount = document.getElementById('employeeCount');
       const employeeDirectoryBody = document.getElementById('employeeDirectoryBody');
@@ -325,41 +474,73 @@
 
       const existingEmployeeIds = ['EMP-0001', 'EMP-0002', 'EMP-0100'];
       const existingEmails = ['maria.santos@company.com', 'james.reyes@company.com'];
+      const employeeRecords = {
+        'EMP-0001': { firstName: 'Maria', middleName: '', lastName: 'Santos', corporateEmail: 'maria.santos@company.com', dateHired: '2023-01-15', employmentStatus: 'Regular', accountStatus: 'Active', contactNumber: '0917-111-2233', birthDate: '1992-04-18', address: 'Quezon City, Metro Manila', department: 'Human Resources', position: 'HR Manager', branch: 'Main Branch', manager: '', onboardingStage: 'Completed', movementType: 'None', movementEffectiveDate: '', movementRemarks: '', sss: '12-3456789-0', philhealth: '12-345678901-2', pagibig: '1234-5678-9012', tin: '123-456-789-000', bankAccount: 'BDO - 1234567890', emergencyContact: 'Carlos Santos - 0917-000-1111' },
+        'EMP-0002': { firstName: 'James', middleName: '', lastName: 'Reyes', corporateEmail: 'james.reyes@company.com', dateHired: '2023-03-10', employmentStatus: 'Regular', accountStatus: 'Active', contactNumber: '0917-222-3344', birthDate: '1990-08-09', address: 'Makati City, Metro Manila', department: 'Finance', position: 'Payroll Admin', branch: 'Main Branch', manager: 'Maria Santos', onboardingStage: 'Completed', movementType: 'None', movementEffectiveDate: '', movementRemarks: '', sss: '23-4567890-1', philhealth: '23-456789012-3', pagibig: '2345-6789-0123', tin: '234-567-890-111', bankAccount: 'BPI - 2345678901', emergencyContact: 'Lea Reyes - 0917-111-2222' },
+        'EMP-0100': { firstName: 'Anna', middleName: '', lastName: 'Cruz', corporateEmail: 'anna.cruz@company.com', dateHired: '2024-02-01', employmentStatus: 'Probationary', accountStatus: 'Active', contactNumber: '0917-333-4455', birthDate: '1996-06-21', address: 'Quezon City, Metro Manila', department: 'Operations', position: 'Immediate Supervisor', branch: 'Quezon Branch', manager: 'Maria Santos', onboardingStage: 'Onboarding', movementType: 'None', movementEffectiveDate: '', movementRemarks: '', sss: '34-5678901-2', philhealth: '34-567890123-4', pagibig: '3456-7890-1234', tin: '345-678-901-222', bankAccount: 'Landbank - 3456789012', emergencyContact: 'Jose Cruz - 0917-222-3333' },
+        'EMP-0200': { firstName: 'Paolo', middleName: '', lastName: 'Garcia', corporateEmail: 'paolo.garcia@company.com', dateHired: '2023-07-08', employmentStatus: 'Contractual', accountStatus: 'Inactive', contactNumber: '0917-444-5566', birthDate: '1994-11-03', address: 'Cebu City, Cebu', department: 'Operations', position: 'Attendance Clerk', branch: 'Cebu Branch', manager: 'Anna Cruz', onboardingStage: 'Completed', movementType: 'Transfer', movementEffectiveDate: '2025-01-15', movementRemarks: 'Transferred to Cebu Branch', sss: '45-6789012-3', philhealth: '45-678901234-5', pagibig: '4567-8901-2345', tin: '456-789-012-333', bankAccount: 'Metrobank - 4567890123', emergencyContact: 'Mina Garcia - 0917-333-4444' },
+        'EMP-0300': { firstName: 'Liza', middleName: 'Dela', lastName: 'Cruz', corporateEmail: 'liza.delacruz@company.com', dateHired: '2022-09-20', employmentStatus: 'Regular', accountStatus: 'Separated', contactNumber: '0917-555-6677', birthDate: '1989-12-12', address: 'Davao City, Davao del Sur', department: 'Human Resources', position: 'HR Officer', branch: 'Davao Branch', manager: 'Maria Santos', onboardingStage: 'Completed', movementType: 'Resignation', movementEffectiveDate: '2026-05-31', movementRemarks: 'Resigned for relocation', offboardingDate: '2026-05-31', offboardingReason: 'Resignation', sss: '56-7890123-4', philhealth: '56-789012345-6', pagibig: '5678-9012-3456', tin: '567-890-123-444', bankAccount: 'UnionBank - 5678901234', emergencyContact: 'Ana Dela Cruz - 0917-444-5555' }
+      };
 
       function setAlert(type, message) {
         alertBox.className = `alert alert-light-${type} border-${type} mt-3 mb-0`;
         alertBox.textContent = message;
       }
 
+      function validStatutory(value, pattern) {
+        if (!value) return true;
+        return pattern.test(value.trim());
+      }
+
+      function getDocumentCount() {
+        return [docContract, docGovIds, docBankForm, docClearance].filter((item) => item.checked).length;
+      }
+
       function updateAccessPreview() {
         if (accountStatus.value === 'Active') {
           accessPreview.textContent = 'Active';
+          accessPreview.className = 'badge bg-light-success text-success';
           profileStateBadge.textContent = 'Active';
-          profileStateBadge.className = 'badge bg-light-primary text-primary';
+          profileStateBadge.className = 'badge bg-light-success text-success';
         } else if (accountStatus.value === 'Inactive') {
           accessPreview.textContent = 'Restricted';
+          accessPreview.className = 'badge bg-light-warning text-warning';
           profileStateBadge.textContent = 'Inactive';
           profileStateBadge.className = 'badge bg-light-warning text-warning';
         } else {
-          accessPreview.textContent = 'Severed';
+          accessPreview.textContent = 'Removed';
+          accessPreview.className = 'badge bg-light-danger text-danger';
           profileStateBadge.textContent = 'Separated';
           profileStateBadge.className = 'badge bg-light-danger text-danger';
         }
       }
 
-      function validStatutory(value, pattern) {
-        if (!value) {
-          return true;
+      function updateOffboardingPanel() {
+        const showOffboarding = accountStatus.value === 'Separated' || movementType.value === 'Resignation';
+        offboardingPanel.classList.toggle('d-none', !showOffboarding);
+        if (!showOffboarding) {
+          offboardingDate.value = '';
+          offboardingReason.value = '';
         }
-        return pattern.test(value.trim());
+      }
+
+      function updateSummary() {
+        const fullName = [firstName.value.trim(), middleName.value.trim(), lastName.value.trim()].filter(Boolean).join(' ');
+        employeeSummary.textContent = fullName || 'No employee profile yet';
+        assignmentSummary.textContent = department.value && position.value && branch.value ? `${department.value} / ${position.value} / ${branch.value}` : 'Department / Position / Branch';
+        managerSummary.textContent = manager.value || 'Not assigned';
+        onboardingSummary.textContent = onboardingStage.value || 'Pre-boarding';
+        movementSummary.textContent = movementType.value === 'None' ? 'None' : `${movementType.value}${movementEffectiveDate.value ? ` (${movementEffectiveDate.value})` : ''}`;
+        employmentSummary.textContent = employmentStatus.value || '-';
+        documentSummary.textContent = `${getDocumentCount()} / 4`;
       }
 
       function validateForm() {
         const idValue = employeeId.value.trim();
         const emailValue = corporateEmail.value.trim().toLowerCase();
-        const fullName = [firstName.value, middleName.value, lastName.value].join(' ').trim();
+        const fullName = [firstName.value, middleName.value, lastName.value].filter(Boolean).join(' ').trim();
 
-        if (!idValue || !emailValue || !firstName.value.trim() || !lastName.value.trim() || !dateHired.value || !employmentStatus.value || !department.value.trim() || !position.value.trim() || !branch.value.trim() || !bankAccount.value.trim()) {
+        if (!idValue || !emailValue || !firstName.value.trim() || !lastName.value.trim() || !dateHired.value || !employmentStatus.value || !department.value || !position.value || !branch.value || !bankAccount.value.trim()) {
           setAlert('danger', 'Please complete the required employee profile fields.');
           return false;
         }
@@ -385,7 +566,7 @@
         }
 
         if (!validStatutory(pagibig.value, /^\d{4}-\d{4}-\d{4}$/)) {
-          setAlert('danger', 'Pag-IBIG must follow a valid Philippine format such as 1234-5678-9012.');
+          setAlert('danger', 'Pag-IBIG must follow a formatted pattern such as 1234-5678-9012.');
           return false;
         }
 
@@ -394,8 +575,62 @@
           return false;
         }
 
+        if ((accountStatus.value === 'Separated' || movementType.value === 'Resignation') && (!offboardingDate.value || !offboardingReason.value)) {
+          setAlert('danger', 'Please complete the offboarding date and reason for separated or resigned employees.');
+          return false;
+        }
+
         setAlert('success', `${fullName} is ready to be saved as a new employee profile.`);
         return true;
+      }
+
+      function loadEmployeeRecord(idValue) {
+        const record = employeeRecords[idValue];
+        if (!record) return;
+
+        employeeId.value = idValue;
+        firstName.value = record.firstName || '';
+        middleName.value = record.middleName || '';
+        lastName.value = record.lastName || '';
+        corporateEmail.value = record.corporateEmail || '';
+        dateHired.value = record.dateHired || '';
+        employmentStatus.value = record.employmentStatus || '';
+        accountStatus.value = record.accountStatus || 'Active';
+        contactNumber.value = record.contactNumber || '';
+        birthDate.value = record.birthDate || '';
+        address.value = record.address || '';
+        department.value = record.department || '';
+        position.value = record.position || '';
+        branch.value = record.branch || '';
+        manager.value = record.manager || '';
+        onboardingStage.value = record.onboardingStage || 'Pre-boarding';
+        movementType.value = record.movementType || 'None';
+        movementEffectiveDate.value = record.movementEffectiveDate || '';
+        movementRemarks.value = record.movementRemarks || '';
+        offboardingDate.value = record.offboardingDate || '';
+        offboardingReason.value = record.offboardingReason || '';
+        sss.value = record.sss || '';
+        philhealth.value = record.philhealth || '';
+        pagibig.value = record.pagibig || '';
+        tin.value = record.tin || '';
+        bankAccount.value = record.bankAccount || '';
+        emergencyContact.value = record.emergencyContact || '';
+        notes.value = '';
+        docContract.checked = true;
+        docGovIds.checked = true;
+        docBankForm.checked = true;
+        docClearance.checked = accountStatus.value === 'Separated';
+
+        updateAccessPreview();
+        updateOffboardingPanel();
+        updateSummary();
+        profileStateBadge.textContent = 'Loaded';
+        profileStateBadge.className = 'badge bg-light-info text-info';
+        setAlert('info', idValue + ' loaded into the employee profile form.');
+        window.requestAnimationFrame(function () {
+          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          employeeId.focus({ preventScroll: true });
+        });
       }
 
       function updateEmployeeDirectoryFilter() {
@@ -406,9 +641,7 @@
           const haystack = (row.dataset.search || row.textContent || '').toLowerCase();
           const showRow = !query || haystack.includes(query);
           row.classList.toggle('d-none', !showRow);
-          if (showRow) {
-            visibleRows += 1;
-          }
+          if (showRow) visibleRows += 1;
         });
 
         employeeCount.textContent = `${visibleRows} record${visibleRows === 1 ? '' : 's'}`;
@@ -416,21 +649,41 @@
 
       form.addEventListener('input', function () {
         updateAccessPreview();
-        updateEmployeeDirectoryFilter();
+        updateOffboardingPanel();
+        updateSummary();
       });
 
-      accountStatus.addEventListener('change', updateAccessPreview);
+      form.addEventListener('change', function () {
+        updateAccessPreview();
+        updateOffboardingPanel();
+        updateSummary();
+      });
+
       employeeSearch.addEventListener('input', updateEmployeeDirectoryFilter);
+
+      employeeDirectoryBody.addEventListener('click', function (event) {
+        const viewButton = event.target.closest('a.btn');
+        if (!viewButton) return;
+        event.preventDefault();
+        const row = viewButton.closest('tr');
+        if (!row) return;
+        const selectedEmployeeId = row.children[0] ? row.children[0].textContent.trim() : '';
+        if (!selectedEmployeeId) return;
+        loadEmployeeRecord(selectedEmployeeId);
+      });
 
       saveBtn.addEventListener('click', function () {
         profileStateBadge.textContent = 'Draft';
         profileStateBadge.className = 'badge bg-light-primary text-primary';
+        updateSummary();
         setAlert('primary', 'Employee profile draft saved locally.');
       });
 
       form.addEventListener('submit', function (event) {
         event.preventDefault();
         updateAccessPreview();
+        updateOffboardingPanel();
+        updateSummary();
 
         if (!validateForm()) {
           return;
@@ -438,12 +691,11 @@
 
         profileStateBadge.textContent = 'Saved';
         profileStateBadge.className = 'badge bg-light-success text-success';
-
         setAlert('success', `${employeeId.value.trim()} saved successfully. Historical data protection remains enforced by policy.`);
 
         const summary = [
           `Name: ${[firstName.value, middleName.value, lastName.value].filter(Boolean).join(' ')}`,
-          `Department: ${department.value.trim()}`,
+          `Assignment: ${department.value} / ${position.value} / ${branch.value}`,
           `Status: ${employmentStatus.value}`,
           `Onboarding: ${onboardingStage.value}`,
           `Movement: ${movementType.value}${movementEffectiveDate.value ? ` (${movementEffectiveDate.value})` : ''}`
@@ -456,6 +708,8 @@
       });
 
       updateAccessPreview();
+      updateOffboardingPanel();
+      updateSummary();
       updateEmployeeDirectoryFilter();
     })();
   </script>
@@ -466,3 +720,11 @@
 <!-- [Body] end -->
 
 </html>
+
+
+
+
+
+
+
+
