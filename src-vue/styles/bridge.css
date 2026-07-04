@@ -1,0 +1,29 @@
+body {
+  background: #f8f9fa;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.pc-item.active > .pc-link {
+  color: var(--bs-primary);
+  font-weight: 600;
+}
+
+.pc-item.active > .pc-link .pc-micon,
+.pc-item.active > .pc-link .pc-mtext {
+  color: var(--bs-primary);
+}
+
+.auth-main {
+  min-height: 100vh;
+}
+
+.auth-main .auth-wrapper.v3 .auth-form {
+  background: none;
+}
+
+.auth-main .auth-wrapper.v3 .auth-form::after {
+  display: none;
+}

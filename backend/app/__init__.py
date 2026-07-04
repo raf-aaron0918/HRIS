@@ -1,0 +1,1 @@
+"""HRIS FastAPI backend package."""
