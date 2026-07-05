@@ -46,14 +46,14 @@
       </li>
       <li class="dropdown pc-h-item header-user-profile">
         <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button">
-          <img src="/dist/assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar" />
+          <img :src="avatar2" alt="user-image" class="user-avtar" />
           <span>{{ displayName }}</span>
         </a>
         <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
           <div class="dropdown-header">
             <div class="d-flex mb-1">
               <div class="flex-shrink-0">
-                <img src="/dist/assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35" />
+                <img :src="avatar2" alt="user-image" class="user-avtar wid-35" />
               </div>
               <div class="flex-grow-1 ms-3">
                 <h6 class="mb-1">{{ displayName }}</h6>
@@ -91,6 +91,10 @@ import { RouterLink } from "vue-router";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 
+import avatar1 from "../../src/assets/images/user/avatar-1.jpg";
+import avatar2 from "../../src/assets/images/user/avatar-2.jpg";
+import avatar3 from "../../src/assets/images/user/avatar-3.jpg";
+
 defineEmits(["toggleSidebar"]);
 const router = useRouter();
 const authStore = useAuthStore();
@@ -105,19 +109,19 @@ function handleLogout() {
 
 const messages = [
   {
-    avatar: "/dist/assets/images/user/avatar-2.jpg",
+    avatar: avatar2,
     time: "3:00 AM",
     title: "It's <b>Cristina Danny's</b> birthday today.",
     subtitle: "2 min ago",
   },
   {
-    avatar: "/dist/assets/images/user/avatar-1.jpg",
+    avatar: avatar1,
     time: "6:00 PM",
     title: "<b>Aida Burg</b> commented on your post.",
     subtitle: "5 August",
   },
   {
-    avatar: "/dist/assets/images/user/avatar-3.jpg",
+    avatar: avatar3,
     time: "2:45 PM",
     title: "<b>There was a failure in your setup.</b>",
     subtitle: "7 hours ago",
