@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build:vue",
+  "outputDirectory": "dist-vue",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
