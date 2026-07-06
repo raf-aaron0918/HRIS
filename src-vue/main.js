@@ -1,8 +1,15 @@
 import { createApp, nextTick } from "vue";
 import { createPinia } from "pinia";
+import "bootstrap";
 import App from "./App.vue";
 import router from "./router";
 import { useAuthStore } from "@/stores/auth";
+import "../src/assets/fonts/tabler-icons.min.css";
+import "../src/assets/fonts/feather.css";
+import "../src/assets/fonts/fontawesome.css";
+import "../src/assets/fonts/material.css";
+import "../src/assets/scss/style.scss";
+import "../src/assets/scss/style-preset.scss";
 import "./styles/bridge.css";
 
 function applyThemeDefaults() {
