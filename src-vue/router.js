@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 import LoginPage from "@/pages/LoginPage.vue";
 import DashboardPage from "@/pages/DashboardPage.vue";
 import EmployeeMasterPage from "@/pages/EmployeeMasterPage.vue";
+import EmployeeProfilePage from "@/pages/EmployeeProfilePage.vue";
+import EmployeeNewPage from "@/pages/EmployeeNewPage.vue";
+
 import AttendancePage from "@/pages/AttendancePage.vue";
 import LeaveManagementPage from "@/pages/LeaveManagementPage.vue";
 import PayrollPage from "@/pages/PayrollPage.vue";
@@ -43,6 +46,24 @@ const routes = [
     meta: {
       shell: true,
       title: "Employee Master",
+    },
+  },
+  {
+    path: "/employee/:id?",
+    name: "employee-profile",
+    component: EmployeeProfilePage,
+    meta: {
+      shell: true,
+      title: "Employee Profile",
+    },
+  },
+  {
+    path: "/employee/new",
+    name: "employee-new",
+    component: EmployeeNewPage,
+    meta: {
+      shell: true,
+      title: "New Employee",
     },
   },
   {
@@ -95,6 +116,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0 };
+    }
+  },
 });
 
 router.beforeEach(async (to) => {

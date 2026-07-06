@@ -1,0 +1,36 @@
+:root{--bb-mobile-gap:12px}
+
+/* Shell: make content take full width on small screens */
+@media (max-width: 991.98px){
+  /* Sidebar/topbar may otherwise force a desktop layout */
+  .pc-sidebar{position:fixed;left:0;top:0;height:100vh;z-index:1050;transform:translateX(-100%);transition:transform .2s ease;max-width:82vw;}
+  .pc-header{position:sticky;top:0;z-index:1030;}
+  body{overflow-x:hidden;}
+  .pc-content{padding-top:var(--bb-mobile-gap);}
+
+
+  /* When sidebar gets toggled open via existing template scripts, allow it to show */
+  body.pc-sidebar-open .pc-sidebar,
+  .pc-sidebar.pc-sidebar-active,
+  .pc-sidebar.is-active{transform:translateX(0);}
+
+  /* Ensure sidebar toggle + links remain clickable on mobile */
+  .pc-header{pointer-events:auto;}
+  .pc-mob-drp, .pc-header .pc-head-link{pointer-events:auto;}
+  .pc-sidebar{pointer-events:auto;}
+
+  /* Prevent any overlay/collapsed sidebar layer from stealing clicks */
+  .pc-sidebar, .pc-header{background-clip:padding-box;}
+
+
+  /* Main container should not be squeezed */
+  .pc-container,.pc-content{width:100%}
+}
+
+/* Payroll page: ensure right summary drops below on mobile */
+@media (max-width: 767.98px){
+  #payrollForm, .pc-content .card.h-100{margin-bottom:var(--bb-mobile-gap)}
+  /* reduce large headings spacing */
+  .pc-content h5{letter-spacing:-0.01em}
+}
+

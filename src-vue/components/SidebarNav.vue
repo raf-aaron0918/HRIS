@@ -45,7 +45,7 @@ const navItems = [
   { to: "/attendance", label: "Time & Attendance", icon: "ti ti-clock" },
   { to: "/leave", label: "Leave Management", icon: "ti ti-calendar-event" },
   { to: "/payroll", label: "Payroll", icon: "ti ti-receipt-2" },
-  { to: "/accounts", label: "Accounts", icon: "ti ti-user-cog" },
+  { to: "/accounts", label: "Accounts", icon: "ti ti-user-check" },
   { to: "/reports", label: "Reports", icon: "ti ti-chart-bar" },
 ];
 </script>
