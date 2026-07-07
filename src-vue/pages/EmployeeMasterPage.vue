@@ -108,40 +108,58 @@
               {{ directoryError }}
             </div>
 
-            <div v-else class="table-responsive mt-3">
-              <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>ID</th>
-                    <th>Employee</th>
-                    <th>Assignment</th>
-                    <th>Status</th>
-                    <th>Lifecycle</th>
-                    <th>Docs</th>
-                    <th>Contact</th>
-                    <th class="text-end">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="filteredDirectory.length === 0">
-                    <td colspan="8" class="text-center py-4 text-muted">
-                      No employees match your search or filter criteria.
-                    </td>
-                  </tr>
-                  <tr v-for="row in filteredDirectory" :key="row.id">
-                    <td data-label="Employee ID">{{ row.id }}</td>
-                    <td data-label="Name">{{ row.name }}</td>
-                    <td data-label="Assignment">{{ row.assignment }}</td>
-                    <td data-label="Status"><span class="badge" :class="row.statusClass">{{ row.statusLabel }}</span></td>
-                    <td data-label="Lifecycle"><span class="badge" :class="row.lifecycleClass">{{ row.lifecycleLabel }}</span></td>
-                    <td data-label="Documents">{{ row.documents }} / 4</td>
-                    <td data-label="Email">{{ row.email }}</td>
-                    <td data-label="Action" class="text-end">
+            <div v-else class="mt-3">
+              <div v-if="filteredDirectory.length === 0" class="text-center py-4 text-muted">
+                No employees match your search or filter criteria.
+              </div>
+
+              <template v-else>
+                <div class="d-none d-md-block">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                      <thead class="table-light">
+                        <tr>
+                          <th>ID</th>
+                          <th>Employee</th>
+                          <th>Assignment</th>
+                          <th>Status</th>
+                          <th>Lifecycle</th>
+                          <th>Docs</th>
+                          <th>Contact</th>
+                          <th class="text-end">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="row in filteredDirectory" :key="row.id">
+                          <td data-label="Employee ID">{{ row.id }}</td>
+                          <td data-label="Name">{{ row.name }}</td>
+                          <td data-label="Assignment">{{ row.assignment }}</td>
+                          <td data-label="Status"><span class="badge" :class="row.statusClass">{{ row.statusLabel }}</span></td>
+                          <td data-label="Lifecycle"><span class="badge" :class="row.lifecycleClass">{{ row.lifecycleLabel }}</span></td>
+                          <td data-label="Documents">{{ row.documents }} / 4</td>
+                          <td data-label="Email">{{ row.email }}</td>
+                          <td data-label="Action" class="text-end">
+                            <RouterLink :to="'/employee/' + row.id" class="btn btn-sm btn-outline-primary">View</RouterLink>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="d-md-none">
+                  <div v-for="row in filteredDirectory" :key="row.id" class="border rounded p-3 mb-2 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                      <div>
+                        <div class="fw-semibold">{{ row.name }}</div>
+                        <div class="small text-muted">{{ row.id }}</div>
+                      </div>
                       <RouterLink :to="'/employee/' + row.id" class="btn btn-sm btn-outline-primary">View</RouterLink>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                    <div class="small text-muted mt-2">{{ row.assignment }}</div>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
