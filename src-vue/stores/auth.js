@@ -69,11 +69,18 @@ export const useAuthStore = defineStore("auth", () => {
       };
     }
 
-    accessToken.value = data.access_token;
-    currentUser.value = data.user;
+    const token = data?.access_token || data?.token || "";
+    const user = data?.user || data || null;
+
+    if (!token) {
+      throw new Error("Login response did not include an access token.");
+    }
+
+    accessToken.value = token;
+    currentUser.value = user;
     persistSession();
 
-    return data.user;
+    return user;
   }
 
   async function loadCurrentUser() {

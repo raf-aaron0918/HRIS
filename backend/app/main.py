@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.core.config import settings
-from app.core.db import init_db
+from app.core.db import init_db, active_database_url, using_fallback_database
 
 
 @asynccontextmanager
@@ -35,3 +35,11 @@ app.include_router(api_router, prefix=settings.api_v1_prefix)
 @app.get("/", tags=["health"])
 def root() -> dict[str, str]:
     return {"message": f"{settings.app_name} is running"}
+
+@app.get("/db-status", tags=["health"])
+def db_status() -> dict[str, str | bool]:
+    return {
+        "app_name": settings.app_name,
+        "database_url": str(active_database_url),
+        "using_fallback_database": using_fallback_database,
+    }

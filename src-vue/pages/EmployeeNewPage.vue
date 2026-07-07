@@ -399,8 +399,10 @@ const positionOptionsByDepartment = {
 };
 
 function createEmptyForm() {
+  const nextId = `EMP-${String(Date.now()).slice(-4)}`;
+
   return {
-    employeeId: "EMP-0001",
+    employeeId: nextId,
     dateHired: "",
     employmentStatus: "",
     firstName: "",
@@ -537,8 +539,9 @@ function removeUpload(index) {
 }
 
 function buildEmployeePayload() {
+  const employeeCode = (form.employeeId || "").trim() || `EMP-${String(Date.now()).slice(-4)}`;
   return {
-    employee_code: form.employeeId.trim(),
+    employee_code: employeeCode,
     first_name: form.firstName.trim(),
     middle_name: form.middleName.trim() || null,
     last_name: form.lastName.trim(),

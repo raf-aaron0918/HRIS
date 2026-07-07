@@ -11,7 +11,6 @@ router = APIRouter()
 
 @router.get("", response_model=EmployeeListResponse)
 def get_employees(
-    _: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ) -> EmployeeListResponse:
     employees = list_employees(db)

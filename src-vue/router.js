@@ -76,6 +76,16 @@ const routes = [
     },
   },
   {
+    path: "/attendance/new",
+    name: "attendance-new",
+    component: () => import("@/pages/AttendanceNewPage.vue"),
+    meta: {
+      shell: true,
+      title: "New Attendance",
+    },
+  },
+
+  {
     path: "/leave",
     name: "leave",
     component: LeaveManagementPage,
