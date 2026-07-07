@@ -316,18 +316,14 @@
         </div>
       </div>
 
-      <div class="col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
+      <div v-if="showConfirmationCard" class="col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
         <div class="card h-100 border-0 shadow-sm">
           <div class="card-header bg-light-primary border-0">
-            <h5 class="mb-0 text-primary">Profile Summary</h5>
-            <small class="text-muted">Read-only preview of the employee record.</small>
+            <h5 class="mb-0 text-primary">Confirm Employee Creation</h5>
+            <small class="text-muted">Review the details before saving.</small>
           </div>
           <div class="card-body">
             <div class="mb-3 p-3 rounded bg-light">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Account Access</span>
-                <span class="badge" :class="accessPreview.class">{{ accessPreview.label }}</span>
-              </div>
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="text-muted">Employee</span>
                 <strong>{{ employeeSummary }}</strong>
@@ -336,42 +332,23 @@
                 <span class="text-muted">Assignment</span>
                 <strong>{{ assignmentSummary }}</strong>
               </div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted">Status</span>
+                <strong>{{ employmentSummary }}</strong>
+              </div>
               <div class="d-flex justify-content-between align-items-center">
                 <span class="text-muted">Manager</span>
                 <strong>{{ managerSummary }}</strong>
               </div>
             </div>
 
-            <div class="row g-3">
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Onboarding</small>
-                  <h5 class="mb-0">{{ onboardingSummary }}</h5>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Movement</small>
-                  <h5 class="mb-0">{{ movementSummary }}</h5>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Employment</small>
-                  <h5 class="mb-0">{{ employmentSummary }}</h5>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Documents</small>
-                  <h5 class="mb-0 text-success">{{ documentSummary }}</h5>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-3 p-3 rounded bg-light-primary border border-primary-subtle">
-              <strong class="d-block text-primary mb-1">Access rule</strong>
-              <small class="text-muted d-block">Changing account status updates whether the employee should have active HRIS access.</small>
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-primary" :disabled="isSubmitting" @click="confirmCreateEmployee">
+                Confirm Create Employee
+              </button>
+              <button type="button" class="btn btn-outline-secondary" @click="cancelConfirmation">
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -444,6 +421,7 @@ function createEmptyForm() {
 const form = reactive(createEmptyForm());
 const validationErrors = reactive({});
 const isSubmitting = ref(false);
+const showConfirmationCard = ref(false);
 
 const alertState = reactive({
   class: "alert-light-primary border-primary",
@@ -610,10 +588,19 @@ function saveDraft() {
   setAlert("primary", "Employee profile draft saved locally.");
 }
 
-async function handleSubmit() {
+function handleSubmit() {
   if (!validateForm()) return;
+  showConfirmationCard.value = true;
+}
 
+function cancelConfirmation() {
+  showConfirmationCard.value = false;
+}
+
+async function confirmCreateEmployee() {
   isSubmitting.value = true;
+  showConfirmationCard.value = false;
+
   try {
     const payload = buildEmployeePayload();
     await apiRequest("/employees", {
