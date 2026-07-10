@@ -78,7 +78,7 @@
                   <span class="input-group-text bg-light border-end-0"><i class="ti ti-search"></i></span>
                   <input v-model="employeeSearch" type="text" class="form-control border-start-0 ps-0 bg-light" placeholder="Search employees...">
                 </div>
-                <RouterLink to="/employee/new" class="btn btn-primary d-flex align-items-center gap-2 text-nowrap">
+                <RouterLink v-if="canManageEmployees" to="/employee/new" class="btn btn-primary d-flex align-items-center gap-2 text-nowrap">
                   <i class="ti ti-user-plus"></i> New Employee
                 </RouterLink>
               </div>
@@ -176,6 +176,7 @@ import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
+const canManageEmployees = computed(() => authStore.currentUser?.role === "HR Admin");
 
 const baseDirectory = ref([]);
 const directoryError = ref("");

@@ -65,3 +65,13 @@ def require_hr_admin(current_user: User = Depends(get_current_active_user)) -> U
         )
 
     return current_user
+
+
+def require_hr_or_payroll_admin(current_user: User = Depends(get_current_active_user)) -> User:
+    if current_user.role not in {UserRole.hr_admin, UserRole.payroll_admin}:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only HR Admin and Payroll Admin users can manage payroll",
+        )
+
+    return current_user

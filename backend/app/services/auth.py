@@ -19,6 +19,10 @@ def get_user_by_email(db: Session, email: str) -> User | None:
     return db.query(User).filter(User.email == email).first()
 
 
+def get_user_by_id(db: Session, user_id: int) -> User | None:
+    return db.query(User).filter(User.id == user_id).first()
+
+
 def list_users(db: Session) -> list[User]:
     return db.query(User).order_by(User.full_name.asc(), User.username.asc()).all()
 
@@ -41,6 +45,14 @@ def create_user(
         role=UserRole(role),
         is_active=is_active,
     )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def update_user_status(db: Session, user: User, *, is_active: bool) -> User:
+    user.is_active = is_active
     db.add(user)
     db.commit()
     db.refresh(user)

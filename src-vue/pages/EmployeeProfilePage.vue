@@ -26,6 +26,9 @@
             <div v-else-if="loadingError" class="alert alert-danger">
               {{ loadingError }}
             </div>
+            <div v-else-if="authStore.currentUser?.role !== 'HR Admin'" class="alert alert-light-warning border-warning">
+              Only HR Admin users can create or update employee records.
+            </div>
             <form v-else novalidate @submit.prevent="handleSubmit">
               <div class="d-flex align-items-center justify-content-between mb-3">
                 <div>
@@ -290,7 +293,7 @@
 
               <div class="d-flex flex-wrap gap-2 mt-2">
                 <button type="button" class="btn btn-outline-primary" @click="saveDraft">Save Draft</button>
-                <button type="submit" class="btn btn-primary" :disabled="isSubmitting">{{ submitButtonLabel }}</button>
+                <button type="submit" class="btn btn-primary" :disabled="isSubmitting || authStore.currentUser?.role !== 'HR Admin'">{{ submitButtonLabel }}</button>
               </div>
 
               <div class="alert mt-3 mb-0" :class="alertState.class" role="alert">
@@ -693,6 +696,11 @@ function buildEmployeePayload() {
 }
 
 async function handleSubmit() {
+  if (authStore.currentUser?.role !== "HR Admin") {
+    setAlert("danger", "Only HR Admin users can create or update employee records.");
+    return;
+  }
+
   if (!validateForm()) {
     return;
   }

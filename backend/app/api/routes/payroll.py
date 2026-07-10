@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_active_user, get_db
+from app.api.deps import get_current_active_user, get_db, require_hr_or_payroll_admin
 from app.models.user import User
 from app.schemas.payroll import PayrollCreate, PayrollListResponse, PayrollResponse, PayrollUpdate
 from app.services.payroll import create_payroll_run, get_payroll_run_by_id, list_payroll_runs, update_payroll_run
@@ -21,7 +21,7 @@ def get_payroll_runs(
 @router.post("", response_model=PayrollResponse, status_code=status.HTTP_201_CREATED)
 def create_payroll_record(
     payload: PayrollCreate,
-    _: User = Depends(get_current_active_user),
+    _: User = Depends(require_hr_or_payroll_admin),
     db: Session = Depends(get_db),
 ) -> PayrollResponse:
     if get_payroll_run_by_id(db, payload.payroll_run_id):
@@ -35,7 +35,7 @@ def create_payroll_record(
 def update_payroll_record(
     payroll_run_id: str,
     payload: PayrollUpdate,
-    _: User = Depends(get_current_active_user),
+    _: User = Depends(require_hr_or_payroll_admin),
     db: Session = Depends(get_db),
 ) -> PayrollResponse:
     record = get_payroll_run_by_id(db, payroll_run_id)

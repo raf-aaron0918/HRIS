@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_active_user, get_db
+from app.api.deps import get_current_active_user, get_db, require_hr_admin
 from app.models.user import User
 from app.schemas.employee import EmployeeCreate, EmployeeListResponse, EmployeeResponse, EmployeeUpdate
 from app.services.employee import create_employee, get_employee_by_code, get_employee_by_email, list_employees, update_employee
@@ -20,7 +20,7 @@ def get_employees(
 @router.post("", response_model=EmployeeResponse, status_code=status.HTTP_201_CREATED)
 def create_employee_record(
     payload: EmployeeCreate,
-    _: User = Depends(get_current_active_user),
+    _: User = Depends(require_hr_admin),
     db: Session = Depends(get_db),
 ) -> EmployeeResponse:
     if get_employee_by_code(db, payload.employee_code):
@@ -37,7 +37,7 @@ def create_employee_record(
 def update_employee_record(
     employee_code: str,
     payload: EmployeeUpdate,
-    _: User = Depends(get_current_active_user),
+    _: User = Depends(require_hr_admin),
     db: Session = Depends(get_db),
 ) -> EmployeeResponse:
     employee = get_employee_by_code(db, employee_code)

@@ -3,7 +3,7 @@
     <BreadcrumbBar section="HR Modules" current="Payroll" />
 
     <div class="row g-3">
-      <div class="col-lg-8">
+      <div class="col-12">
         <div class="card h-100">
           <div class="card-header d-flex align-items-center justify-content-between">
             <div>
@@ -13,6 +13,9 @@
             <span class="badge" :class="runBadge.class">{{ form.payslipStatus }}</span>
           </div>
           <div class="card-body">
+            <div v-if="!canManagePayroll" class="alert alert-light-warning border-warning mb-3" role="alert">
+              Only HR Admin and Payroll Admin users can create or publish payroll runs.
+            </div>
             <form novalidate @submit.prevent="handleSubmit">
               <div class="d-flex align-items-center justify-content-between mb-3">
                 <div>
@@ -96,7 +99,7 @@
               <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
                 <div>
                   <h6 class="mb-1">3. Earnings and deductions</h6>
-                  <p class="text-muted mb-0 small">Use only the values that need review; the summary updates automatically.</p>
+                  <p class="text-muted mb-0 small">Use only the values that need review.</p>
                 </div>
               </div>
 
@@ -145,9 +148,9 @@
               </div>
 
               <div class="d-flex flex-wrap gap-2 mt-2">
-                <button type="button" class="btn btn-outline-primary" @click="saveDraft">Save Draft</button>
-                <button type="button" class="btn btn-outline-success" @click="applySampleRates">Apply Sample Rates</button>
-                <button type="submit" class="btn btn-primary">Finalize Payroll Batch</button>
+                <button type="button" class="btn btn-outline-primary" :disabled="!canManagePayroll" @click="saveDraft">Save Draft</button>
+                <button type="button" class="btn btn-outline-success" :disabled="!canManagePayroll" @click="applySampleRates">Apply Sample Rates</button>
+                <button type="submit" class="btn btn-primary" :disabled="!canManagePayroll">Finalize Payroll Batch</button>
               </div>
 
               <div class="alert mt-3 mb-0" :class="payrollAlert.class" role="alert">
@@ -158,73 +161,6 @@
         </div>
       </div>
 
-      <div class="col-lg-4">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-header bg-light-primary border-0">
-            <h5 class="mb-0 text-primary">Payroll Summary</h5>
-            <small class="text-muted">Calculated live from the form values.</small>
-          </div>
-          <div class="card-body">
-            <div class="mb-3 p-3 rounded bg-light">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Payslip Status</span>
-                <span class="badge" :class="runBadge.class">{{ form.payslipStatus }}</span>
-              </div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Payroll ID</span>
-                <strong>{{ form.payrollRunId || "-" }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Employee</span>
-                <strong>{{ employeeSummary }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="text-muted">Cutoff</span>
-                <strong>{{ periodSummary }}</strong>
-              </div>
-            </div>
-
-            <div class="row g-3">
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Gross Pay</small>
-                  <h4 class="mb-0 text-primary">{{ money(grossPay) }}</h4>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Deductions</small>
-                  <h4 class="mb-0 text-danger">{{ money(totalDeductions) }}</h4>
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="border rounded p-3">
-                  <small class="text-muted d-block mb-1">Net Pay</small>
-                  <h2 class="mb-0 text-success">{{ money(netPay) }}</h2>
-                  <small class="text-muted">Release amount: <strong>{{ money(releaseAmount) }}</strong></small>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Daily Rate</small>
-                  <h5 class="mb-0">{{ money(dailyRate) }}</h5>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Hourly Rate</small>
-                  <h5 class="mb-0">{{ money(hourlyRate) }}</h5>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-3 p-3 rounded bg-light-primary border border-primary-subtle">
-              <strong class="d-block text-primary mb-1">What stays manual?</strong>
-              <small class="text-muted d-block">Only review fields that may vary by cutoff: allowances, OT, holiday pay, night differential, and deductions that need approval.</small>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -238,6 +174,9 @@ import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
 const employeeData = ref({});
 const employeeOptions = ref([]);
+const canManagePayroll = computed(() =>
+  ["HR Admin", "Payroll Admin"].includes(authStore.currentUser?.role || "")
+);
 
 const payrollAlert = reactive({
   class: "alert-light-primary border-primary",
@@ -303,12 +242,6 @@ function handleFormMutation(fieldName = "") {
 }
 
 const selectedEmployee = computed(() => employeeData.value[form.employeeSelect] || null);
-const employeeSummary = computed(() =>
-  selectedEmployee.value ? `${selectedEmployee.value.name} - ${selectedEmployee.value.position}` : "No employee selected"
-);
-const periodSummary = computed(() =>
-  form.cutoffStart && form.cutoffEnd ? `${form.cutoffStart} to ${form.cutoffEnd}` : "-"
-);
 
 const grossPay = computed(
   () =>
@@ -328,10 +261,6 @@ const totalDeductions = computed(
 );
 
 const netPay = computed(() => grossPay.value - totalDeductions.value);
-const releaseAmount = computed(() => Math.max(netPay.value, 0));
-const dailyRate = computed(() => Number(form.basePay || 0) / 22);
-const hourlyRate = computed(() => Number(form.basePay || 0) / 176);
-
 const runBadge = computed(() =>
   form.payslipStatus === "Published"
     ? { class: "bg-light-success text-success" }
@@ -428,6 +357,10 @@ function applySampleRates() {
 }
 
 function saveDraft() {
+  if (!canManagePayroll.value) {
+    setAlert("danger", "Only HR Admin and Payroll Admin users can create payroll runs.");
+    return;
+  }
   form.payslipStatus = "Draft";
   setAlert("primary", "Payroll draft saved locally.");
 }
@@ -461,6 +394,11 @@ function buildPayrollPayload() {
 }
 
 async function handleSubmit() {
+  if (!canManagePayroll.value) {
+    setAlert("danger", "Only HR Admin and Payroll Admin users can create payroll runs.");
+    return;
+  }
+
   form.payrollRunId = generatePayrollRunId();
 
   if (!validateForm()) {

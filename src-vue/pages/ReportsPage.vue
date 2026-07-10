@@ -3,7 +3,7 @@
     <BreadcrumbBar section="HR Modules" current="Reports" />
 
     <div class="row g-3">
-      <div class="col-lg-8">
+      <div class="col-12">
         <div class="card">
           <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="mb-0">Report Builder</h5>
@@ -74,61 +74,6 @@
                 {{ reportAlert.message }}
               </div>
             </form>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-header bg-light-primary border-0">
-            <h5 class="mb-0 text-primary">Report Summary</h5>
-            <small class="text-muted">Read-only metadata for the current report.</small>
-          </div>
-          <div class="card-body">
-            <div class="mb-3 p-3 rounded bg-light">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Report ID</span>
-                <strong>{{ reportId }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Report Type</span>
-                <strong>{{ currentDefinition.label }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Rows</span>
-                <strong>{{ filteredRows.length }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="text-muted">Scope</span>
-                <strong>{{ filterScopeDisplay }}</strong>
-              </div>
-            </div>
-
-            <div class="row g-3">
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Generated</small>
-                  <h6 class="mb-0">{{ generatedDisplay }}</h6>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Preview Mode</small>
-                  <h6 class="mb-0">{{ previewModeDisplay }}</h6>
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="border rounded p-3">
-                  <small class="text-muted d-block mb-1">Export Target</small>
-                  <h6 class="mb-0 text-success">{{ exportTargetDisplay }}</h6>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-3 p-3 rounded bg-light-primary border border-primary-subtle">
-              <strong class="d-block text-primary mb-1">Authorization boundary</strong>
-              <small class="text-muted d-block">Report results should stay inside the operator's allowed department and branch scope.</small>
-            </div>
           </div>
         </div>
       </div>
@@ -226,7 +171,6 @@ const reportAlert = reactive({
 const validationErrors = reactive({});
 
 const reportId = ref(generateReportId());
-const generatedDisplay = ref("Pending");
 const reportStatus = ref("Draft");
 const backendReport = ref({
   reportType: "",
@@ -380,18 +324,6 @@ const filteredRows = computed(() =>
     : currentDefinition.value.rows.filter((row) => matchesFilter(row, currentDefinition.value))
 );
 
-const filterScopeDisplay = computed(() =>
-  [form.department.trim(), form.branch.trim()].filter(Boolean).join(" / ") || "All Records"
-);
-
-const previewModeDisplay = computed(() =>
-  form.previewMode === "compact" ? "Compact" : "Standard"
-);
-
-const exportTargetDisplay = computed(() =>
-  form.exportTarget === "csv" ? "CSV (.csv)" : "Excel (.xlsx)"
-);
-
 function formatBackendColumn(column) {
   return column
     .split("_")
@@ -426,7 +358,6 @@ async function loadBackendReportRows() {
 async function refreshPreview() {
   if (!validateForm({ requireOperator: false })) return;
   const usedBackendData = await loadBackendReportRows();
-  generatedDisplay.value = new Date().toLocaleString();
   updateStatus("Generated", "success");
   setAlert(
     "success",
@@ -553,7 +484,6 @@ async function generateReport() {
   }
 
   await loadBackendReportRows();
-  generatedDisplay.value = new Date().toLocaleString();
   updateStatus("Generated", "success");
   setAlert(
     "success",

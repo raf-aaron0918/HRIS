@@ -21,5 +21,9 @@ class CreateUserRequest(BaseModel):
     is_active: bool = True
 
 
+class UserStatusUpdate(BaseModel):
+    is_active: bool
+
+
 class UserListResponse(BaseModel):
     items: list[CurrentUserResponse]

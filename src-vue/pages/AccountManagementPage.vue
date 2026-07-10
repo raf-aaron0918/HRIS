@@ -3,52 +3,7 @@
     <BreadcrumbBar section="Administration" current="Accounts" />
 
     <div class="row g-3">
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <small class="text-muted d-block mb-2">Total Accounts</small>
-            <div class="d-flex align-items-end justify-content-between">
-              <div>
-                <h3 class="mb-1">{{ isLoading ? "..." : accountSummary.total }}</h3>
-                <span class="text-muted small">User logins in HRIS</span>
-              </div>
-              <span class="badge bg-light-primary text-primary">Access</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <small class="text-muted d-block mb-2">Active Accounts</small>
-            <div class="d-flex align-items-end justify-content-between">
-              <div>
-                <h3 class="mb-1">{{ isLoading ? "..." : accountSummary.active }}</h3>
-                <span class="text-muted small">Can sign in now</span>
-              </div>
-              <span class="badge bg-light-success text-success">Enabled</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <small class="text-muted d-block mb-2">HR Admins</small>
-            <div class="d-flex align-items-end justify-content-between">
-              <div>
-                <h3 class="mb-1">{{ isLoading ? "..." : accountSummary.admins }}</h3>
-                <span class="text-muted small">Full account managers</span>
-              </div>
-              <span class="badge bg-light-warning text-warning">Control</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-xl-7">
+      <div class="col-12">
         <div class="card h-100">
           <div class="card-header d-flex align-items-center justify-content-between">
             <div>
@@ -89,9 +44,9 @@
                   </select>
                 </div>
                 <div class="col-md-6 mb-3 d-flex align-items-end">
-                  <div class="form-check mb-2">
-                    <input id="accountActive" v-model="form.isActive" class="form-check-input" type="checkbox" :disabled="!canManageAccounts || isSubmitting">
-                    <label class="form-check-label" for="accountActive">Allow this user to sign in immediately</label>
+                  <div class="border rounded-3 px-3 py-2 bg-light w-100">
+                    <small class="text-muted d-block mb-1">Account status</small>
+                    <strong>New accounts are created active by default.</strong>
                   </div>
                 </div>
               </div>
@@ -111,7 +66,7 @@
         </div>
       </div>
 
-      <div class="col-xl-5">
+      <div class="col-lg-5 d-none">
         <div class="card h-100 border-0 shadow-sm">
           <div class="card-header bg-light-primary border-0">
             <h5 class="mb-0 text-primary">Account Preview</h5>
@@ -177,11 +132,12 @@
                     <th>Email</th>
                     <th>Role</th>
                     <th>Status</th>
+                    <th class="text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="!accounts.length && !isLoading">
-                    <td colspan="5" class="text-center text-muted py-4">No user accounts found yet.</td>
+                    <td colspan="6" class="text-center text-muted py-4">No user accounts found yet.</td>
                   </tr>
                   <tr v-for="account in accounts" :key="account.id">
                     <td>{{ account.full_name }}</td>
@@ -192,6 +148,17 @@
                       <span class="badge" :class="account.is_active ? 'bg-light-success text-success' : 'bg-light-danger text-danger'">
                         {{ account.is_active ? "Active" : "Inactive" }}
                       </span>
+                    </td>
+                    <td class="text-end">
+                      <button
+                        type="button"
+                        class="btn btn-sm"
+                        :class="account.is_active ? 'btn-outline-danger' : 'btn-outline-success'"
+                        :disabled="isLoading || isSubmitting || toggleUserId === account.id"
+                        @click="toggleAccountStatus(account)"
+                      >
+                        {{ toggleUserId === account.id ? "Updating..." : account.is_active ? "Disable" : "Enable" }}
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -214,6 +181,7 @@ const authStore = useAuthStore();
 const accounts = ref([]);
 const isLoading = ref(false);
 const isSubmitting = ref(false);
+const toggleUserId = ref(null);
 const tableMessage = ref("");
 
 const roleOptions = ["HR Admin", "Immediate Supervisor", "Payroll Admin"];
@@ -239,14 +207,9 @@ function createEmptyForm() {
 const currentRole = computed(() => authStore.currentUser?.role || "Authorized User");
 const canManageAccounts = computed(() => currentRole.value === "HR Admin");
 
-const accountSummary = computed(() => ({
-  total: accounts.value.length,
-  active: accounts.value.filter((account) => account.is_active).length,
-  admins: accounts.value.filter((account) => account.role === "HR Admin").length,
-}));
-
 const previewName = computed(() => form.fullName.trim() || "No name yet");
 const previewUsername = computed(() => form.username.trim() || "No username yet");
+
 const roleBadgeClass = computed(() =>
   canManageAccounts.value ? "bg-light-success text-success" : "bg-light-warning text-warning"
 );
@@ -330,7 +293,7 @@ async function handleSubmit() {
         email: form.email.trim().toLowerCase(),
         password: form.password,
         role: form.role,
-        is_active: form.isActive,
+        is_active: true,
       }),
     });
 
@@ -353,6 +316,37 @@ async function handleSubmit() {
     }
   } finally {
     isSubmitting.value = false;
+  }
+}
+
+async function toggleAccountStatus(account) {
+  toggleUserId.value = account.id;
+
+  try {
+    const updatedUser = await apiRequest(`/users/${account.id}/status`, {
+      method: "PUT",
+      token: authStore.accessToken,
+      body: JSON.stringify({
+        is_active: !account.is_active,
+      }),
+    });
+
+    accounts.value = accounts.value.map((item) => (item.id === updatedUser.id ? updatedUser : item));
+    setAlert(
+      "success",
+      `${updatedUser.full_name} is now ${updatedUser.is_active ? "active" : "inactive"}.`
+    );
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      setAlert("danger", "Your session expired. Please sign in again.");
+      authStore.logout();
+    } else if (error instanceof ApiError && error.status === 403) {
+      setAlert("danger", "Only HR Admin users can update account status.");
+    } else {
+      setAlert("danger", "Could not update the account status. Please make sure the FastAPI backend is running.");
+    }
+  } finally {
+    toggleUserId.value = null;
   }
 }
 

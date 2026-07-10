@@ -3,7 +3,7 @@
     <BreadcrumbBar section="HR Modules" current="Leave Management" />
 
     <div class="row g-3">
-      <div class="col-lg-8">
+      <div class="col-12">
         <div class="card h-100">
           <div class="card-header d-flex align-items-center justify-content-between">
             <div>
@@ -13,27 +13,6 @@
             <span class="badge" :class="statusBadge.class">{{ form.status }}</span>
           </div>
           <div class="card-body">
-            <div class="row g-3 mb-4">
-              <div class="col-md-4">
-                <div class="border rounded-3 p-3 h-100 bg-light">
-                  <small class="text-muted d-block mb-1">Coverage</small>
-                  <strong class="d-block">Vacation, sick, emergency, maternity, paternity, and LWOP</strong>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="border rounded-3 p-3 h-100 bg-light">
-                  <small class="text-muted d-block mb-1">Approvals</small>
-                  <strong class="d-block">Supervisor review with optional HR validation</strong>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="border rounded-3 p-3 h-100 bg-light">
-                  <small class="text-muted d-block mb-1">Payroll Impact</small>
-                  <strong class="d-block">Leave without pay updates payable days automatically</strong>
-                </div>
-              </div>
-            </div>
-
             <form novalidate @submit.prevent="handleSubmit">
               <div class="mb-3">
                 <h6 class="mb-1">1. Employee and schedule details</h6>
@@ -157,79 +136,6 @@
         </div>
       </div>
 
-      <div class="col-lg-4">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-header bg-light-primary border-0">
-            <h5 class="mb-0 text-primary">Leave Summary</h5>
-            <small class="text-muted">Read-only request preview, credits, and approval route.</small>
-          </div>
-          <div class="card-body">
-            <div class="mb-3 p-3 rounded bg-light">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Request Status</span>
-                <span class="badge" :class="statusBadge.class">{{ form.status }}</span>
-              </div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Employee</span>
-                <strong>{{ employeeSummary }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Leave Type</span>
-                <strong>{{ leaveTypeSummary }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="text-muted">Approver</span>
-                <strong>{{ approverSummary }}</strong>
-              </div>
-            </div>
-
-            <div class="row g-3">
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Available Credits</small>
-                  <h4 class="mb-0 text-primary">{{ availableCredits.toFixed(1) }}</h4>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Credits Used</small>
-                  <h4 class="mb-0 text-warning">{{ creditsUsed.toFixed(1) }}</h4>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Chargeable Days</small>
-                  <h5 class="mb-0">{{ leaveDays.toFixed(1) }}</h5>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="border rounded p-3 h-100">
-                  <small class="text-muted d-block mb-1">Payroll Impact</small>
-                  <h5 class="mb-0 text-danger">{{ payrollImpact.toFixed(1) }}</h5>
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="border rounded p-3">
-                  <small class="text-muted d-block mb-1">Balance After Request</small>
-                  <h3 class="mb-0 text-success">{{ balanceAfter.toFixed(1) }}</h3>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-3 p-3 rounded bg-light-primary border border-primary-subtle">
-              <strong class="d-block text-primary mb-1">Approval route</strong>
-              <small class="text-muted d-block">{{ approvalRoute }}</small>
-            </div>
-
-            <div class="mt-3 border rounded-3 p-3">
-              <strong class="d-block mb-2">Review checklist</strong>
-              <small class="text-muted d-block mb-1">Confirm credits before approving the request.</small>
-              <small class="text-muted d-block mb-1">Check holidays and rest days inside the selected range.</small>
-              <small class="text-muted d-block">Verify supporting documents for sick leave and policy exceptions.</small>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -263,15 +169,6 @@ const policyAlert = reactive({
   message: "Fill out the form to see leave balance checks, payroll impact, and policy warnings here.",
 });
 const validationErrors = reactive({});
-
-const leaveTypeLabels = {
-  vacation: "Vacation Leave",
-  sick: "Sick Leave",
-  emergency: "Emergency Leave",
-  maternity: "Maternity Leave",
-  paternity: "Paternity Leave",
-  unpaid: "Leave Without Pay",
-};
 
 const leaveTypesRequiringCredits = new Set(["vacation", "sick", "emergency"]);
 
@@ -320,15 +217,6 @@ const leaveDays = computed(() => {
 const creditsUsed = computed(() => (leaveTypesRequiringCredits.has(form.leaveType) ? leaveDays.value : 0));
 const payrollImpact = computed(() => (form.leaveType === "unpaid" ? leaveDays.value : 0));
 const balanceAfter = computed(() => Math.max(availableCredits.value - creditsUsed.value, 0));
-const employeeSummary = computed(() => form.employee || "No employee selected");
-const leaveTypeSummary = computed(() => leaveTypeLabels[form.leaveType] || "-");
-const approverSummary = computed(() => form.approver || "Not assigned");
-const approvalRoute = computed(() =>
-  form.leaveType === "unpaid"
-    ? "Employee files leave, supervisor approves, and payroll reflects leave without pay."
-    : "Employee files leave, supervisor approves, and HR reviews when policy requires it."
-);
-
 const statusBadge = computed(() => {
   if (form.status === "Pending") return { class: "bg-light-warning text-warning" };
   if (form.status === "For HR Review") return { class: "bg-light-danger text-danger" };
@@ -461,7 +349,10 @@ function buildLeavePayload(status) {
     leave_days: leaveDays.value,
     credits_used: creditsUsed.value,
     payroll_impact: payrollImpact.value,
-    notes: approvalRoute.value,
+    notes:
+      form.leaveType === "unpaid"
+        ? "Employee files leave, supervisor approves, and payroll reflects leave without pay."
+        : "Employee files leave, supervisor approves, and HR reviews when policy requires it.",
   };
 }
 

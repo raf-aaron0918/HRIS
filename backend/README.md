@@ -32,6 +32,26 @@ python -m pip install -r backend/requirements.txt
 npm run dev:api
 ```
 
+## Render Deployment
+
+This backend is ready to deploy on Render as a Python web service.
+
+Recommended settings:
+
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Root directory: `backend`
+
+Required environment variables:
+
+- `APP_ENV=production`
+- `APP_DEBUG=false`
+- `SECRET_KEY` set to a long random value
+- `BACKEND_CORS_ORIGINS` set to your Vercel frontend URL
+- `DATABASE_URL` set to a Postgres connection string
+
+If you want a ready-made blueprint, use the root `render.yaml`.
+
 ## Default Local Login
 
 - Username: `admin`

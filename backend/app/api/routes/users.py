@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_hr_admin
-from app.schemas.user import CreateUserRequest, CurrentUserResponse, UserListResponse
-from app.services.auth import create_user, get_user_by_email, get_user_by_username, list_users
+from app.schemas.user import CreateUserRequest, CurrentUserResponse, UserListResponse, UserStatusUpdate
+from app.services.auth import create_user, get_user_by_email, get_user_by_id, get_user_by_username, list_users, update_user_status
 
 router = APIRouter()
 
@@ -55,3 +55,18 @@ def create_account(
         ) from exc
 
     return CurrentUserResponse.model_validate(user)
+
+
+@router.put("/{user_id}/status", response_model=CurrentUserResponse)
+def update_account_status(
+    user_id: int,
+    payload: UserStatusUpdate,
+    _: object = Depends(require_hr_admin),
+    db: Session = Depends(get_db),
+) -> CurrentUserResponse:
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    updated_user = update_user_status(db, user, is_active=payload.is_active)
+    return CurrentUserResponse.model_validate(updated_user)

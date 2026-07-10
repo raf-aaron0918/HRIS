@@ -25,6 +25,9 @@
           </div>
 
           <div class="card-body">
+            <div v-if="authStore.currentUser?.role !== 'HR Admin'" class="alert alert-light-warning border-warning mb-3" role="alert">
+              Only HR Admin users can create employee profiles.
+            </div>
             <form novalidate @submit.prevent="handleSubmit">
               <div class="d-flex align-items-center justify-content-between mb-3">
                 <div>
@@ -305,7 +308,7 @@
 
               <div class="d-flex flex-wrap gap-2 mt-2">
                 <button type="button" class="btn btn-outline-primary" @click="saveDraft">Save Draft</button>
-                <button type="submit" class="btn btn-primary" :disabled="isSubmitting">Create Employee Profile</button>
+                <button type="submit" class="btn btn-primary" :disabled="isSubmitting || authStore.currentUser?.role !== 'HR Admin'">Create Employee Profile</button>
               </div>
 
               <div class="alert mt-3 mb-0" :class="alertState.class" role="alert">
@@ -589,6 +592,11 @@ function saveDraft() {
 }
 
 function handleSubmit() {
+  if (authStore.currentUser?.role !== "HR Admin") {
+    setAlert("danger", "Only HR Admin users can create employee profiles.");
+    return;
+  }
+
   if (!validateForm()) return;
   showConfirmationCard.value = true;
 }
@@ -598,6 +606,11 @@ function cancelConfirmation() {
 }
 
 async function confirmCreateEmployee() {
+  if (authStore.currentUser?.role !== "HR Admin") {
+    setAlert("danger", "Only HR Admin users can create employee profiles.");
+    return;
+  }
+
   isSubmitting.value = true;
   showConfirmationCard.value = false;
 
@@ -622,4 +635,3 @@ async function confirmCreateEmployee() {
   }
 }
 </script>
-
