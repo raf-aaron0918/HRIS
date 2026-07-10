@@ -252,6 +252,7 @@ body {
   .mobile-filter-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
     scrollbar-width: none; /* Firefox */
   }
   .mobile-filter-scroll::-webkit-scrollbar {
@@ -259,49 +260,5 @@ body {
   }
   .mobile-filter-scroll .btn {
     flex-shrink: 0; /* Prevent buttons from squishing */
-  }
-
-  /* Data Table to Cards */
-  .table-responsive .table {
-    min-width: 0 !important;
-  }
-  .table-responsive table,
-  .table-responsive thead,
-  .table-responsive tbody,
-  .table-responsive th,
-  .table-responsive td,
-  .table-responsive tr {
-    display: block;
-  }
-  .table-responsive thead tr {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-  }
-  .table-responsive tr {
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-  }
-  .table-responsive td {
-    border: none;
-    border-bottom: 1px solid #f1f1f1;
-    position: relative;
-    padding-left: 50% !important;
-    text-align: right;
-  }
-  .table-responsive td:last-child {
-    border-bottom: 0;
-  }
-  .table-responsive td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 12px;
-    width: 45%;
-    padding-right: 10px;
-    white-space: nowrap;
-    text-align: left;
-    font-weight: 600;
   }
 }

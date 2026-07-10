@@ -37,9 +37,13 @@
         <div class="card h-100 border-0 shadow-sm">
           <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="mb-0">Approval Queue</h5>
-            <span class="badge bg-light-warning text-warning">18 items</span>
+            <span class="badge bg-light-warning text-warning">{{ approvalQueueTotal }} items</span>
           </div>
           <div class="card-body">
+            <div v-if="dashboardLoading" class="text-muted small">Loading live dashboard data...</div>
+            <div v-else-if="dashboardError" class="alert alert-warning mb-0">
+              {{ dashboardError }}
+            </div>
             <div v-for="item in approvals" :key="item.label" class="border rounded-3 p-3 mb-3">
               <div class="d-flex justify-content-between align-items-start mb-1">
                 <h6 class="mb-0">{{ item.label }}</h6>
@@ -131,6 +135,11 @@
                     <td><span class="badge" :class="activity.badgeClass">{{ activity.status }}</span></td>
                     <td>{{ activity.time }}</td>
                   </tr>
+                  <tr v-if="!recentActivity.length">
+                    <td colspan="5" class="text-center text-muted py-4">
+                      {{ dashboardLoading ? "Loading recent activity..." : "No recent activity to display yet." }}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -142,70 +151,113 @@
 </template>
 
 <script setup>
+import { computed, onMounted, ref, watch } from "vue";
 import { RouterLink } from "vue-router";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
+import { apiRequest } from "@/lib/api";
+import { useAuthStore } from "@/stores/auth";
 
-const heroStats = [
-  { label: "Workforce", value: "0 active employee records", caption: "Add employees from Employee Master" },
-  { label: "Attendance", value: "0 present today", caption: "No attendance logs yet" },
-  { label: "Payroll", value: "No open cutoff", caption: "Create payroll runs from Payroll" },
-];
+const authStore = useAuthStore();
+const dashboardLoading = ref(false);
+const dashboardError = ref("");
+const employeeCount = ref(0);
+const activeEmployeeCount = ref(0);
+const presentTodayCount = ref(0);
+const lateTodayCount = ref(0);
+const leavePendingCount = ref(0);
+const attendanceCorrectionsCount = ref(0);
+const payrollExceptionCount = ref(0);
+const payrollDraftCount = ref(0);
+const payrollPublishedCount = ref(0);
+const recentActivities = ref([]);
+const payrollCutoffLabel = ref("No payroll cutoff configured yet.");
+const payrollCutoffBadge = ref("-");
 
-const approvals = [
+const heroStats = computed(() => [
+  {
+    label: "Workforce",
+    value: `${activeEmployeeCount.value} active employee${activeEmployeeCount.value === 1 ? "" : "s"}`,
+    caption: `${employeeCount.value} total employee${employeeCount.value === 1 ? "" : "s"} on file`,
+  },
+  {
+    label: "Attendance",
+    value: `${presentTodayCount.value} present today`,
+    caption: `${lateTodayCount.value} late log${lateTodayCount.value === 1 ? "" : "s"} in the latest attendance data`,
+  },
+  {
+    label: "Payroll",
+    value: payrollDraftCount.value > 0 ? `${payrollDraftCount.value} draft run${payrollDraftCount.value === 1 ? "" : "s"}` : "No open cutoff",
+    caption:
+      payrollPublishedCount.value > 0
+        ? `${payrollPublishedCount.value} published payroll run${payrollPublishedCount.value === 1 ? "" : "s"}`
+        : "Create payroll runs from Payroll",
+  },
+]);
+
+const approvals = computed(() => [
   {
     label: "Leave Requests",
-    count: "0",
-    caption: "No leave requests waiting for approval.",
+    count: String(leavePendingCount.value),
+    caption:
+      leavePendingCount.value > 0
+        ? "Leave requests are waiting for approval."
+        : "No leave requests waiting for approval.",
     badgeClass: "bg-light-warning text-warning",
   },
   {
     label: "Attendance Corrections",
-    count: "0",
-    caption: "No attendance correction requests need supervisor review.",
+    count: String(attendanceCorrectionsCount.value),
+    caption:
+      attendanceCorrectionsCount.value > 0
+        ? "Attendance correction requests need supervisor review."
+        : "No attendance correction requests need supervisor review.",
     badgeClass: "bg-light-info text-info",
   },
   {
     label: "Payroll Exceptions",
-    count: "0",
-    caption: "No payroll exceptions are waiting for review.",
+    count: String(payrollExceptionCount.value),
+    caption:
+      payrollExceptionCount.value > 0
+        ? "Payroll exceptions are waiting for review."
+        : "No payroll exceptions are waiting for review.",
     badgeClass: "bg-light-danger text-danger",
   },
-];
+]);
 
-const moduleStats = [
+const moduleStats = computed(() => [
   {
     title: "Employee Master",
-    value: "0",
-    badge: "Ready",
+    value: String(employeeCount.value),
+    badge: employeeCount.value > 0 ? "Live" : "Empty",
     badgeClass: "bg-light-primary border border-primary",
     icon: "ti ti-users",
     caption: "Profiles, status changes, onboarding, offboarding, and document tracking.",
   },
   {
     title: "Attendance Control",
-    value: "0",
-    badge: "No logs",
+    value: String(presentTodayCount.value + lateTodayCount.value),
+    badge: presentTodayCount.value > 0 ? "Live" : "No logs",
     badgeClass: "bg-light-success border border-success",
     icon: "ti ti-clock-check",
     caption: "Shift logs, late cases, undertime, overtime, and correction requests.",
   },
   {
     title: "Leave Management",
-    value: "0",
-    badge: "None",
+    value: String(leavePendingCount.value),
+    badge: leavePendingCount.value > 0 ? "Pending" : "None",
     badgeClass: "bg-light-warning border border-warning",
     icon: "ti ti-calendar-event",
     caption: "Balances, leave types, approval flow, cancellations, and payroll impact.",
   },
   {
     title: "Payroll Run",
-    value: "Draft",
-    badge: "Cutoff open",
+    value: payrollDraftCount.value > 0 ? "Draft" : "Ready",
+    badge: payrollDraftCount.value > 0 ? "Cutoff open" : "No draft",
     badgeClass: "bg-light-danger border border-danger",
     icon: "ti ti-wallet",
     caption: "Compensation, deductions, premiums, and payslip publication are still under review.",
   },
-];
+]);
 
 const quickActions = [
   { to: "/employees", title: "Add Employee", icon: "ti ti-user-plus text-primary", caption: "Create a profile and begin onboarding." },
@@ -216,9 +268,110 @@ const quickActions = [
   { to: "/reports", title: "Generate Reports", icon: "ti ti-report-analytics text-success", caption: "Export employee, attendance, leave, and payroll data." },
 ];
 
-const importantDates = [
-  { label: "Payroll Cutoff End", caption: "No payroll cutoff configured yet.", when: "-", badgeClass: "bg-light-secondary text-secondary" },
-];
+const importantDates = computed(() => [
+  {
+    label: "Payroll Cutoff End",
+    caption: payrollCutoffLabel.value,
+    when: payrollCutoffBadge.value,
+    badgeClass: payrollDraftCount.value > 0 ? "bg-light-warning text-warning" : "bg-light-secondary text-secondary",
+  },
+]);
 
-const recentActivity = [];
+const recentActivity = computed(() => recentActivities.value);
+const approvalQueueTotal = computed(() => leavePendingCount.value + attendanceCorrectionsCount.value + payrollExceptionCount.value);
+
+function normalizeEmployeeCount(items) {
+  employeeCount.value = items.length;
+  activeEmployeeCount.value = items.filter((employee) => (employee.account_status || employee.employment_status) === "Active").length;
+}
+
+function normalizeAttendanceSummary(summary, logs) {
+  const today = summary?.today || {};
+  presentTodayCount.value = Number(today.present || 0);
+  lateTodayCount.value = Number(today.late || 0);
+  attendanceCorrectionsCount.value = Number(today.corrections || 0);
+  recentActivities.value = (logs || []).slice(0, 5).map((log) => ({
+    activity: log.status || "Attendance update",
+    employee: log.employee_name || log.employee_code || "-",
+    module: "Attendance",
+    status: log.status || "Saved",
+    badgeClass: "bg-light-info text-info",
+    time: log.work_date || "-",
+  }));
+}
+
+function normalizeLeaveSummary(summary, requests) {
+  const pending = Number(summary?.pending_requests || 0);
+  leavePendingCount.value = pending;
+  if (!recentActivities.value.length) {
+    recentActivities.value = (requests || []).slice(0, 5).map((request) => ({
+      activity: request.leave_type || "Leave request",
+      employee: request.employee_name || "-",
+      module: "Leave",
+      status: request.status || "Draft",
+      badgeClass: "bg-light-warning text-warning",
+      time: request.start_date || "-",
+    }));
+  }
+}
+
+function normalizePayrollSummary(summary, runs) {
+  const recentRuns = runs || [];
+  payrollDraftCount.value = recentRuns.filter((run) => String(run.payslip_status || "").toLowerCase() === "draft").length;
+  payrollPublishedCount.value = Number(summary?.published_runs || 0);
+  payrollExceptionCount.value = recentRuns.filter((run) => String(run.payslip_status || "").toLowerCase() === "exception").length;
+
+  if (recentRuns.length && !recentActivities.value.length) {
+    recentActivities.value = recentRuns.slice(0, 5).map((run) => ({
+      activity: `Payroll ${run.payslip_status || "Draft"}`,
+      employee: run.employee_name || run.employee_code || "-",
+      module: "Payroll",
+      status: run.payslip_status || "Draft",
+      badgeClass: "bg-light-danger text-danger",
+      time: `${run.cutoff_start || "-"} to ${run.cutoff_end || "-"}`,
+    }));
+  }
+
+  if (recentRuns.length) {
+    const latestRun = recentRuns[0];
+    payrollCutoffLabel.value = `${latestRun.cutoff_start || "-"} to ${latestRun.cutoff_end || "-"}`;
+    payrollCutoffBadge.value = latestRun.payslip_status || "Draft";
+  }
+}
+
+async function loadDashboardData() {
+  if (!authStore.accessToken) return;
+
+  dashboardLoading.value = true;
+  dashboardError.value = "";
+
+  try {
+    const [employees, attendanceSummary, attendanceLogs, leaveSummary, leaveRequests, payrollSummary, payrollRuns] = await Promise.all([
+      apiRequest("/employees", { token: authStore.accessToken }),
+      apiRequest("/attendance/summary", { token: authStore.accessToken }),
+      apiRequest("/attendance", { token: authStore.accessToken }),
+      apiRequest("/leave/summary", { token: authStore.accessToken }),
+      apiRequest("/leave", { token: authStore.accessToken }),
+      apiRequest("/payroll/summary", { token: authStore.accessToken }),
+      apiRequest("/payroll", { token: authStore.accessToken }),
+    ]);
+
+    normalizeEmployeeCount(employees.items || []);
+    normalizeAttendanceSummary(attendanceSummary, attendanceLogs.items || []);
+    normalizeLeaveSummary(leaveSummary, leaveRequests.items || []);
+    normalizePayrollSummary(payrollSummary, payrollRuns.items || []);
+  } catch (error) {
+    dashboardError.value = error?.message || "Unable to load dashboard data.";
+  } finally {
+    dashboardLoading.value = false;
+  }
+}
+
+onMounted(loadDashboardData);
+watch(
+  () => authStore.accessToken,
+  () => {
+    loadDashboardData();
+  }
+);
 </script>

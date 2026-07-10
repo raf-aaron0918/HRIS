@@ -48,14 +48,7 @@
         </div>
         <div class="auth-footer row">
           <div class="col my-1">
-            <p class="m-0 text-muted">Secure access for authorized HRIS users and administrators.</p>
-          </div>
-          <div class="col-auto my-1">
-            <ul class="list-inline footer-link mb-0">
-              <li class="list-inline-item"><a href="#">Help Center</a></li>
-              <li class="list-inline-item"><a href="#">Data Privacy</a></li>
-              <li class="list-inline-item"><a href="#">IT Support</a></li>
-            </ul>
+            <p class="m-0 text-muted">HRIS secure access for authorized users and administrators.</p>
           </div>
         </div>
       </div>

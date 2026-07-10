@@ -5,7 +5,7 @@
     <div class="row g-3">
       <div class="col-12">
         <div class="card h-100">
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
             <div>
               <h5 class="mb-0">Create Account</h5>
               <small class="text-muted">Add a login for HR Admin, Immediate Supervisor, or Payroll Admin users.</small>
@@ -112,7 +112,7 @@
 
       <div class="col-12">
         <div class="card h-100">
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
             <div>
               <h5 class="mb-0">Existing Accounts</h5>
               <small class="text-muted">Review usernames, role assignment, and active status.</small>
@@ -123,7 +123,7 @@
             <div v-if="tableMessage" class="alert alert-light-warning border-warning m-3 mb-0" role="alert">
               {{ tableMessage }}
             </div>
-            <div class="table-responsive">
+            <div class="d-none d-md-block table-responsive">
               <table class="table table-hover mb-0">
                 <thead>
                   <tr>
@@ -163,6 +163,37 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <div class="d-md-none px-3 pb-3">
+              <div v-if="!accounts.length && !isLoading" class="text-center text-muted py-4">
+                No user accounts found yet.
+              </div>
+
+              <div v-for="account in accounts" :key="`mobile-${account.id}`" class="border rounded-3 p-3 mb-2 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                  <div>
+                    <div class="fw-semibold">{{ account.full_name }}</div>
+                    <div class="small text-muted">{{ account.username }}</div>
+                  </div>
+                  <span class="badge" :class="account.is_active ? 'bg-light-success text-success' : 'bg-light-danger text-danger'">
+                    {{ account.is_active ? "Active" : "Inactive" }}
+                  </span>
+                </div>
+                <div class="small text-muted mt-2">{{ account.email }}</div>
+                <div class="small text-muted">Role: <span class="badge bg-light-secondary text-secondary">{{ account.role }}</span></div>
+                <div class="d-grid mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    :class="account.is_active ? 'btn-outline-danger' : 'btn-outline-success'"
+                    :disabled="isLoading || isSubmitting || toggleUserId === account.id"
+                    @click="toggleAccountStatus(account)"
+                  >
+                    {{ toggleUserId === account.id ? "Updating..." : account.is_active ? "Disable" : "Enable" }}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

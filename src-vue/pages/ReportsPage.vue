@@ -5,7 +5,7 @@
     <div class="row g-3">
       <div class="col-12">
         <div class="card">
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
             <h5 class="mb-0">Report Builder</h5>
             <span class="badge" :class="reportStatusBadge.class">{{ reportStatusBadge.label }}</span>
           </div>
@@ -64,7 +64,7 @@
                 </div>
               </div>
 
-              <div class="d-flex flex-wrap gap-2 mt-2">
+              <div class="d-grid gap-2 d-md-flex flex-md-wrap mt-2">
                 <button type="button" class="btn btn-outline-primary" @click="refreshPreview">Refresh Preview</button>
                 <button type="button" class="btn btn-outline-success" @click="exportCurrent">Export Report</button>
                 <button type="submit" class="btn btn-primary">Generate Report</button>
@@ -80,12 +80,12 @@
 
       <div class="col-lg-12">
         <div class="card mt-3">
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
             <h5 class="mb-0">Preview Grid</h5>
             <span class="text-muted small">Dynamic columns based on report selection</span>
           </div>
           <div class="card-body">
-            <div class="table-responsive">
+            <div class="d-none d-md-block table-responsive">
               <table class="table table-hover table-bordered align-middle mb-0">
                 <thead :class="form.previewMode === 'compact' ? 'table-light' : ''">
                   <tr>
@@ -103,6 +103,19 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <div class="d-md-none">
+              <div v-for="(row, rowIndex) in filteredRows" :key="`mobile-row-${rowIndex}`" class="border rounded-3 p-3 mb-2 shadow-sm">
+                <div class="fw-semibold mb-2">{{ currentDefinition.label }}</div>
+                <div v-for="(cell, cellIndex) in row" :key="`mobile-${rowIndex}-${cellIndex}`" class="d-flex justify-content-between gap-3 py-1 border-bottom">
+                  <span class="text-muted small">{{ currentColumns[cellIndex] }}</span>
+                  <span class="small text-end">{{ cell }}</span>
+                </div>
+              </div>
+              <div v-if="!filteredRows.length" class="text-center text-muted py-4">
+                No rows match the selected report scope.
+              </div>
             </div>
           </div>
         </div>

@@ -4,12 +4,6 @@ import { apiRequest } from "@/lib/api";
 
 const TOKEN_KEY = "hris.accessToken";
 const USER_KEY = "hris.currentUser";
-const OFFLINE_ADMIN_TOKEN = "offline-admin-session";
-const OFFLINE_ADMIN_USER = {
-  username: "admin",
-  full_name: "HRIS Administrator",
-  role: "HR Admin",
-};
 
 export const useAuthStore = defineStore("auth", () => {
   const accessToken = ref("");
@@ -48,26 +42,10 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function login(credentials) {
-    let data;
-
-    try {
-      data = await apiRequest("/auth/login", {
-        method: "POST",
-        body: JSON.stringify(credentials),
-      });
-    } catch (error) {
-      const username = String(credentials.username || "").trim().toLowerCase();
-      const password = String(credentials.password || "");
-
-      if (username !== "admin" || password !== "admin123") {
-        throw error;
-      }
-
-      data = {
-        access_token: OFFLINE_ADMIN_TOKEN,
-        user: OFFLINE_ADMIN_USER,
-      };
-    }
+    const data = await apiRequest("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
 
     const token = data?.access_token || data?.token || "";
     const user = data?.user || data || null;

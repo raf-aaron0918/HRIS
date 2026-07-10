@@ -6,9 +6,19 @@
       <div class="col-12">
         <div class="card h-100">
           <div class="card-header d-flex align-items-center justify-content-between">
-            <div>
-              <h5 class="mb-0">Attendance Entry</h5>
-              <small class="text-muted">Record shift logs and corrections for payroll reconciliation.</small>
+            <div class="d-flex align-items-center gap-3">
+              <button
+                class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
+                style="width: 32px; height: 32px; padding: 0;"
+                @click="goBack"
+                title="Back to Attendance"
+              >
+                <i class="ti ti-arrow-left"></i>
+              </button>
+              <div>
+                <h5 class="mb-0">Attendance Entry</h5>
+                <small class="text-muted">Record shift logs and corrections for payroll reconciliation.</small>
+              </div>
             </div>
             <span class="badge" :class="adjustmentBadge.class">{{ adjustmentBadge.label }}</span>
           </div>
@@ -262,11 +272,13 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
 import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
+const router = useRouter();
 
 const employeeData = ref({});
 const employeeOptions = ref([]);
@@ -593,6 +605,10 @@ function saveDraft() {
   setAlert("primary", "Attendance draft saved locally.");
 }
 
+function goBack() {
+  router.push("/attendance");
+}
+
 function buildAttendancePayload(statusLabel) {
   return {
     log_id: logId.value,
@@ -737,4 +753,3 @@ onMounted(() => {
   fetchEmployees();
 });
 </script>
-

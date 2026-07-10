@@ -5,7 +5,7 @@
     <div class="row g-3">
       <div class="col-12">
         <div class="card h-100">
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
             <div>
               <h5 class="mb-1">Leave Request Form</h5>
               <small class="text-muted">Submit leave requests with live credit checks, policy guidance, and approval routing.</small>
@@ -123,7 +123,7 @@
                 </div>
               </div>
 
-              <div class="d-flex flex-wrap gap-2 mt-3">
+              <div class="d-grid gap-2 d-md-flex flex-md-wrap mt-3">
                 <button type="button" class="btn btn-outline-primary" @click="saveDraft">Save Draft</button>
                 <button type="submit" class="btn btn-primary">Submit Leave Request</button>
               </div>

@@ -5,7 +5,7 @@
     <div class="row g-3">
       <div class="col-12">
         <div class="card h-100">
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
             <div>
               <h5 class="mb-0">Payroll Run</h5>
               <small class="text-muted">Keep the essentials in the form and let the system calculate the rest.</small>
@@ -147,7 +147,7 @@
                 </div>
               </div>
 
-              <div class="d-flex flex-wrap gap-2 mt-2">
+              <div class="d-grid gap-2 d-md-flex flex-md-wrap mt-2">
                 <button type="button" class="btn btn-outline-primary" :disabled="!canManagePayroll" @click="saveDraft">Save Draft</button>
                 <button type="button" class="btn btn-outline-success" :disabled="!canManagePayroll" @click="applySampleRates">Apply Sample Rates</button>
                 <button type="submit" class="btn btn-primary" :disabled="!canManagePayroll">Finalize Payroll Batch</button>

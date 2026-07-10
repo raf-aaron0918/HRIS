@@ -85,8 +85,8 @@
                 <small class="text-muted">Review live logs, premium work, and correction items in one list.</small>
               </div>
 
-              <div class="d-flex gap-2 align-items-center">
-                <div class="input-group" style="max-width: 300px;">
+              <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch align-items-md-center w-100 w-md-auto">
+                <div class="input-group w-100" style="max-width: 300px;">
                   <span class="input-group-text bg-light border-end-0">
                     <i class="ti ti-search"></i>
                   </span>
@@ -98,10 +98,7 @@
                   />
                 </div>
 
-                <RouterLink
-                  to="/attendance/new"
-                  class="btn btn-primary d-flex align-items-center gap-2 text-nowrap"
-                >
+                <RouterLink to="/attendance/new" class="btn btn-primary d-flex align-items-center justify-content-center gap-2 text-nowrap">
                   <i class="ti ti-user-plus"></i> New Attendance
                 </RouterLink>
 
@@ -124,13 +121,14 @@
               </button>
             </div>
 
-            <div class="table-responsive mt-3">
-              <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Log ID</th>
-                    <th>Employee</th>
-                    <th>Shift</th>
+            <div class="d-none d-md-block">
+              <div class="table-responsive mt-3">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Log ID</th>
+                      <th>Employee</th>
+                      <th>Shift</th>
                     <th>Status</th>
                     <th>Late / OT</th>
                     <th>Payable</th>
@@ -139,31 +137,52 @@
                   </tr>
                 </thead>
 
-                <tbody>
-                  <tr v-for="row in filteredAttendanceRows" :key="row.logId">
-                    <td>{{ row.logId }}</td>
-                    <td>{{ row.employee }}</td>
-                    <td>{{ row.shift }}</td>
-                    <td>
-                      <span class="badge" :class="row.statusClass">{{ row.statusLabel }}</span>
-                    </td>
-                    <td>{{ row.lateOt }}</td>
-                    <td>{{ row.payable }}</td>
-                    <td>{{ row.source }}</td>
-                    <td class="text-end">
-                      <a href="#" class="btn btn-sm btn-outline-primary" @click.prevent="noopView(row)">
-                        View
-                      </a>
-                    </td>
-                  </tr>
+                  <tbody>
+                    <tr v-for="row in filteredAttendanceRows" :key="row.logId">
+                      <td>{{ row.logId }}</td>
+                      <td>{{ row.employee }}</td>
+                      <td>{{ row.shift }}</td>
+                      <td>
+                        <span class="badge" :class="row.statusClass">{{ row.statusLabel }}</span>
+                      </td>
+                      <td>{{ row.lateOt }}</td>
+                      <td>{{ row.payable }}</td>
+                      <td>{{ row.source }}</td>
+                      <td class="text-end">
+                        <a href="#" class="btn btn-sm btn-outline-primary" @click.prevent="noopView(row)">
+                          View
+                        </a>
+                      </td>
+                    </tr>
 
-                  <tr v-if="!filteredAttendanceRows.length">
-                    <td colspan="8" class="text-center text-muted py-4">
-                      No attendance log matches the current search or filter.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    <tr v-if="!filteredAttendanceRows.length">
+                      <td colspan="8" class="text-center text-muted py-4">
+                        No attendance log matches the current search or filter.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="d-md-none px-3 pb-3">
+              <div v-for="row in filteredAttendanceRows" :key="`mobile-${row.logId}`" class="border rounded-3 p-3 mb-2 shadow-sm">
+                <div class="d-flex justify-content-between gap-2 align-items-start">
+                  <div>
+                    <div class="fw-semibold">{{ row.employee }}</div>
+                    <div class="small text-muted">{{ row.logId }}</div>
+                  </div>
+                  <span class="badge" :class="row.statusClass">{{ row.statusLabel }}</span>
+                </div>
+                <div class="small text-muted mt-2">Shift: {{ row.shift }}</div>
+                <div class="small text-muted">Late / OT: {{ row.lateOt }}</div>
+                <div class="small text-muted">Payable: {{ row.payable }}</div>
+                <div class="small text-muted">Source: {{ row.source }}</div>
+              </div>
+
+              <div v-if="!filteredAttendanceRows.length" class="text-center text-muted py-4">
+                No attendance log matches the current search or filter.
+              </div>
             </div>
           </div>
         </div>

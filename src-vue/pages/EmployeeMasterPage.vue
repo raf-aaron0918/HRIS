@@ -269,9 +269,9 @@ function normalizeEmployeeRow(employee) {
 }
 
 async function fetchEmployees() {
-  const fallbackToken = authStore.accessToken || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc4MzQxNzIzOH0.MRIN_qvu1OgCOXWOM_3iY0OuYAuPdezbCs-Cl-66jJs";
+  const token = authStore.accessToken;
 
-  if (!fallbackToken) {
+  if (!token) {
     directoryError.value = "Sign in first to load employee records.";
     return;
   }
@@ -281,7 +281,7 @@ async function fetchEmployees() {
 
   try {
     const response = await apiRequest("/employees", {
-      token: fallbackToken,
+      token,
     });
 
     const rawItems = Array.isArray(response) ? response : response?.items || [];

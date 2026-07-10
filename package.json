@@ -1,7 +1,7 @@
 {
-  "name": "mantis-free-bootstrap-admin-template",
+  "name": "hris",
   "version": "1.0.0",
-  "description": "Mantis Free Bootstrap 5 Admin Dashboard Template",
+  "description": "HRIS admin application",
   "main": "index.js",
   "license":"MIT",
   "scripts": {
@@ -13,7 +13,7 @@
     "preview:vue": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "CodedThemes",
+  "author": "HRIS",
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
     "@babel/core": "^7.22.5",
@@ -106,5 +106,4 @@
     "wow.js": "^1.2.2"
   }
 }
-
 
