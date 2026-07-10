@@ -2,17 +2,27 @@
   <div>
     <BreadcrumbBar section="Administration" current="Accounts" />
 
+    <div class="premium-hero mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="premium-badge mb-2">Administration</div>
+          <h4 class="mb-1 premium-title">Accounts</h4>
+          <p class="mb-0 premium-subtitle">Create and manage HRIS sign-ins with a clearer access flow and a cleaner account list.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="row g-3">
       <div class="col-12">
-        <div class="card h-100">
-          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
+        <div class="card h-100 border-0 shadow-sm premium-panel">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 bg-white border-bottom-0 pt-4 pb-0 premium-panel-header">
             <div>
               <h5 class="mb-0">Create Account</h5>
               <small class="text-muted">Add a login for HR Admin, Immediate Supervisor, or Payroll Admin users.</small>
             </div>
             <span class="badge" :class="roleBadgeClass">{{ currentRole }}</span>
           </div>
-          <div class="card-body">
+          <div class="card-body premium-panel-body">
             <div v-if="!canManageAccounts" class="alert alert-light-warning border-warning mb-3" role="alert">
               Your current role can view this module, but only HR Admin accounts can create new logins.
             </div>
@@ -21,30 +31,30 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="accountFullName">Full Name</label>
-                  <input id="accountFullName" v-model="form.fullName" type="text" class="form-control" placeholder="Employee full name" :disabled="!canManageAccounts || isSubmitting">
+                  <input id="accountFullName" v-model="form.fullName" type="text" class="form-control premium-input" placeholder="Employee full name" :disabled="!canManageAccounts || isSubmitting">
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="accountUsername">Username</label>
-                  <input id="accountUsername" v-model="form.username" type="text" class="form-control" placeholder="maria.santos" :disabled="!canManageAccounts || isSubmitting">
+                  <input id="accountUsername" v-model="form.username" type="text" class="form-control premium-input" placeholder="maria.santos" :disabled="!canManageAccounts || isSubmitting">
                 </div>
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="accountEmail">Email</label>
-                  <input id="accountEmail" v-model="form.email" type="email" class="form-control" placeholder="maria.santos@company.com" :disabled="!canManageAccounts || isSubmitting">
+                  <input id="accountEmail" v-model="form.email" type="email" class="form-control premium-input" placeholder="maria.santos@company.com" :disabled="!canManageAccounts || isSubmitting">
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="accountPassword">Temporary Password</label>
-                  <input id="accountPassword" v-model="form.password" type="password" class="form-control" placeholder="Minimum 8 characters" :disabled="!canManageAccounts || isSubmitting">
+                  <input id="accountPassword" v-model="form.password" type="password" class="form-control premium-input" placeholder="Minimum 8 characters" :disabled="!canManageAccounts || isSubmitting">
                 </div>
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="accountRole">Role</label>
-                  <select id="accountRole" v-model="form.role" class="form-select" :disabled="!canManageAccounts || isSubmitting">
+                  <select id="accountRole" v-model="form.role" class="form-select premium-input" :disabled="!canManageAccounts || isSubmitting">
                     <option v-for="option in roleOptions" :key="option" :value="option">{{ option }}</option>
                   </select>
                 </div>
                 <div class="col-md-6 mb-3 d-flex align-items-end">
-                  <div class="border rounded-3 px-3 py-2 bg-light w-100">
+                  <div class="border rounded-4 px-3 py-2 bg-light w-100 premium-note">
                     <small class="text-muted d-block mb-1">Account status</small>
                     <strong>New accounts are created active by default.</strong>
                   </div>
@@ -52,7 +62,7 @@
               </div>
 
               <div class="d-flex flex-wrap gap-2">
-                <button type="button" class="btn btn-outline-primary" :disabled="isSubmitting" @click="resetFormWithMessage">Clear</button>
+                <button type="button" class="btn btn-outline-primary premium-action" :disabled="isSubmitting" @click="resetFormWithMessage">Clear</button>
                 <button type="submit" class="btn btn-primary" :disabled="!canManageAccounts || isSubmitting">
                   {{ isSubmitting ? "Creating..." : "Create Account" }}
                 </button>
@@ -66,65 +76,21 @@
         </div>
       </div>
 
-      <div class="col-lg-5 d-none">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-header bg-light-primary border-0">
-            <h5 class="mb-0 text-primary">Account Preview</h5>
-            <small class="text-muted">Check the login identity before saving it.</small>
-          </div>
-          <div class="card-body">
-            <div class="p-3 rounded bg-light mb-3">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Display Name</span>
-                <strong>{{ previewName }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Username</span>
-                <strong>{{ previewUsername }}</strong>
-              </div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Role</span>
-                <span class="badge bg-light-secondary text-secondary">{{ form.role }}</span>
-              </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="text-muted">Access</span>
-                <span class="badge" :class="form.isActive ? 'bg-light-success text-success' : 'bg-light-danger text-danger'">
-                  {{ form.isActive ? "Active" : "Inactive" }}
-                </span>
-              </div>
-            </div>
-
-            <div class="border rounded p-3 mb-3">
-              <h6 class="mb-2">Setup Notes</h6>
-              <p class="text-muted small mb-2">Use a unique username and company email. The password entered here becomes the user’s first login password.</p>
-              <p class="text-muted small mb-0">If you disable the account, the user record stays in the system but sign-in is blocked.</p>
-            </div>
-
-            <div class="border rounded p-3">
-              <h6 class="mb-2">Recommended Flow</h6>
-              <p class="text-muted small mb-2">1. Create the employee in Employee Master.</p>
-              <p class="text-muted small mb-2">2. Add the user account here.</p>
-              <p class="text-muted small mb-0">3. Share the temporary password and ask the user to sign in.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="col-12">
-        <div class="card h-100">
-          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
+        <div class="card h-100 border-0 shadow-sm premium-panel">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 bg-white border-bottom-0 pt-4 pb-0 premium-panel-header">
             <div>
               <h5 class="mb-0">Existing Accounts</h5>
               <small class="text-muted">Review usernames, role assignment, and active status.</small>
             </div>
             <button type="button" class="btn btn-sm btn-light-primary" :disabled="isLoading" @click="fetchAccounts">Refresh</button>
           </div>
-          <div class="card-body p-0">
+          <div class="card-body p-0 premium-panel-body">
             <div v-if="tableMessage" class="alert alert-light-warning border-warning m-3 mb-0" role="alert">
               {{ tableMessage }}
             </div>
             <div class="d-none d-md-block table-responsive">
-              <table class="table table-hover mb-0">
+              <table class="table table-hover align-middle mb-0 premium-table">
                 <thead>
                   <tr>
                     <th>Full Name</th>
@@ -170,7 +136,7 @@
                 No user accounts found yet.
               </div>
 
-              <div v-for="account in accounts" :key="`mobile-${account.id}`" class="border rounded-3 p-3 mb-2 shadow-sm">
+              <div v-for="account in accounts" :key="`mobile-${account.id}`" class="border rounded-4 p-3 mb-2 shadow-sm premium-mobile-card">
                 <div class="d-flex justify-content-between align-items-start gap-2">
                   <div>
                     <div class="fw-semibold">{{ account.full_name }}</div>
@@ -237,9 +203,6 @@ function createEmptyForm() {
 
 const currentRole = computed(() => authStore.currentUser?.role || "Authorized User");
 const canManageAccounts = computed(() => currentRole.value === "HR Admin");
-
-const previewName = computed(() => form.fullName.trim() || "No name yet");
-const previewUsername = computed(() => form.username.trim() || "No username yet");
 
 const roleBadgeClass = computed(() =>
   canManageAccounts.value ? "bg-light-success text-success" : "bg-light-warning text-warning"
@@ -385,3 +348,103 @@ onMounted(() => {
   fetchAccounts();
 });
 </script>
+
+<style scoped>
+.premium-hero {
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background:
+    linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.02)),
+    #fff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.premium-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  background: rgba(13, 110, 253, 0.08);
+  color: #0d6efd;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.premium-title {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.premium-subtitle {
+  color: #64748b;
+  max-width: 56rem;
+}
+
+.premium-panel {
+  border-radius: 1.35rem;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  overflow: hidden;
+}
+
+.premium-panel-header {
+  padding-bottom: 1rem;
+}
+
+.premium-panel-body {
+  background:
+    radial-gradient(circle at top left, rgba(13, 110, 253, 0.05), transparent 35%),
+    #fff;
+}
+
+.premium-input {
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.premium-input:focus {
+  box-shadow: none;
+  border-color: #0d6efd;
+}
+
+.premium-note {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%) !important;
+}
+
+.premium-action {
+  border-color: rgba(13, 110, 253, 0.22);
+}
+
+.premium-table thead th {
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom-color: rgba(148, 163, 184, 0.2);
+}
+
+.premium-table tbody td {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.premium-mobile-card {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+}
+
+@media (max-width: 767.98px) {
+  .premium-hero {
+    padding: 1rem 1.1rem;
+    border-radius: 1.15rem;
+  }
+
+  .premium-panel-header {
+    padding-top: 1.1rem !important;
+  }
+}
+</style>

@@ -4,12 +4,11 @@
 
     <div class="row g-3">
       <div class="col-12">
-        <div class="card h-100">
-          <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card h-100 border-0 shadow-sm premium-panel">
+          <div class="card-header d-flex align-items-center justify-content-between bg-white border-bottom-0 pt-4 pb-0 premium-panel-header">
             <div class="d-flex align-items-center gap-3">
               <button
-                class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
-                style="width: 32px; height: 32px; padding: 0;"
+                class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center premium-back"
                 @click="goBack"
                 title="Back to Attendance"
               >
@@ -20,10 +19,9 @@
                 <small class="text-muted">Record shift logs and corrections for payroll reconciliation.</small>
               </div>
             </div>
-            <span class="badge" :class="adjustmentBadge.class">{{ adjustmentBadge.label }}</span>
           </div>
 
-          <div class="card-body">
+          <div class="card-body premium-panel-body">
             <form novalidate @submit.prevent="handleSubmit">
               <div class="d-flex align-items-center justify-content-between mb-3">
                 <div>
@@ -38,7 +36,7 @@
                   <select
                     id="employeeSelect"
                     v-model="form.employeeSelect"
-                    class="form-select"
+                    class="form-select premium-input"
                     :class="fieldClass('employeeSelect')"
                     required
                     @change="handleEmployeeChange"
@@ -52,7 +50,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                   <label class="form-label" for="employeeId">Employee ID</label>
-                  <input id="employeeId" :value="form.employeeSelect" type="text" class="form-control" placeholder="Auto-filled" readonly />
+                  <input id="employeeId" :value="form.employeeSelect" type="text" class="form-control premium-input" placeholder="Auto-filled" readonly />
                 </div>
                 <div class="col-md-3 mb-3">
                   <label class="form-label" for="workDate">Date</label>
@@ -60,7 +58,7 @@
                     id="workDate"
                     v-model="form.workDate"
                     type="date"
-                    class="form-control"
+                    class="form-control premium-input"
                     :class="fieldClass('workDate')"
                     required
                     @input="handleFormMutation('workDate')"
@@ -70,7 +68,7 @@
 
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="shiftSchedule">Shift Schedule</label>
-                  <select id="shiftSchedule" v-model="form.shiftSchedule" class="form-select" @change="applyShiftPreset">
+                  <select id="shiftSchedule" v-model="form.shiftSchedule" class="form-select premium-input" @change="applyShiftPreset">
                     <option value="regular">Regular Day Shift</option>
                     <option value="night">Night Shift</option>
                     <option value="compressed">Compressed Schedule</option>
@@ -79,12 +77,12 @@
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="shiftStart">Shift Start</label>
-                  <input id="shiftStart" v-model="form.shiftStart" type="time" class="form-control" :class="fieldClass('shiftStart')" required @input="handleFormMutation('shiftStart')" />
+                  <input id="shiftStart" v-model="form.shiftStart" type="time" class="form-control premium-input" :class="fieldClass('shiftStart')" required @input="handleFormMutation('shiftStart')" />
                   <div class="invalid-feedback">{{ validationErrors.shiftStart }}</div>
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="shiftEnd">Shift End</label>
-                  <input id="shiftEnd" v-model="form.shiftEnd" type="time" class="form-control" :class="fieldClass('shiftEnd')" required @input="handleFormMutation('shiftEnd')" />
+                  <input id="shiftEnd" v-model="form.shiftEnd" type="time" class="form-control premium-input" :class="fieldClass('shiftEnd')" required @input="handleFormMutation('shiftEnd')" />
                   <div class="invalid-feedback">{{ validationErrors.shiftEnd }}</div>
                 </div>
               </div>
@@ -99,17 +97,17 @@
               <div class="row">
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="clockIn">Clock In</label>
-                  <input id="clockIn" v-model="form.clockIn" type="time" class="form-control" :class="fieldClass('clockIn')" required @input="handleFormMutation('clockIn')" />
+                  <input id="clockIn" v-model="form.clockIn" type="time" class="form-control premium-input" :class="fieldClass('clockIn')" required @input="handleFormMutation('clockIn')" />
                   <div class="invalid-feedback">{{ validationErrors.clockIn }}</div>
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="clockOut">Clock Out</label>
-                  <input id="clockOut" v-model="form.clockOut" type="time" class="form-control" :class="fieldClass('clockOut')" required @input="handleFormMutation('clockOut')" />
+                  <input id="clockOut" v-model="form.clockOut" type="time" class="form-control premium-input" :class="fieldClass('clockOut')" required @input="handleFormMutation('clockOut')" />
                   <div class="invalid-feedback">{{ validationErrors.clockOut }}</div>
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="source">Source / Device</label>
-                  <select id="source" v-model="form.source" class="form-select" :class="fieldClass('source')" required @change="handleFormMutation('source')">
+                  <select id="source" v-model="form.source" class="form-select premium-input" :class="fieldClass('source')" required @change="handleFormMutation('source')">
                     <option value="">Select source</option>
                     <option>Web</option>
                     <option>Mobile</option>
@@ -120,15 +118,15 @@
 
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="breakOut">Break Out</label>
-                  <input id="breakOut" v-model="form.breakOut" type="time" class="form-control" />
+                  <input id="breakOut" v-model="form.breakOut" type="time" class="form-control premium-input" />
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="breakIn">Break In</label>
-                  <input id="breakIn" v-model="form.breakIn" type="time" class="form-control" />
+                  <input id="breakIn" v-model="form.breakIn" type="time" class="form-control premium-input" />
                 </div>
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="logAction">Entry Type</label>
-                  <select id="logAction" v-model="form.logAction" class="form-select">
+                  <select id="logAction" v-model="form.logAction" class="form-select premium-input">
                     <option value="original">Original Log</option>
                     <option value="correction">Attendance Correction</option>
                   </select>
@@ -138,21 +136,21 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="restDayWork">Rest Day Work</label>
-                  <select id="restDayWork" v-model="form.restDayWork" class="form-select">
+                  <select id="restDayWork" v-model="form.restDayWork" class="form-select premium-input">
                     <option value="no">No</option>
                     <option value="yes">Yes</option>
                   </select>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="holidayWork">Holiday Work</label>
-                  <select id="holidayWork" v-model="form.holidayWork" class="form-select">
+                  <select id="holidayWork" v-model="form.holidayWork" class="form-select premium-input">
                     <option value="no">No</option>
                     <option value="yes">Yes</option>
                   </select>
                 </div>
               </div>
 
-              <div v-if="isCorrection" class="border rounded p-3 mb-3">
+              <div v-if="isCorrection" class="premium-correction mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                   <div>
                     <h6 class="mb-1">Correction request</h6>
@@ -163,7 +161,7 @@
                 <div class="row">
                   <div class="col-md-4 mb-3">
                     <label class="form-label" for="correctionType">Correction Type</label>
-                    <select id="correctionType" v-model="form.correctionType" class="form-select" :class="fieldClass('correctionType')" @change="handleFormMutation('correctionType')">
+                    <select id="correctionType" v-model="form.correctionType" class="form-select premium-input" :class="fieldClass('correctionType')" @change="handleFormMutation('correctionType')">
                       <option value="">Select correction</option>
                       <option>Missing Clock In</option>
                       <option>Missing Clock Out</option>
@@ -177,7 +175,7 @@
                     <textarea
                       id="adjustmentReason"
                       v-model="form.adjustmentReason"
-                      class="form-control"
+                      class="form-control premium-input"
                       :class="fieldClass('adjustmentReason')"
                       rows="2"
                       placeholder="Explain why this correction is needed."
@@ -189,7 +187,7 @@
               </div>
 
               <div class="d-flex flex-wrap gap-2 mt-2">
-                <button type="button" class="btn btn-outline-primary" @click="saveDraft">Save Draft</button>
+                <button type="button" class="btn btn-outline-primary premium-action" @click="saveDraft">Save Draft</button>
                 <button type="submit" class="btn btn-primary">Save Attendance Log</button>
               </div>
 
@@ -198,73 +196,6 @@
           </div>
         </div>
 
-        <div class="mt-3">
-          <div class="card h-100 border-0 shadow-sm">
-            <div class="card-header bg-light-primary border-0">
-              <h5 class="mb-0 text-primary">Attendance Summary</h5>
-              <small class="text-muted">Read-only values calculated from the log.</small>
-            </div>
-            <div class="card-body">
-              <div class="mb-3 p-3 rounded bg-light">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <span class="text-muted">Log ID</span>
-                  <strong>{{ logIdDisplay }}</strong>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <span class="text-muted">Status</span>
-                  <span class="badge" :class="statusBadge.class">{{ statusBadge.label }}</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <span class="text-muted">Employee</span>
-                  <strong>{{ employeeSummary }}</strong>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="text-muted">Schedule</span>
-                  <strong>{{ scheduleSummary }}</strong>
-                </div>
-              </div>
-
-              <div class="row g-3">
-                <div class="col-6">
-                  <div class="border rounded p-3 h-100">
-                    <small class="text-muted d-block mb-1">Late</small>
-                    <h4 class="mb-0 text-warning">{{ metrics.lateLabel }}</h4>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="border rounded p-3 h-100">
-                    <small class="text-muted d-block mb-1">Undertime</small>
-                    <h4 class="mb-0 text-danger">{{ metrics.undertimeLabel }}</h4>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="border rounded p-3 h-100">
-                    <small class="text-muted d-block mb-1">Overtime</small>
-                    <h4 class="mb-0 text-primary">{{ metrics.overtimeLabel }}</h4>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="border rounded p-3 h-100">
-                    <small class="text-muted d-block mb-1">Night Diff</small>
-                    <h4 class="mb-0 text-info">{{ metrics.nightDiffLabel }}</h4>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="border rounded p-3 h-100">
-                    <small class="text-muted d-block mb-1">Worked Hours</small>
-                    <h5 class="mb-0">{{ metrics.totalHours }}</h5>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="border rounded p-3 h-100">
-                    <small class="text-muted d-block mb-1">Payable Hours</small>
-                    <h5 class="mb-0 text-success">{{ metrics.payableHours }}</h5>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -437,14 +368,6 @@ function validateForm() {
 
 const isCorrection = computed(() => form.logAction === "correction");
 
-const employeeSummary = computed(() =>
-  form.employeeSelect
-    ? `${employeeData.value[form.employeeSelect] || "Unknown Employee"} (${form.employeeSelect})`
-    : "No employee selected"
-);
-
-const scheduleSummary = computed(() => `${form.shiftStart || "--:--"} - ${form.shiftEnd || "--:--"}`);
-
 const metrics = computed(() => {
   const shiftStartMin = toMinutes(form.shiftStart);
   const shiftEndMin = normalizeEnd(shiftStartMin, toMinutes(form.shiftEnd));
@@ -537,14 +460,6 @@ const statusBadge = computed(() => {
   if (metrics.value.nightDiffMinutes > 0) return { label: "Night Differential", class: "bg-light-info text-info" };
   return { label: "Present", class: "bg-light-success text-success" };
 });
-
-const adjustmentBadge = computed(() =>
-  isCorrection.value
-    ? { label: "Pending Correction", class: "bg-light-warning text-warning" }
-    : { label: "Original", class: "bg-light-primary text-primary" }
-);
-
-const logIdDisplay = computed(() => logId.value);
 
 function syncAlertFromMetrics() {
   if (!metrics.value.valid) {
@@ -753,3 +668,55 @@ onMounted(() => {
   fetchEmployees();
 });
 </script>
+
+<style scoped>
+.premium-panel {
+  border-radius: 1.35rem;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  overflow: hidden;
+}
+
+.premium-panel-header {
+  padding-bottom: 1rem;
+}
+
+.premium-panel-body {
+  background:
+    radial-gradient(circle at top left, rgba(13, 110, 253, 0.05), transparent 35%),
+    #fff;
+}
+
+.premium-back {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-color: rgba(148, 163, 184, 0.22);
+  border-radius: 0.85rem;
+}
+
+.premium-input {
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.premium-input:focus {
+  box-shadow: none;
+  border-color: #0d6efd;
+}
+
+.premium-correction {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+}
+
+.premium-action {
+  border-color: rgba(13, 110, 253, 0.22);
+}
+
+@media (max-width: 767.98px) {
+  .premium-panel-header {
+    padding-top: 1.1rem !important;
+  }
+}
+</style>

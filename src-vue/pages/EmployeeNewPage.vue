@@ -4,13 +4,12 @@
     <BreadcrumbBar section="HR Modules / Employee Master" current="New Employee" />
 
     <div class="row g-3">
-      <div class="col-lg-8 order-2 order-lg-1">
-        <div class="card h-100">
-          <div class="card-header d-flex align-items-center justify-content-between">
+      <div :class="mainColumnClass">
+        <div class="card h-100 border-0 shadow-sm premium-panel">
+          <div class="card-header d-flex align-items-center justify-content-between premium-panel-header">
             <div class="d-flex align-items-center gap-3">
               <button
-                class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
-                style="width: 32px; height: 32px; padding: 0;"
+                class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center premium-back"
                 @click="goBack"
                 title="Back to Directory"
               >
@@ -21,10 +20,10 @@
                 <small class="text-muted">Fill out the form to create a new employee record.</small>
               </div>
             </div>
-            <span class="badge bg-light-primary text-primary">Draft</span>
+            <span class="badge rounded-pill premium-badge">Draft</span>
           </div>
 
-          <div class="card-body">
+          <div class="card-body premium-panel-body">
             <div v-if="authStore.currentUser?.role !== 'HR Admin'" class="alert alert-light-warning border-warning mb-3" role="alert">
               Only HR Admin users can create employee profiles.
             </div>
@@ -108,7 +107,7 @@
                 </div>
               </div>
 
-              <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
+              <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
                 <div>
                   <h6 class="mb-1">2. Employment details</h6>
                   <p class="text-muted mb-0 small">Use controlled fields to keep department, position, branch, and manager records consistent.</p>
@@ -159,7 +158,7 @@
                 </div>
               </div>
 
-              <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
+              <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
                 <div>
                   <h6 class="mb-1">3. Lifecycle and movement</h6>
                   <p class="text-muted mb-0 small">Show onboarding by default, and reveal offboarding only for separated or resigned employees.</p>
@@ -225,7 +224,7 @@
                 </div>
               </div>
 
-              <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
+              <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
                 <div>
                   <h6 class="mb-1">4. Statutory, banking, and documents</h6>
                   <p class="text-muted mb-0 small">Validate government identifiers and track required file submissions.</p>
@@ -320,13 +319,13 @@
       </div>
 
       <div v-if="showConfirmationCard" class="col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-header bg-light-primary border-0">
+        <div class="card h-100 border-0 shadow-sm premium-panel">
+          <div class="card-header bg-light-primary border-0 premium-panel-header">
             <h5 class="mb-0 text-primary">Confirm Employee Creation</h5>
             <small class="text-muted">Review the details before saving.</small>
           </div>
-          <div class="card-body">
-            <div class="mb-3 p-3 rounded bg-light">
+          <div class="card-body premium-panel-body">
+            <div class="mb-3 p-3 rounded premium-summary">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="text-muted">Employee</span>
                 <strong>{{ employeeSummary }}</strong>
@@ -425,6 +424,9 @@ const form = reactive(createEmptyForm());
 const validationErrors = reactive({});
 const isSubmitting = ref(false);
 const showConfirmationCard = ref(false);
+const mainColumnClass = computed(() =>
+  showConfirmationCard.value ? "col-lg-8 order-2 order-lg-1" : "col-12"
+);
 
 const alertState = reactive({
   class: "alert-light-primary border-primary",
@@ -635,3 +637,48 @@ async function confirmCreateEmployee() {
   }
 }
 </script>
+
+<style scoped>
+.premium-panel {
+  border-radius: 1.15rem;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+
+.premium-panel-header {
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 30%),
+    #fff;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 1.1rem 1.25rem;
+}
+
+.premium-panel-body {
+  padding: 1.25rem;
+}
+
+.premium-back {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 0.85rem;
+}
+
+.premium-badge {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.16);
+  padding: 0.45rem 0.8rem;
+}
+
+.premium-summary {
+  background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 991.98px) {
+  .premium-panel-body {
+    padding: 1rem;
+  }
+}
+</style>

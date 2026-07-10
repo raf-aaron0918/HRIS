@@ -2,17 +2,27 @@
   <div>
     <BreadcrumbBar section="HR Modules" current="Leave Management" />
 
+    <div class="premium-hero mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="premium-badge mb-2">HR Modules</div>
+          <h4 class="mb-1 premium-title">Leave Management</h4>
+          <p class="mb-0 premium-subtitle">Submit and review leave requests with credits, policy checks, and payroll impact in one clean flow.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="row g-3">
       <div class="col-12">
-        <div class="card h-100">
-          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
+        <div class="card h-100 border-0 shadow-sm premium-panel">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 bg-white border-bottom-0 pt-4 pb-0 premium-panel-header">
             <div>
               <h5 class="mb-1">Leave Request Form</h5>
               <small class="text-muted">Submit leave requests with live credit checks, policy guidance, and approval routing.</small>
             </div>
             <span class="badge" :class="statusBadge.class">{{ form.status }}</span>
           </div>
-          <div class="card-body">
+          <div class="card-body premium-panel-body">
             <form novalidate @submit.prevent="handleSubmit">
               <div class="mb-3">
                 <h6 class="mb-1">1. Employee and schedule details</h6>
@@ -110,13 +120,13 @@
 
               <div class="row g-3 mt-1 mb-2">
                 <div class="col-md-6">
-                  <div class="border rounded-3 p-3 h-100">
+                  <div class="border rounded-4 p-3 h-100 premium-note">
                     <small class="text-muted d-block mb-1">Policy reminder</small>
                     <span class="text-muted small d-block">Sick leave may require an attachment. Leave without pay affects payroll directly.</span>
                   </div>
                 </div>
                 <div class="col-md-6">
-                  <div class="border rounded-3 p-3 h-100">
+                  <div class="border rounded-4 p-3 h-100 premium-note">
                     <small class="text-muted d-block mb-1">Validation coverage</small>
                     <span class="text-muted small d-block">The form checks date range, available credits, holidays, and approval readiness.</span>
                   </div>
@@ -124,7 +134,7 @@
               </div>
 
               <div class="d-grid gap-2 d-md-flex flex-md-wrap mt-3">
-                <button type="button" class="btn btn-outline-primary" @click="saveDraft">Save Draft</button>
+                <button type="button" class="btn btn-outline-primary premium-action" @click="saveDraft">Save Draft</button>
                 <button type="submit" class="btn btn-primary">Submit Leave Request</button>
               </div>
 
@@ -415,3 +425,75 @@ onMounted(() => {
   fetchEmployees();
 });
 </script>
+
+<style scoped>
+.premium-hero {
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background:
+    linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.02)),
+    #fff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.premium-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  background: rgba(13, 110, 253, 0.08);
+  color: #0d6efd;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.premium-title {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.premium-subtitle {
+  color: #64748b;
+  max-width: 56rem;
+}
+
+.premium-panel {
+  border-radius: 1.35rem;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  overflow: hidden;
+}
+
+.premium-panel-header {
+  padding-bottom: 1rem;
+}
+
+.premium-panel-body {
+  background:
+    radial-gradient(circle at top left, rgba(13, 110, 253, 0.05), transparent 35%),
+    #fff;
+}
+
+.premium-note {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+}
+
+.premium-action {
+  border-color: rgba(13, 110, 253, 0.22);
+}
+
+@media (max-width: 767.98px) {
+  .premium-hero {
+    padding: 1rem 1.1rem;
+    border-radius: 1.15rem;
+  }
+
+  .premium-panel-header {
+    padding-top: 1.1rem !important;
+  }
+}
+</style>

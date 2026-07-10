@@ -4,8 +4,8 @@
 
     <div class="row g-3 mb-4">
       <div class="col-6 col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
+        <div class="premium-metric h-100">
+          <div class="card-body p-0">
             <small class="text-muted d-block mb-2">Total Employees</small>
             <div class="d-flex align-items-end justify-content-between">
               <div>
@@ -19,8 +19,8 @@
       </div>
 
       <div class="col-6 col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
+        <div class="premium-metric h-100">
+          <div class="card-body p-0">
             <small class="text-muted d-block mb-2">Active Access</small>
             <div class="d-flex align-items-end justify-content-between">
               <div>
@@ -34,8 +34,8 @@
       </div>
 
       <div class="col-6 col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
+        <div class="premium-metric h-100">
+          <div class="card-body p-0">
             <small class="text-muted d-block mb-2">Onboarding</small>
             <div class="d-flex align-items-end justify-content-between">
               <div>
@@ -49,8 +49,8 @@
       </div>
 
       <div class="col-6 col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
+        <div class="premium-metric h-100">
+          <div class="card-body p-0">
             <small class="text-muted d-block mb-2">Missing Docs</small>
             <div class="d-flex align-items-end justify-content-between">
               <div>
@@ -66,31 +66,31 @@
 
     <div class="row g-3">
       <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+        <div class="card border-0 shadow-sm premium-panel">
+          <div class="card-header premium-panel-header">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
               <div>
                 <h5 class="mb-0">Employee Directory</h5>
                 <small class="text-muted">{{ employeeCountLabel }}</small>
               </div>
-              <div class="d-flex gap-2">
-                <div class="input-group" style="max-width: 300px;">
+              <div class="d-flex flex-column flex-md-row gap-2">
+                <div class="input-group premium-search">
                   <span class="input-group-text bg-light border-end-0"><i class="ti ti-search"></i></span>
                   <input v-model="employeeSearch" type="text" class="form-control border-start-0 ps-0 bg-light" placeholder="Search employees...">
                 </div>
-                <RouterLink v-if="canManageEmployees" to="/employee/new" class="btn btn-primary d-flex align-items-center gap-2 text-nowrap">
+                <RouterLink v-if="canManageEmployees" to="/employee/new" class="btn btn-primary d-flex align-items-center gap-2 text-nowrap premium-action">
                   <i class="ti ti-user-plus"></i> New Employee
                 </RouterLink>
               </div>
             </div>
           </div>
 
-          <div class="card-body p-0">
+          <div class="card-body p-0 premium-panel-body">
             <div class="px-3 pt-3 d-flex flex-nowrap overflow-auto gap-2 pb-2 mobile-filter-scroll">
               <button
                 v-for="filter in directoryFilters"
                 :key="filter.value"
-                class="btn btn-sm rounded-pill px-3"
+                class="btn btn-sm rounded-pill px-3 premium-filter"
                 :class="activeDirectoryFilter === filter.value ? 'btn-primary' : 'btn-outline-secondary'"
                 @click="activeDirectoryFilter = filter.value"
               >
@@ -116,7 +116,7 @@
               <template v-else>
                 <div class="d-none d-md-block">
                   <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0 premium-table">
                       <thead class="table-light">
                         <tr>
                           <th>ID</th>
@@ -148,7 +148,7 @@
                 </div>
 
                 <div class="d-md-none">
-                  <div v-for="row in filteredDirectory" :key="row.id" class="border rounded p-3 mb-2 shadow-sm">
+                  <div v-for="row in filteredDirectory" :key="row.id" class="premium-mobile-card mb-2">
                     <div class="d-flex justify-content-between align-items-start gap-2">
                       <div>
                         <div class="fw-semibold">{{ row.name }}</div>
@@ -306,3 +306,71 @@ onMounted(() => {
   fetchEmployees();
 });
 </script>
+
+<style scoped>
+.premium-metric {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(249, 250, 255, 0.95));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 1rem;
+  padding: 1rem 1rem 1.05rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.premium-panel {
+  border-radius: 1.15rem;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+
+.premium-panel-header {
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 30%),
+    #fff;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 1.15rem 1.25rem;
+}
+
+.premium-panel-body {
+  padding: 1.15rem;
+}
+
+.premium-search {
+  max-width: 320px;
+}
+
+.premium-action {
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.14);
+}
+
+.premium-filter {
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.premium-table thead th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.premium-table tbody td {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.premium-mobile-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.03);
+}
+
+@media (max-width: 767.98px) {
+  .premium-search {
+    max-width: none;
+  }
+}
+</style>

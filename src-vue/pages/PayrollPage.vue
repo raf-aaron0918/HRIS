@@ -2,17 +2,27 @@
   <div>
     <BreadcrumbBar section="HR Modules" current="Payroll" />
 
+    <div class="premium-hero mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="premium-badge mb-2">HR Modules</div>
+          <h4 class="mb-1 premium-title">Payroll</h4>
+          <p class="mb-0 premium-subtitle">Prepare payroll runs with a cleaner workflow, role-based access, and clearer net pay visibility.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="row g-3">
       <div class="col-12">
-        <div class="card h-100">
-          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
+        <div class="card h-100 border-0 shadow-sm premium-panel">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 bg-white border-bottom-0 pt-4 pb-0 premium-panel-header">
             <div>
               <h5 class="mb-0">Payroll Run</h5>
               <small class="text-muted">Keep the essentials in the form and let the system calculate the rest.</small>
             </div>
             <span class="badge" :class="runBadge.class">{{ form.payslipStatus }}</span>
           </div>
-          <div class="card-body">
+          <div class="card-body premium-panel-body">
             <div v-if="!canManagePayroll" class="alert alert-light-warning border-warning mb-3" role="alert">
               Only HR Admin and Payroll Admin users can create or publish payroll runs.
             </div>
@@ -148,8 +158,8 @@
               </div>
 
               <div class="d-grid gap-2 d-md-flex flex-md-wrap mt-2">
-                <button type="button" class="btn btn-outline-primary" :disabled="!canManagePayroll" @click="saveDraft">Save Draft</button>
-                <button type="button" class="btn btn-outline-success" :disabled="!canManagePayroll" @click="applySampleRates">Apply Sample Rates</button>
+                <button type="button" class="btn btn-outline-primary premium-action" :disabled="!canManagePayroll" @click="saveDraft">Save Draft</button>
+                <button type="button" class="btn btn-outline-success premium-action" :disabled="!canManagePayroll" @click="applySampleRates">Apply Sample Rates</button>
                 <button type="submit" class="btn btn-primary" :disabled="!canManagePayroll">Finalize Payroll Batch</button>
               </div>
 
@@ -454,3 +464,70 @@ onMounted(() => {
   fetchEmployees();
 });
 </script>
+
+<style scoped>
+.premium-hero {
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background:
+    linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.02)),
+    #fff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.premium-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  background: rgba(13, 110, 253, 0.08);
+  color: #0d6efd;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.premium-title {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.premium-subtitle {
+  color: #64748b;
+  max-width: 56rem;
+}
+
+.premium-panel {
+  border-radius: 1.35rem;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  overflow: hidden;
+}
+
+.premium-panel-header {
+  padding-bottom: 1rem;
+}
+
+.premium-panel-body {
+  background:
+    radial-gradient(circle at top left, rgba(13, 110, 253, 0.05), transparent 35%),
+    #fff;
+}
+
+.premium-action {
+  border-color: rgba(13, 110, 253, 0.22);
+}
+
+@media (max-width: 767.98px) {
+  .premium-hero {
+    padding: 1rem 1.1rem;
+    border-radius: 1.15rem;
+  }
+
+  .premium-panel-header {
+    padding-top: 1.1rem !important;
+  }
+}
+</style>
