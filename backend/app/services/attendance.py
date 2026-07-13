@@ -199,16 +199,16 @@ def find_duplicate_attendance_log(
     *,
     employee_code: str,
     work_date: str,
-    clock_in: str,
-    clock_out: str,
     exclude_log_id: str | None = None,
+    include_corrections: bool = False,
 ) -> AttendanceLog | None:
     query = db.query(AttendanceLog).filter(
         AttendanceLog.employee_code == employee_code,
         AttendanceLog.work_date == work_date,
-        AttendanceLog.clock_in == clock_in,
-        AttendanceLog.clock_out == clock_out,
     )
+
+    if not include_corrections:
+        query = query.filter(AttendanceLog.log_action != "correction")
 
     if exclude_log_id:
         query = query.filter(AttendanceLog.log_id != exclude_log_id)

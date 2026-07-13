@@ -85,6 +85,15 @@ const routes = [
       title: "New Attendance",
     },
   },
+  {
+    path: "/attendance/:logId/edit",
+    name: "attendance-edit",
+    component: () => import("@/pages/AttendanceNewPage.vue"),
+    meta: {
+      shell: true,
+      title: "Edit Attendance",
+    },
+  },
 
   {
     path: "/leave",

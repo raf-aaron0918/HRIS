@@ -160,11 +160,15 @@ function normalizeAttendanceSummary(summary, logs) {
   const todayDate = getTodayDateValue();
   const attendanceLogs = logs || [];
   const todaysLogs = attendanceLogs.filter((log) => log.work_date === todayDate);
+  const fallbackPresentCount = new Set(
+    todaysLogs
+      .filter((log) => isPresentAttendanceStatus(log.status))
+      .map((log) => getAttendanceIdentityKey(log))
+      .filter(Boolean)
+  ).size;
 
   expectedTodayCount.value = Number(summary?.today?.expected || 0);
-  presentTodayCount.value = Number(
-    summary?.today?.present ?? todaysLogs.filter((log) => isPresentAttendanceStatus(log.status)).length
-  );
+  presentTodayCount.value = Math.max(Number(summary?.today?.present || 0), fallbackPresentCount);
   attendanceCorrectionsCount.value = todaysLogs.filter(
     (log) => String(log.status || "").toLowerCase().includes("correction") || String(log.log_action || "").toLowerCase() === "correction"
   ).length;
@@ -200,6 +204,17 @@ function isPresentAttendanceStatus(statusValue) {
     normalizedStatus.includes("late") ||
     normalizedStatus.includes("undertime")
   );
+}
+
+function getAttendanceIdentityKey(log) {
+  const employeeCode = String(log.employee_code || "").trim();
+  if (employeeCode) return `code:${employeeCode}`;
+
+  const employeeName = String(log.employee_name || "").trim().toLowerCase().replace(/\s+/g, " ");
+  if (employeeName) return `name:${employeeName}`;
+
+  const logId = String(log.log_id || "").trim();
+  return logId ? `log:${logId}` : "";
 }
 
 function getTodayDateValue() {

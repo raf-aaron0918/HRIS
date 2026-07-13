@@ -49,6 +49,14 @@ def is_present_attendance_status(status: str | None) -> bool:
     )
 
 
+def resolve_log_employee_code(log, employee_codes_by_name: dict[str, str]) -> str:
+    employee_code = str(log.employee_code or "").strip()
+    if employee_code:
+        return employee_code
+
+    return employee_codes_by_name.get(normalize_employee_name(log.employee_name), "")
+
+
 @router.get("", response_model=AttendanceListResponse)
 def get_attendance_logs(
     _: User = Depends(get_current_active_user),
@@ -62,24 +70,39 @@ def get_attendance_logs(
 def get_duplicate_attendance_check(
     employee_code: str = Query(...),
     work_date: str = Query(...),
-    clock_in: str = Query(...),
-    clock_out: str = Query(...),
     exclude_log_id: str | None = Query(default=None),
+    log_action: str = Query(default="original"),
     _: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ) -> dict:
+    if str(log_action or "").strip().lower() == "correction":
+        return {
+            "is_duplicate": False,
+            "matched_log_id": None,
+        }
+
     matched_log = find_duplicate_attendance_log(
         db,
         employee_code=employee_code,
         work_date=work_date,
-        clock_in=clock_in,
-        clock_out=clock_out,
         exclude_log_id=exclude_log_id,
     )
     return {
         "is_duplicate": matched_log is not None,
         "matched_log_id": matched_log.log_id if matched_log else None,
     }
+
+
+@router.get("/record/{log_id}", response_model=AttendanceResponse)
+def get_attendance_record(
+    log_id: str,
+    _: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> AttendanceResponse:
+    record = get_attendance_log_by_id(db, log_id)
+    if not record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance log not found")
+    return AttendanceResponse.model_validate(record)
 
 
 @router.post("", response_model=AttendanceResponse, status_code=status.HTTP_201_CREATED)
@@ -90,6 +113,18 @@ def create_attendance_record(
 ) -> AttendanceResponse:
     if get_attendance_log_by_id(db, payload.log_id):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Attendance log ID already exists")
+
+    if str(payload.log_action or "").strip().lower() != "correction":
+        matched_log = find_duplicate_attendance_log(
+            db,
+            employee_code=payload.employee_code,
+            work_date=payload.work_date,
+        )
+        if matched_log:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Attendance already exists for this employee on {payload.work_date} ({matched_log.log_id})",
+            )
 
     payload_data = payload.model_dump()
     if get_holiday_by_date(db, payload.work_date):
@@ -157,12 +192,21 @@ def get_attendance_summary(
     scheduled_employees = [
         employee for employee in list_employees(db) if is_employee_scheduled_for_date(employee, target_date)
     ]
+    employee_codes_by_name = {
+        normalize_employee_name(f"{employee.first_name} {employee.last_name}"): employee.employee_code
+        for employee in scheduled_employees
+    }
     present_employee_codes = {
-        log.employee_code
+        resolve_log_employee_code(log, employee_codes_by_name)
         for log in today_logs
         if is_present_attendance_status(log.status)
+        and resolve_log_employee_code(log, employee_codes_by_name)
     }
-    logged_employee_codes = {log.employee_code for log in today_logs}
+    logged_employee_codes = {
+        resolve_log_employee_code(log, employee_codes_by_name)
+        for log in today_logs
+        if resolve_log_employee_code(log, employee_codes_by_name)
+    }
     approved_leaves = approved_leave_by_employee_name(list_leave_requests(db), target_date)
     on_leave_employees = [
         employee

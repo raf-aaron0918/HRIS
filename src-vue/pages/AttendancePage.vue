@@ -159,9 +159,19 @@
                       <td>{{ row.lateOt }}</td>
                       <td>{{ row.payable }}</td>
                       <td class="text-end">
-                        <a href="#" class="btn btn-sm btn-outline-primary" @click.prevent="noopView(row)">
-                          View
-                        </a>
+                        <div class="d-inline-flex gap-2">
+                          <button type="button" class="btn btn-sm btn-outline-primary" @click="openAttendanceDetail(row)">
+                            View
+                          </button>
+                          <button
+                            v-if="!String(row.logId || '').startsWith('ROSTER-')"
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            @click="editAttendanceRow(row)"
+                          >
+                            Edit
+                          </button>
+                        </div>
                       </td>
                     </tr>
 
@@ -189,11 +199,113 @@
                 <div v-if="row.isCorrection" class="small text-info">Corrected attendance entry</div>
                 <div class="small text-muted">Variance: {{ row.lateOt }}</div>
                 <div class="small text-muted">Payable: {{ row.payable }}</div>
+                <div class="d-flex gap-2 mt-3">
+                  <button type="button" class="btn btn-sm btn-outline-primary" @click="openAttendanceDetail(row)">
+                    View
+                  </button>
+                  <button
+                    v-if="!String(row.logId || '').startsWith('ROSTER-')"
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    @click="editAttendanceRow(row)"
+                  >
+                    Edit
+                  </button>
+                </div>
               </div>
 
               <div v-if="!filteredAttendanceRows.length" class="text-center text-muted py-4">
                 No attendance log matches the current search or filter.
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="selectedAttendanceRow" class="premium-modal-backdrop" @click="closeAttendanceDetail">
+      <div class="premium-modal-card" @click.stop>
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+          <div>
+            <h5 class="mb-1">Attendance Details</h5>
+            <div class="text-muted small">{{ selectedAttendanceRow.employee }} · {{ selectedAttendanceRow.logId }}</div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary" @click="closeAttendanceDetail">Close</button>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Status</div>
+              <div class="premium-detail-value">
+                <span class="badge" :class="selectedAttendanceRow.statusClass">{{ selectedAttendanceRow.statusLabel }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Date</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.workDate }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Employee Code</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.employeeId || "-" }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Shift</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.shift }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Clock In</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.raw?.clock_in || "-" }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Clock Out</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.raw?.clock_out || "-" }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Break Out</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.raw?.break_out || "-" }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Break In</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.raw?.break_in || "-" }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Variance</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.lateOt }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Payable Hours</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.payable }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Entry Type</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.isCorrection ? "Correction" : "Original Log" }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="premium-detail-item">
+              <div class="premium-detail-label">Premium Work</div>
+              <div class="premium-detail-value">{{ selectedAttendanceRow.premium === "yes" ? "Yes" : "No" }}</div>
             </div>
           </div>
         </div>
@@ -205,11 +317,12 @@
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
+const router = useRouter();
 
 const attendanceRows = ref([]);
 const rosterRows = ref([]);
@@ -228,6 +341,7 @@ const attendanceFilters = [
 
 const attendanceSearch = ref("");
 const activeAttendanceFilter = ref("all");
+const selectedAttendanceRow = ref(null);
 
 const dayAttendanceRows = computed(() =>
   [
@@ -371,8 +485,19 @@ async function fetchAttendanceData() {
   }
 }
 
-// Entry form was removed from this page; keep handler safe.
-function noopView() {}
+function openAttendanceDetail(row) {
+  selectedAttendanceRow.value = row;
+}
+
+function closeAttendanceDetail() {
+  selectedAttendanceRow.value = null;
+}
+
+function editAttendanceRow(row) {
+  if (!row?.raw?.log_id) return;
+  closeAttendanceDetail();
+  router.push(`/attendance/${encodeURIComponent(row.raw.log_id)}/edit`);
+}
 
 function getTodayDateValue() {
   const today = new Date();
@@ -508,6 +633,47 @@ watch(attendanceDate, () => {
   background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
 }
 
+.premium-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1080;
+}
+
+.premium-modal-card {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 0;
+  padding: 1.25rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+}
+
+.premium-detail-item {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #fff;
+  padding: 0.9rem 1rem;
+}
+
+.premium-detail-label {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.premium-detail-value {
+  color: #0f172a;
+  word-break: break-word;
+}
+
 @media (max-width: 767.98px) {
   .premium-hero {
     padding: 1rem 1.1rem;
@@ -516,6 +682,10 @@ watch(attendanceDate, () => {
 
   .premium-panel-header {
     padding-top: 1.1rem !important;
+  }
+
+  .premium-modal-card {
+    padding: 1rem;
   }
 }
 </style>

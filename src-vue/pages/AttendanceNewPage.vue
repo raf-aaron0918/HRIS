@@ -1,6 +1,6 @@
 <template>
   <div>
-    <BreadcrumbBar section="HR Modules / Time & Attendance" current="New Attendance" />
+    <BreadcrumbBar section="HR Modules / Time & Attendance" :current="pageTitle" />
 
     <div class="row g-3">
       <div class="col-12">
@@ -15,8 +15,8 @@
                 <i class="ti ti-arrow-left"></i>
               </button>
               <div>
-                <h5 class="mb-0">Attendance Entry</h5>
-                <small class="text-muted">Record shift logs and corrections for payroll reconciliation.</small>
+                <h5 class="mb-0">{{ pageTitle }}</h5>
+                <small class="text-muted">{{ pageSubtitle }}</small>
               </div>
             </div>
           </div>
@@ -40,6 +40,7 @@
                     input-class="premium-input"
                     :invalid="Boolean(validationErrors.employeeSelect)"
                     placeholder="Type name or employee code"
+                    :disabled="isEditMode"
                     required
                     @change="handleEmployeeChange"
                   />
@@ -57,6 +58,7 @@
                     type="date"
                     class="form-control premium-input"
                     :class="fieldClass('workDate')"
+                    :disabled="isEditMode"
                     required
                     @input="handleWorkDateChange"
                   />
@@ -180,7 +182,7 @@
 
               <div class="d-flex flex-wrap gap-2 mt-2">
                 <button type="button" class="btn btn-outline-primary premium-action" @click="saveDraft">Save Draft</button>
-                <button type="submit" class="btn btn-primary">Save Attendance Log</button>
+                <button type="submit" class="btn btn-primary">{{ submitButtonLabel }}</button>
               </div>
 
               <div class="alert mt-3 mb-0" :class="alertState.class" role="alert">{{ alertState.message }}</div>
@@ -195,13 +197,14 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
 import EmployeeSearchSelect from "@/components/EmployeeSearchSelect.vue";
 import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
+const route = useRoute();
 const router = useRouter();
 
 const employeeData = ref({});
@@ -240,12 +243,22 @@ const form = reactive({
 });
 
 const logId = ref("Pending");
+const existingLogId = ref("");
 const duplicateCheck = reactive({
   isDuplicate: false,
   matchedLogId: "",
   isChecking: false,
 });
 let duplicateCheckRequestId = 0;
+
+const isEditMode = computed(() => Boolean(String(route.params.logId || "").trim()));
+const pageTitle = computed(() => (isEditMode.value ? "Edit Attendance" : "New Attendance"));
+const pageSubtitle = computed(() =>
+  isEditMode.value
+    ? "Review and update the selected attendance log."
+    : "Record shift logs and corrections for payroll reconciliation."
+);
+const submitButtonLabel = computed(() => (isEditMode.value ? "Update Attendance Log" : "Save Attendance Log"));
 
 function setAlert(type, message) {
   alertState.class = `alert-light-${type} border-${type}`;
@@ -568,6 +581,26 @@ function goBack() {
   router.push("/attendance");
 }
 
+function applyAttendanceRecord(record) {
+  existingLogId.value = record.log_id || "";
+  logId.value = record.log_id || "Pending";
+  form.employeeSelect = record.employee_code || "";
+  form.workDate = record.work_date || "";
+  form.shiftSchedule = record.shift_schedule || "regular";
+  form.shiftStart = record.shift_start || "09:00";
+  form.shiftEnd = record.shift_end || "18:00";
+  form.graceMinutes = Number(record.grace_minutes || 0);
+  form.clockIn = record.clock_in || "";
+  form.clockOut = record.clock_out || "";
+  form.breakOut = record.break_out || "";
+  form.breakIn = record.break_in || "";
+  form.logAction = record.log_action || "original";
+  form.restDayWork = record.rest_day_work || "no";
+  form.holidayWork = record.holiday_work || "no";
+  form.correctionType = record.correction_type || "";
+  form.adjustmentReason = record.adjustment_reason || "";
+}
+
 function buildAttendancePayload(statusLabel) {
   return {
     log_id: logId.value,
@@ -595,33 +628,26 @@ function buildAttendancePayload(statusLabel) {
 }
 
 async function saveAttendanceToApi(payload) {
-  try {
-    return await apiRequest("/attendance", {
-      method: "POST",
+  if (isEditMode.value && existingLogId.value) {
+    const { log_id: _logId, ...updatePayload } = payload;
+    return apiRequest(`/attendance/${encodeURIComponent(existingLogId.value)}`, {
+      method: "PUT",
       token: authStore.accessToken,
-      body: JSON.stringify(payload),
+      body: JSON.stringify(updatePayload),
     });
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 409) {
-      const { log_id: _logId, ...updatePayload } = payload;
-      return apiRequest(`/attendance/${encodeURIComponent(payload.log_id)}`, {
-        method: "PUT",
-        token: authStore.accessToken,
-        body: JSON.stringify(updatePayload),
-      });
-    }
-
-    throw error;
   }
+
+  return apiRequest("/attendance", {
+    method: "POST",
+    token: authStore.accessToken,
+    body: JSON.stringify(payload),
+  });
 }
 
 async function checkDuplicateAttendance() {
-  const hasRequiredFields = form.employeeSelect && form.workDate && form.clockIn && form.clockOut;
+  const hasRequiredFields = form.employeeSelect && form.workDate;
   const canCheck =
     hasRequiredFields &&
-    metrics.value.valid &&
-    !metrics.value.sameDayInvalid &&
-    !isCorrection.value &&
     Boolean(authStore.accessToken);
 
   duplicateCheckRequestId += 1;
@@ -638,7 +664,7 @@ async function checkDuplicateAttendance() {
 
   try {
     const response = await apiRequest(
-      `/attendance/duplicate-check?employee_code=${encodeURIComponent(form.employeeSelect)}&work_date=${encodeURIComponent(form.workDate)}&clock_in=${encodeURIComponent(form.clockIn)}&clock_out=${encodeURIComponent(form.clockOut)}`,
+      `/attendance/duplicate-check?employee_code=${encodeURIComponent(form.employeeSelect)}&work_date=${encodeURIComponent(form.workDate)}&log_action=${encodeURIComponent(form.logAction)}${existingLogId.value ? `&exclude_log_id=${encodeURIComponent(existingLogId.value)}` : ""}`,
       {
         token: authStore.accessToken,
       }
@@ -669,19 +695,29 @@ async function handleSubmit() {
 
   await checkDuplicateAttendance();
   syncAlertFromMetrics();
+  if (duplicateCheck.isDuplicate && !isCorrection.value) {
+    setAlert(
+      "danger",
+      `Attendance already exists for this employee on ${form.workDate}${duplicateCheck.matchedLogId ? ` (${duplicateCheck.matchedLogId})` : ""}.`
+    );
+    return;
+  }
   ensureLogId();
   const statusLabel = isCorrection.value ? "Correction" : statusBadge.value.label;
 
   try {
     const savedRecord = await saveAttendanceToApi(buildAttendancePayload(statusLabel));
     if (isCorrection.value) {
-      setAlert("warning", `${logId.value.trim()} saved as a corrected ${String(savedRecord.status || "attendance").toLowerCase()} record.`);
+      setAlert(
+        "warning",
+        `${(existingLogId.value || logId.value).trim()} ${isEditMode.value ? "updated as" : "saved as"} a corrected ${String(savedRecord.status || "attendance").toLowerCase()} record.`
+      );
       return;
     }
 
     setAlert(
       "success",
-      `${logId.value.trim()} saved as ${savedRecord.status}. Payable hours: ${Number(savedRecord.payable_hours || 0).toFixed(2)}.`
+      `${(existingLogId.value || logId.value).trim()} ${isEditMode.value ? "updated" : "saved"} as ${savedRecord.status}. Payable hours: ${Number(savedRecord.payable_hours || 0).toFixed(2)}.`
     );
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
@@ -725,6 +761,24 @@ async function fetchEmployees() {
   }
 }
 
+async function fetchAttendanceRecord() {
+  const targetLogId = String(route.params.logId || "").trim();
+  if (!targetLogId || !authStore.accessToken) return;
+
+  try {
+    const record = await apiRequest(`/attendance/record/${encodeURIComponent(targetLogId)}`, {
+      token: authStore.accessToken,
+    });
+    applyAttendanceRecord(record);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      authStore.logout();
+      return;
+    }
+    setAlert("danger", "Could not load the attendance log for editing.");
+  }
+}
+
 watch(
   () => form.logAction,
   (value) => {
@@ -764,8 +818,9 @@ watch(
 
 syncAlertFromMetrics();
 
-onMounted(() => {
-  fetchEmployees();
+onMounted(async () => {
+  await fetchEmployees();
+  await fetchAttendanceRecord();
 });
 </script>
 
