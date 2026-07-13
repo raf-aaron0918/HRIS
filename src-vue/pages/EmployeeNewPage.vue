@@ -160,7 +160,81 @@
 
               <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
                 <div>
-                  <h6 class="mb-1">3. Lifecycle and movement</h6>
+                  <h6 class="mb-1">3. Compensation</h6>
+                  <p class="text-muted mb-0 small">Set the employee pay basis used as the default in payroll.</p>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label" for="payType">Pay Type</label>
+                  <select id="payType" v-model="form.payType" class="form-select" :class="fieldClass('payType')" @change="handleFormMutation('payType')">
+                    <option value="monthly">Monthly Salary</option>
+                    <option value="daily">Daily Rate</option>
+                    <option value="hourly">Hourly Rate</option>
+                  </select>
+                  <div class="invalid-feedback">{{ validationErrors.payType }}</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label" for="baseRate">Base {{ payRateLabel }}</label>
+                  <input id="baseRate" v-model.number="form.baseRate" type="number" step="0.01" min="0" class="form-control" :class="fieldClass('baseRate')" @input="handleFormMutation('baseRate')">
+                  <div class="invalid-feedback">{{ validationErrors.baseRate }}</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label" for="fixedAllowance">Fixed Allowance</label>
+                  <input id="fixedAllowance" v-model.number="form.fixedAllowance" type="number" step="0.01" min="0" class="form-control" :class="fieldClass('fixedAllowance')" @input="handleFormMutation('fixedAllowance')">
+                  <div class="invalid-feedback">{{ validationErrors.fixedAllowance }}</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
+                <div>
+                  <h6 class="mb-1">4. Work schedule</h6>
+                  <p class="text-muted mb-0 small">Set the default shift used by attendance and daily present counts.</p>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <label class="form-label" for="workSchedule">Schedule Type</label>
+                  <select id="workSchedule" v-model="form.workSchedule" class="form-select" :class="fieldClass('workSchedule')" @change="applySchedulePreset">
+                    <option value="regular">Regular Day Shift</option>
+                    <option value="night">Night Shift</option>
+                    <option value="compressed">Compressed Schedule</option>
+                    <option value="flexible">Flexible Schedule</option>
+                  </select>
+                  <div class="invalid-feedback">{{ validationErrors.workSchedule }}</div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label class="form-label" for="defaultShiftStart">Shift Start</label>
+                  <input id="defaultShiftStart" v-model="form.defaultShiftStart" type="time" class="form-control" :class="fieldClass('defaultShiftStart')" @input="handleFormMutation('defaultShiftStart')">
+                  <div class="invalid-feedback">{{ validationErrors.defaultShiftStart }}</div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label class="form-label" for="defaultShiftEnd">Shift End</label>
+                  <input id="defaultShiftEnd" v-model="form.defaultShiftEnd" type="time" class="form-control" :class="fieldClass('defaultShiftEnd')" @input="handleFormMutation('defaultShiftEnd')">
+                  <div class="invalid-feedback">{{ validationErrors.defaultShiftEnd }}</div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label class="form-label" for="defaultGraceMinutes">Late Grace</label>
+                  <input id="defaultGraceMinutes" v-model.number="form.defaultGraceMinutes" type="number" min="0" max="120" class="form-control" :class="fieldClass('defaultGraceMinutes')" @input="handleFormMutation('defaultGraceMinutes')">
+                  <div class="invalid-feedback">{{ validationErrors.defaultGraceMinutes }}</div>
+                </div>
+                <div class="col-12 mb-3">
+                  <label class="form-label d-block">Work Days</label>
+                  <div class="d-flex flex-wrap gap-2">
+                    <label v-for="day in workDayOptions" :key="day.value" class="schedule-day-option">
+                      <input v-model="form.workDays" class="form-check-input" type="checkbox" :value="day.value" @change="handleFormMutation('workDays')">
+                      <span>{{ day.label }}</span>
+                    </label>
+                  </div>
+                  <div v-if="validationErrors.workDays" class="text-danger small mt-1">{{ validationErrors.workDays }}</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
+                <div>
+                  <h6 class="mb-1">5. Lifecycle and movement</h6>
                   <p class="text-muted mb-0 small">Show onboarding by default, and reveal offboarding only for separated or resigned employees.</p>
                 </div>
               </div>
@@ -226,7 +300,7 @@
 
               <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
                 <div>
-                  <h6 class="mb-1">4. Statutory, banking, and documents</h6>
+                  <h6 class="mb-1">6. Statutory, banking, and documents</h6>
                   <p class="text-muted mb-0 small">Validate government identifiers and track required file submissions.</p>
                 </div>
               </div>
@@ -376,6 +450,21 @@ const positionOptionsByDepartment = {
   Operations: ["Operations Staff", "Operations Coordinator", "Operations Supervisor", "Branch Manager", "Attendance Clerk"],
   IT: ["IT Staff", "IT Support Specialist", "System Administrator", "Network Administrator", "IT Manager"],
 };
+const schedulePresets = {
+  regular: { start: "09:00", end: "18:00" },
+  night: { start: "22:00", end: "06:00" },
+  compressed: { start: "08:00", end: "19:00" },
+  flexible: { start: "10:00", end: "19:00" },
+};
+const workDayOptions = [
+  { value: "mon", label: "Mon" },
+  { value: "tue", label: "Tue" },
+  { value: "wed", label: "Wed" },
+  { value: "thu", label: "Thu" },
+  { value: "fri", label: "Fri" },
+  { value: "sat", label: "Sat" },
+  { value: "sun", label: "Sun" },
+];
 
 function createEmptyForm() {
   const nextId = `EMP-${String(Date.now()).slice(-4)}`;
@@ -397,6 +486,14 @@ function createEmptyForm() {
     customPosition: "",
     branch: "",
     manager: "",
+    payType: "monthly",
+    baseRate: 0,
+    fixedAllowance: 0,
+    workSchedule: "regular",
+    workDays: ["mon", "tue", "wed", "thu", "fri"],
+    defaultShiftStart: "09:00",
+    defaultShiftEnd: "18:00",
+    defaultGraceMinutes: 0,
     onboardingStage: "Pre-boarding",
     movementType: "None",
     movementEffectiveDate: "",
@@ -458,6 +555,11 @@ const selectedPositionOptions = computed(() => positionOptionsByDepartment[form.
 const isCustomPosition = computed(() => form.position === "__custom");
 
 const effectivePosition = computed(() => (isCustomPosition.value ? form.customPosition.trim() : form.position));
+const payRateLabel = computed(() => {
+  if (form.payType === "daily") return "Daily Rate";
+  if (form.payType === "hourly") return "Hourly Rate";
+  return "Monthly Salary";
+});
 
 const employeeSummary = computed(() => {
   const name = [form.firstName.trim(), form.middleName.trim(), form.lastName.trim()].filter(Boolean).join(" ");
@@ -511,6 +613,14 @@ function handlePositionChange() {
   handleFormMutation();
 }
 
+function applySchedulePreset() {
+  const preset = schedulePresets[form.workSchedule];
+  if (!preset) return;
+  form.defaultShiftStart = preset.start;
+  form.defaultShiftEnd = preset.end;
+  handleFormMutation("workSchedule");
+}
+
 function handleDocumentUpload(event) {
   form.uploads = Array.from(event.target.files || []);
   handleFormMutation("uploads");
@@ -537,6 +647,14 @@ function buildEmployeePayload() {
     position: effectivePosition.value,
     branch: form.branch || null,
     manager: form.manager || null,
+    pay_type: form.payType,
+    base_rate: Number(form.baseRate || 0),
+    fixed_allowance: Number(form.fixedAllowance || 0),
+    work_schedule: form.workSchedule,
+    work_days: form.workDays.join(","),
+    default_shift_start: form.defaultShiftStart,
+    default_shift_end: form.defaultShiftEnd,
+    default_grace_minutes: Number(form.defaultGraceMinutes || 0),
     employment_status: form.employmentStatus,
     account_status: form.accountStatus || null,
     onboarding_stage: form.onboardingStage || null,
@@ -568,6 +686,16 @@ function validateForm() {
   if (!form.position) validationErrors.position = "Position is required.";
   if (isCustomPosition.value && !form.customPosition.trim()) validationErrors.customPosition = "Custom position is required.";
   if (!form.branch) validationErrors.branch = "Branch is required.";
+  if (!form.payType) validationErrors.payType = "Pay type is required.";
+  if (Number(form.baseRate || 0) < 0) validationErrors.baseRate = "Base rate cannot be negative.";
+  if (Number(form.fixedAllowance || 0) < 0) validationErrors.fixedAllowance = "Fixed allowance cannot be negative.";
+  if (!form.workSchedule) validationErrors.workSchedule = "Schedule type is required.";
+  if (!form.defaultShiftStart) validationErrors.defaultShiftStart = "Shift start is required.";
+  if (!form.defaultShiftEnd) validationErrors.defaultShiftEnd = "Shift end is required.";
+  if (!Array.isArray(form.workDays) || !form.workDays.length) validationErrors.workDays = "Select at least one work day.";
+  if (!Number.isInteger(form.defaultGraceMinutes) || form.defaultGraceMinutes < 0 || form.defaultGraceMinutes > 120) {
+    validationErrors.defaultGraceMinutes = "Grace period must be from 0 to 120 minutes.";
+  }
   if (!form.bankAccount.trim()) validationErrors.bankAccount = "Bank account details are required.";
 
   if (!validStatutory(form.sss, /^\d{2}-\d{7}-\d{1}$/)) validationErrors.sss = "Invalid SSS format.";
@@ -674,6 +802,15 @@ async function confirmCreateEmployee() {
 .premium-summary {
   background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
   border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.schedule-day-option {
+  align-items: center;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 0.5rem;
+  display: inline-flex;
+  gap: 0.45rem;
+  padding: 0.45rem 0.7rem;
 }
 
 @media (max-width: 991.98px) {

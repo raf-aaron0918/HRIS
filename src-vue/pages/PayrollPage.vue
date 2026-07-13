@@ -9,6 +9,9 @@
           <h4 class="mb-1 premium-title">Payroll</h4>
           <p class="mb-0 premium-subtitle">Prepare payroll runs with a cleaner workflow, role-based access, and clearer net pay visibility.</p>
         </div>
+        <RouterLink to="/payroll/batch" class="btn btn-primary">
+          <i class="ti ti-users"></i> Batch Payroll
+        </RouterLink>
       </div>
     </div>
 
@@ -76,12 +79,15 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="employeeSelect">Employee</label>
-                  <select id="employeeSelect" v-model="form.employeeSelect" class="form-select" :class="fieldClass('employeeSelect')" required @change="populateEmployee">
-                    <option value="">Select employee</option>
-                    <option v-for="employee in employeeOptions" :key="employee.employee_code" :value="employee.employee_code">
-                      {{ employee.name }}
-                    </option>
-                  </select>
+                  <EmployeeSearchSelect
+                    v-model="form.employeeSelect"
+                    input-id="employeeSelect"
+                    :options="employeeOptions"
+                    :invalid="Boolean(validationErrors.employeeSelect)"
+                    placeholder="Type name or employee code"
+                    required
+                    @change="populateEmployee"
+                  />
                   <div class="invalid-feedback">{{ validationErrors.employeeSelect }}</div>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -103,6 +109,18 @@
                 <div class="col-md-4 mb-3">
                   <label class="form-label" for="branch">Branch</label>
                   <input id="branch" :value="selectedEmployee?.branch || ''" type="text" class="form-control" readonly placeholder="Main Branch">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label" for="payType">Pay Type</label>
+                  <input id="payType" :value="selectedEmployee?.payTypeLabel || ''" type="text" class="form-control" readonly placeholder="Monthly Salary">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label" for="employeeBaseRate">Base Rate</label>
+                  <input id="employeeBaseRate" :value="money(selectedEmployee?.basePay || 0)" type="text" class="form-control" readonly placeholder="0.00">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label" for="employeeAllowance">Fixed Allowance</label>
+                  <input id="employeeAllowance" :value="money(selectedEmployee?.fixedAllowance || 0)" type="text" class="form-control" readonly placeholder="0.00">
                 </div>
               </div>
 
@@ -140,15 +158,15 @@
                 </div>
 
                 <div class="col-md-3 mb-3">
-                  <label class="form-label" for="sssDeduction">SSS</label>
+                  <label class="form-label" for="sssDeduction">SSS Employee Share</label>
                   <input id="sssDeduction" v-model.number="form.sssDeduction" type="number" step="0.01" min="0" class="form-control">
                 </div>
                 <div class="col-md-3 mb-3">
-                  <label class="form-label" for="philhealthDeduction">PhilHealth</label>
+                  <label class="form-label" for="philhealthDeduction">PhilHealth Employee Share</label>
                   <input id="philhealthDeduction" v-model.number="form.philhealthDeduction" type="number" step="0.01" min="0" class="form-control">
                 </div>
                 <div class="col-md-3 mb-3">
-                  <label class="form-label" for="pagibigDeduction">Pag-IBIG</label>
+                  <label class="form-label" for="pagibigDeduction">Pag-IBIG Employee Share</label>
                   <input id="pagibigDeduction" v-model.number="form.pagibigDeduction" type="number" step="0.01" min="0" class="form-control">
                 </div>
                 <div class="col-md-3 mb-3">
@@ -159,8 +177,84 @@
 
               <div class="d-grid gap-2 d-md-flex flex-md-wrap mt-2">
                 <button type="button" class="btn btn-outline-primary premium-action" :disabled="!canManagePayroll" @click="saveDraft">Save Draft</button>
-                <button type="button" class="btn btn-outline-success premium-action" :disabled="!canManagePayroll" @click="applySampleRates">Apply Sample Rates</button>
-                <button type="submit" class="btn btn-primary" :disabled="!canManagePayroll">Finalize Payroll Batch</button>
+                <button type="button" class="btn btn-outline-info premium-action" :disabled="!canManagePayroll || !form.employeeSelect || !form.cutoffStart || !form.cutoffEnd" @click="loadAttendanceTotals">
+                  Load Attendance Totals
+                </button>
+                <button type="button" class="btn btn-outline-success premium-action" :disabled="!canManagePayroll" @click="applyStatutoryDeductions">Apply Statutory Deductions</button>
+                <button type="submit" class="btn btn-primary" :disabled="!canManagePayroll">Finalize Payroll</button>
+              </div>
+
+              <div v-if="attendanceTotals" class="payroll-attendance-summary mt-3">
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+                  <div>
+                    <h6 class="mb-1">Attendance totals</h6>
+                    <small class="text-muted">{{ form.cutoffStart }} to {{ form.cutoffEnd }}</small>
+                  </div>
+                  <span class="badge bg-light-info text-info">{{ attendanceTotals.employee_name }}</span>
+                </div>
+                <div class="row g-2">
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>Payable</small>
+                      <strong>{{ attendanceTotals.regular_payable_hours }}h</strong>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>Scheduled</small>
+                      <strong>{{ attendanceTotals.scheduled_days }}d / {{ attendanceTotals.scheduled_hours }}h</strong>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>OT</small>
+                      <strong>{{ attendanceTotals.overtime_minutes }}m</strong>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>Night Diff</small>
+                      <strong>{{ attendanceTotals.night_diff_minutes }}m</strong>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>Holiday/Rest</small>
+                      <strong>{{ attendanceTotals.holiday_work_days }}/{{ attendanceTotals.rest_day_work_days }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>Present</small>
+                      <strong>{{ attendanceTotals.present_days }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>Leave</small>
+                      <strong>{{ attendanceTotals.leave_days }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>Absent</small>
+                      <strong>{{ attendanceTotals.absent_days }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="summary-tile">
+                      <small>Incomplete</small>
+                      <strong>{{ attendanceTotals.incomplete_logs }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="summary-tile summary-tile-wide">
+                      <small>Attendance-based base pay</small>
+                      <strong>{{ money(attendancePayrollPreview.basePay) }}</strong>
+                      <span>{{ attendancePayrollPreview.note }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="alert mt-3 mb-0" :class="payrollAlert.class" role="alert">
@@ -178,12 +272,14 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
+import EmployeeSearchSelect from "@/components/EmployeeSearchSelect.vue";
 import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 const employeeData = ref({});
 const employeeOptions = ref([]);
+const attendanceTotals = ref(null);
 const canManagePayroll = computed(() =>
   ["HR Admin", "Payroll Admin"].includes(authStore.currentUser?.role || "")
 );
@@ -252,6 +348,7 @@ function handleFormMutation(fieldName = "") {
 }
 
 const selectedEmployee = computed(() => employeeData.value[form.employeeSelect] || null);
+const attendancePayrollPreview = computed(() => calculateAttendancePayroll(attendanceTotals.value));
 
 const grossPay = computed(
   () =>
@@ -282,12 +379,14 @@ function populateEmployee() {
   const data = employeeData.value[form.employeeSelect];
   if (!data) {
     form.basePay = 0;
+    form.allowances = 0;
     return;
   }
 
-  if (!Number(form.basePay || 0)) {
-    form.basePay = data.basePay;
-  }
+  form.basePay = data.basePay;
+  form.allowances = data.fixedAllowance;
+  updateStatutoryDeductions();
+  attendanceTotals.value = null;
 }
 
 async function fetchEmployees() {
@@ -309,7 +408,13 @@ async function fetchEmployees() {
           department: employee.department,
           branch: employee.branch || "",
           position: employee.position,
-          basePay: 0,
+          payType: employee.pay_type || "monthly",
+          payTypeLabel: formatPayType(employee.pay_type || "monthly"),
+          basePay: Number(employee.base_rate || 0),
+          fixedAllowance: Number(employee.fixed_allowance || 0),
+          workDays: employee.work_days || "mon,tue,wed,thu,fri",
+          shiftStart: employee.default_shift_start || "09:00",
+          shiftEnd: employee.default_shift_end || "18:00",
         },
       ])
     );
@@ -317,6 +422,12 @@ async function fetchEmployees() {
     employeeOptions.value = [];
     employeeData.value = {};
   }
+}
+
+function formatPayType(value) {
+  if (value === "daily") return "Daily Rate";
+  if (value === "hourly") return "Hourly Rate";
+  return "Monthly Salary";
 }
 
 function validateForm() {
@@ -351,19 +462,178 @@ function updateAlertFromValues() {
   setAlert("success", "Payroll batch is balanced and ready for review.");
 }
 
-function applySampleRates() {
+function calculatePagibigEmployeeShare(monthlyBasicSalary) {
+  const salary = Math.max(0, Number(monthlyBasicSalary || 0));
+  const salaryBase = Math.min(salary, 10000);
+  const rate = salary <= 1500 ? 0.01 : 0.02;
+  return Number(Math.min(salaryBase * rate, 200).toFixed(2));
+}
+
+function calculatePhilhealthEmployeeShare(monthlyBasicSalary) {
+  const salary = Math.max(0, Number(monthlyBasicSalary || 0));
+  if (salary <= 0) return 0;
+  const salaryBase = Math.min(Math.max(salary, 10000), 100000);
+  return Number((salaryBase * 0.025).toFixed(2));
+}
+
+function calculateSssEmployeeShare(monthlyBasicSalary) {
+  const salary = Math.max(0, Number(monthlyBasicSalary || 0));
+  if (salary <= 0) return 0;
+  const boundedSalary = Math.min(Math.max(salary, 5000), 35000);
+  const monthlySalaryCredit = Math.min(Math.max(Math.floor((boundedSalary + 250) / 500) * 500, 5000), 35000);
+  return Number((monthlySalaryCredit * 0.05).toFixed(2));
+}
+
+function updateStatutoryDeductions() {
+  const monthlyBasicSalary = Number(form.basePay || 0);
+  form.sssDeduction = calculateSssEmployeeShare(monthlyBasicSalary);
+  form.philhealthDeduction = calculatePhilhealthEmployeeShare(monthlyBasicSalary);
+  form.pagibigDeduction = calculatePagibigEmployeeShare(monthlyBasicSalary);
+}
+
+function applyStatutoryDeductions() {
   if (selectedEmployee.value && !Number(form.basePay || 0)) {
     form.basePay = selectedEmployee.value.basePay;
   }
+  if (selectedEmployee.value && !Number(form.allowances || 0)) {
+    form.allowances = selectedEmployee.value.fixedAllowance;
+  }
 
-  const gross = grossPay.value;
-  form.holidayPay = Number((gross * 0.1).toFixed(2));
-  form.nightDiffPay = Number((gross * 0.05).toFixed(2));
-  form.sssDeduction = Number((gross * 0.045).toFixed(2));
-  form.philhealthDeduction = Number((gross * 0.05).toFixed(2));
-  form.pagibigDeduction = Number(Math.min(100, gross * 0.02).toFixed(2));
-  form.taxDeduction = Number((gross * 0.1).toFixed(2));
-  setAlert("info", "Sample payroll values applied. Adjust them to match your configured payroll tables.");
+  updateStatutoryDeductions();
+  setAlert("info", "2026 statutory employee deductions applied. Withholding tax remains manual.");
+}
+
+function roundMoney(value) {
+  return Number(Number(value || 0).toFixed(2));
+}
+
+function parseTimeToMinutes(value, fallback) {
+  const [hourText, minuteText] = String(value || fallback).split(":");
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return 0;
+  return hour * 60 + minute;
+}
+
+function scheduledHoursPerDay(employee) {
+  const start = parseTimeToMinutes(employee?.shiftStart, "09:00");
+  let end = parseTimeToMinutes(employee?.shiftEnd, "18:00");
+  if (end <= start) end += 24 * 60;
+  return Math.max((end - start) / 60, 0) || 8;
+}
+
+function monthlyScheduledHours(employee, cutoffStart) {
+  if (!employee || !cutoffStart) return 0;
+
+  const date = new Date(`${cutoffStart}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return 0;
+
+  const workDays = new Set(
+    String(employee.workDays || "mon,tue,wed,thu,fri")
+      .split(",")
+      .map((day) => day.trim().toLowerCase())
+      .filter(Boolean)
+  );
+  const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const lastDate = new Date(year, month + 1, 0).getDate();
+  let scheduledDays = 0;
+
+  for (let day = 1; day <= lastDate; day += 1) {
+    const cursor = new Date(year, month, day);
+    if (workDays.has(dayKeys[cursor.getDay()])) {
+      scheduledDays += 1;
+    }
+  }
+
+  return scheduledDays * scheduledHoursPerDay(employee);
+}
+
+function calculateAttendancePayroll(row) {
+  const employee = selectedEmployee.value;
+  if (!row || !employee) {
+    return {
+      basePay: Number(form.basePay || 0),
+      allowance: Number(form.allowances || 0),
+      paidHours: 0,
+      paidRatio: 0,
+      note: "Load attendance totals to prorate salary by present days, paid leave, and absences.",
+    };
+  }
+
+  const scheduledHours = Number(row.scheduled_hours || 0);
+  const scheduledDays = Number(row.scheduled_days || 0);
+  const averageScheduledHours = scheduledDays > 0 ? scheduledHours / scheduledDays : 8;
+  const paidLeaveHours = Number(row.leave_days || 0) * averageScheduledHours;
+  const paidHours = Number(row.regular_payable_hours || 0) + paidLeaveHours;
+  const monthlyHours = monthlyScheduledHours(employee, form.cutoffStart);
+  const paidRatio = monthlyHours > 0 ? Math.min(paidHours / monthlyHours, 1) : 0;
+  const allowanceRatio = scheduledHours > 0 ? Math.min(paidHours / scheduledHours, 1) : 0;
+  const payType = employee.payType || "monthly";
+
+  let basePay = 0;
+  if (payType === "hourly") {
+    basePay = Number(employee.basePay || 0) * paidHours;
+  } else if (payType === "daily") {
+    const paidDays = averageScheduledHours > 0 ? paidHours / averageScheduledHours : 0;
+    basePay = Number(employee.basePay || 0) * paidDays;
+  } else {
+    basePay = Number(employee.basePay || 0) * paidRatio;
+  }
+
+  return {
+    basePay: roundMoney(basePay),
+    allowance: roundMoney(Number(employee.fixedAllowance || 0) * allowanceRatio),
+    paidHours: roundMoney(paidHours),
+    paidRatio,
+    note: `${roundMoney(paidHours)} paid hour(s), ${row.absent_days} unpaid absence day(s), ${row.leave_days} paid leave day(s).`,
+  };
+}
+
+function applyAttendancePayroll(row) {
+  const payroll = calculateAttendancePayroll(row);
+  form.basePay = payroll.basePay;
+  form.allowances = payroll.allowance;
+  updateStatutoryDeductions();
+}
+
+async function loadAttendanceTotals() {
+  if (!validateForm()) return;
+
+  try {
+    const response = await apiRequest(
+      `/attendance/payroll-summary?cutoff_start=${encodeURIComponent(form.cutoffStart)}&cutoff_end=${encodeURIComponent(form.cutoffEnd)}`,
+      { token: authStore.accessToken }
+    );
+    const row = (response.rows || []).find((item) => item.employee_code === form.employeeSelect);
+    attendanceTotals.value = row || null;
+
+    if (!row) {
+      setAlert("warning", "No attendance totals found for the selected employee and cutoff.");
+      return;
+    }
+
+    applyAttendancePayroll(row);
+
+    form.remarks = [
+      `${row.regular_payable_hours} payable hours`,
+      `${row.scheduled_days} scheduled day(s)`,
+      `${row.overtime_minutes} OT minutes`,
+      `${row.night_diff_minutes} night diff minutes`,
+      `${row.absent_days} absent day(s)`,
+      `${row.leave_days} leave day(s)`,
+      `${row.incomplete_logs} incomplete log(s)`,
+    ].join(" | ");
+    setAlert("info", "Attendance totals loaded. Base pay and allowances were prorated from present time, paid leave, and absences.");
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      setAlert("danger", "Your session expired. Please sign in again.");
+      authStore.logout();
+    } else {
+      setAlert("danger", "Could not load attendance totals for the selected cutoff.");
+    }
+  }
 }
 
 function saveDraft() {
@@ -458,6 +728,20 @@ watch(
   { deep: true }
 );
 
+watch(
+  () => [form.cutoffStart, form.cutoffEnd, form.employeeSelect],
+  () => {
+    attendanceTotals.value = null;
+  }
+);
+
+watch(
+  () => form.basePay,
+  () => {
+    updateStatutoryDeductions();
+  }
+);
+
 updateAlertFromValues();
 
 onMounted(() => {
@@ -518,6 +802,38 @@ onMounted(() => {
 
 .premium-action {
   border-color: rgba(13, 110, 253, 0.22);
+}
+
+.payroll-attendance-summary {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: #fff;
+}
+
+.summary-tile {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  min-height: 74px;
+}
+
+.summary-tile small {
+  color: #64748b;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.summary-tile strong {
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.summary-tile-wide span {
+  color: #64748b;
+  display: block;
+  font-size: 0.82rem;
+  margin-top: 0.35rem;
 }
 
 @media (max-width: 767.98px) {

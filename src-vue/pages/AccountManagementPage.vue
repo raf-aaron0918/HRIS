@@ -29,6 +29,20 @@
 
             <form novalidate @submit.prevent="handleSubmit">
               <div class="row">
+                <div class="col-12 mb-3">
+                  <label class="form-label" for="accountEmployee">Who is this account for?</label>
+                  <EmployeeSearchSelect
+                    v-model="form.employeeCode"
+                    input-id="accountEmployee"
+                    :options="employeeOptions"
+                    value-key="employeeCode"
+                    input-class="premium-input"
+                    :disabled="!canManageAccounts || isSubmitting"
+                    placeholder="Type name, employee code, or email"
+                    @change="populateSelectedEmployee"
+                  />
+                  <small class="text-muted">Choose an employee to auto-fill the account owner details and access role.</small>
+                </div>
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="accountFullName">Full Name</label>
                   <input id="accountFullName" v-model="form.fullName" type="text" class="form-control premium-input" placeholder="Employee full name" :disabled="!canManageAccounts || isSubmitting">
@@ -48,10 +62,9 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label" for="accountRole">Role</label>
-                  <select id="accountRole" v-model="form.role" class="form-select premium-input" :disabled="!canManageAccounts || isSubmitting">
-                    <option v-for="option in roleOptions" :key="option" :value="option">{{ option }}</option>
-                  </select>
+                  <label class="form-label" for="accountRole">Assigned Role</label>
+                  <input id="accountRole" :value="form.role || 'Select an employee first'" type="text" class="form-control premium-input" readonly>
+                  <small class="text-muted">{{ roleAccessNote }}</small>
                 </div>
                 <div class="col-md-6 mb-3 d-flex align-items-end">
                   <div class="border rounded-4 px-3 py-2 bg-light w-100 premium-note">
@@ -171,17 +184,18 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
+import EmployeeSearchSelect from "@/components/EmployeeSearchSelect.vue";
 import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 const accounts = ref([]);
+const employeeOptions = ref([]);
+const employeeData = ref({});
 const isLoading = ref(false);
 const isSubmitting = ref(false);
 const toggleUserId = ref(null);
 const tableMessage = ref("");
-
-const roleOptions = ["HR Admin", "Immediate Supervisor", "Payroll Admin"];
 
 const alertState = reactive({
   class: "alert-light-primary border-primary",
@@ -192,11 +206,12 @@ const form = reactive(createEmptyForm());
 
 function createEmptyForm() {
   return {
+    employeeCode: "",
     fullName: "",
     username: "",
     email: "",
     password: "",
-    role: roleOptions[0],
+    role: "",
     isActive: true,
   };
 }
@@ -207,6 +222,12 @@ const canManageAccounts = computed(() => currentRole.value === "HR Admin");
 const roleBadgeClass = computed(() =>
   canManageAccounts.value ? "bg-light-success text-success" : "bg-light-warning text-warning"
 );
+const roleAccessNote = computed(() => {
+  if (form.role === "HR Admin") return "Access: employee records, attendance, leave, payroll, reports, and account management.";
+  if (form.role === "Payroll Admin") return "Access: payroll, reports, attendance summaries, and payroll-related records.";
+  if (form.role === "Immediate Supervisor") return "Access: team attendance and leave review workflows.";
+  return "The access role is assigned from the selected employee's position or department.";
+});
 
 function setAlert(type, message) {
   alertState.class = `alert-light-${type} border-${type}`;
@@ -217,14 +238,89 @@ function resetForm() {
   Object.assign(form, createEmptyForm());
 }
 
+function makeUsername(employee) {
+  const firstName = String(employee.first_name || "").trim().toLowerCase();
+  const lastName = String(employee.last_name || "").trim().toLowerCase();
+  const code = String(employee.employee_code || "").trim().toLowerCase();
+  const baseName = [firstName, lastName].filter(Boolean).join(".");
+  return (baseName || code).replace(/[^a-z0-9._-]/g, "");
+}
+
+function deriveAccountRole(employee) {
+  const roleSource = `${employee.position || ""} ${employee.department || ""}`.toLowerCase();
+
+  if (roleSource.includes("payroll")) return "Payroll Admin";
+  if (roleSource.includes("hr admin") || roleSource.includes("hr manager") || roleSource.includes("hr officer")) return "HR Admin";
+  if (roleSource.includes("human resource") || roleSource.includes("human resources")) return "HR Admin";
+  if (roleSource.includes("supervisor") || roleSource.includes("manager") || roleSource.includes("lead") || roleSource.includes("head")) {
+    return "Immediate Supervisor";
+  }
+
+  return "Immediate Supervisor";
+}
+
+function populateSelectedEmployee() {
+  const employee = employeeData.value[form.employeeCode];
+  if (!employee) return;
+
+  form.fullName = employee.name;
+  form.email = employee.email;
+  form.username = employee.username;
+  form.role = employee.role;
+  setAlert("info", `${employee.name} selected. ${employee.role} access will be assigned automatically.`);
+}
+
+async function fetchEmployees() {
+  if (!authStore.accessToken) return;
+
+  try {
+    const response = await apiRequest("/employees", {
+      token: authStore.accessToken,
+    });
+    const employees = response.items || [];
+    employeeOptions.value = employees.map((employee) => ({
+      employeeCode: employee.employee_code,
+      name: `${employee.first_name} ${employee.last_name}`,
+      email: employee.email,
+    }));
+    employeeData.value = Object.fromEntries(
+      employees.map((employee) => [
+        employee.employee_code,
+        {
+          employeeCode: employee.employee_code,
+          name: `${employee.first_name} ${employee.last_name}`,
+          email: employee.email,
+          username: makeUsername(employee),
+          department: employee.department,
+          position: employee.position,
+          role: deriveAccountRole(employee),
+        },
+      ])
+    );
+  } catch {
+    employeeOptions.value = [];
+    employeeData.value = {};
+  }
+}
+
 function resetFormWithMessage() {
   resetForm();
   setAlert("primary", "Create a login for staff who need access to the HRIS modules.");
 }
 
 function validateForm() {
+  if (!form.employeeCode) {
+    setAlert("danger", "Please choose who this account is for.");
+    return false;
+  }
+
   if (!form.fullName.trim() || !form.username.trim() || !form.email.trim() || !form.password.trim()) {
     setAlert("danger", "Please complete the full name, username, email, and temporary password fields.");
+    return false;
+  }
+
+  if (!form.role) {
+    setAlert("danger", "The selected employee does not have an assigned access role.");
     return false;
   }
 
@@ -345,6 +441,7 @@ async function toggleAccountStatus(account) {
 }
 
 onMounted(() => {
+  fetchEmployees();
   fetchAccounts();
 });
 </script>

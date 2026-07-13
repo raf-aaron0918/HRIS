@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import Float, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -21,6 +21,14 @@ class Employee(Base):
     position: Mapped[str] = mapped_column(String(120))
     branch: Mapped[str] = mapped_column(String(120), nullable=True)
     manager: Mapped[str] = mapped_column(String(120), nullable=True)
+    pay_type: Mapped[str] = mapped_column(String(40), default="monthly")
+    base_rate: Mapped[float] = mapped_column(Float, default=0)
+    fixed_allowance: Mapped[float] = mapped_column(Float, default=0)
+    work_schedule: Mapped[str] = mapped_column(String(80), default="regular")
+    work_days: Mapped[str] = mapped_column(String(80), default="mon,tue,wed,thu,fri")
+    default_shift_start: Mapped[str] = mapped_column(String(10), default="09:00")
+    default_shift_end: Mapped[str] = mapped_column(String(10), default="18:00")
+    default_grace_minutes: Mapped[int] = mapped_column(Integer, default=0)
     employment_status: Mapped[str] = mapped_column(String(50))
     account_status: Mapped[str] = mapped_column(String(50), nullable=True)
     onboarding_stage: Mapped[str] = mapped_column(String(50), nullable=True)

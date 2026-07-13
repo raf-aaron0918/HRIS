@@ -15,6 +15,14 @@ class EmployeeBase(BaseModel):
     position: str
     branch: str | None = None
     manager: str | None = None
+    pay_type: str = "monthly"
+    base_rate: float = 0
+    fixed_allowance: float = 0
+    work_schedule: str = "regular"
+    work_days: str = "mon,tue,wed,thu,fri"
+    default_shift_start: str = "09:00"
+    default_shift_end: str = "18:00"
+    default_grace_minutes: int = 0
     employment_status: str
     account_status: str | None = None
     onboarding_stage: str | None = None
@@ -49,6 +57,14 @@ class EmployeeWrite(BaseModel):
     position: str
     branch: str | None = None
     manager: str | None = None
+    pay_type: str = "monthly"
+    base_rate: float = 0
+    fixed_allowance: float = 0
+    work_schedule: str = "regular"
+    work_days: str = "mon,tue,wed,thu,fri"
+    default_shift_start: str = "09:00"
+    default_shift_end: str = "18:00"
+    default_grace_minutes: int = 0
     employment_status: str
     account_status: str | None = None
     onboarding_stage: str | None = None

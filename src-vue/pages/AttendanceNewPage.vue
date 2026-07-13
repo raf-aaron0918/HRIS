@@ -33,19 +33,16 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="employeeSelect">Employee</label>
-                  <select
-                    id="employeeSelect"
+                  <EmployeeSearchSelect
                     v-model="form.employeeSelect"
-                    class="form-select premium-input"
-                    :class="fieldClass('employeeSelect')"
+                    input-id="employeeSelect"
+                    :options="employeeOptions"
+                    input-class="premium-input"
+                    :invalid="Boolean(validationErrors.employeeSelect)"
+                    placeholder="Type name or employee code"
                     required
                     @change="handleEmployeeChange"
-                  >
-                    <option value="">Select employee</option>
-                    <option v-for="employee in employeeOptions" :key="employee.employee_code" :value="employee.employee_code">
-                      {{ employee.employee_code }} - {{ employee.name }}
-                    </option>
-                  </select>
+                  />
                   <div class="invalid-feedback">{{ validationErrors.employeeSelect }}</div>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -61,12 +58,12 @@
                     class="form-control premium-input"
                     :class="fieldClass('workDate')"
                     required
-                    @input="handleFormMutation('workDate')"
+                    @input="handleWorkDateChange"
                   />
                   <div class="invalid-feedback">{{ validationErrors.workDate }}</div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                   <label class="form-label" for="shiftSchedule">Shift Schedule</label>
                   <select id="shiftSchedule" v-model="form.shiftSchedule" class="form-select premium-input" @change="applyShiftPreset">
                     <option value="regular">Regular Day Shift</option>
@@ -75,15 +72,20 @@
                     <option value="flexible">Flexible Schedule</option>
                   </select>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                   <label class="form-label" for="shiftStart">Shift Start</label>
                   <input id="shiftStart" v-model="form.shiftStart" type="time" class="form-control premium-input" :class="fieldClass('shiftStart')" required @input="handleFormMutation('shiftStart')" />
                   <div class="invalid-feedback">{{ validationErrors.shiftStart }}</div>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                   <label class="form-label" for="shiftEnd">Shift End</label>
                   <input id="shiftEnd" v-model="form.shiftEnd" type="time" class="form-control premium-input" :class="fieldClass('shiftEnd')" required @input="handleFormMutation('shiftEnd')" />
                   <div class="invalid-feedback">{{ validationErrors.shiftEnd }}</div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label class="form-label" for="graceMinutes">Late Grace (minutes)</label>
+                  <input id="graceMinutes" v-model.number="form.graceMinutes" type="number" min="0" max="120" class="form-control premium-input" :class="fieldClass('graceMinutes')" @input="handleFormMutation('graceMinutes')" />
+                  <div class="invalid-feedback">{{ validationErrors.graceMinutes }}</div>
                 </div>
               </div>
 
@@ -95,25 +97,15 @@
               </div>
 
               <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label" for="clockIn">Clock In</label>
-                  <input id="clockIn" v-model="form.clockIn" type="time" class="form-control premium-input" :class="fieldClass('clockIn')" required @input="handleFormMutation('clockIn')" />
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="clockIn">Clock In <span class="text-muted">(optional)</span></label>
+                  <input id="clockIn" v-model="form.clockIn" type="time" class="form-control premium-input" :class="fieldClass('clockIn')" @input="handleFormMutation('clockIn')" />
                   <div class="invalid-feedback">{{ validationErrors.clockIn }}</div>
                 </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label" for="clockOut">Clock Out</label>
-                  <input id="clockOut" v-model="form.clockOut" type="time" class="form-control premium-input" :class="fieldClass('clockOut')" required @input="handleFormMutation('clockOut')" />
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="clockOut">Clock Out <span class="text-muted">(optional)</span></label>
+                  <input id="clockOut" v-model="form.clockOut" type="time" class="form-control premium-input" :class="fieldClass('clockOut')" @input="handleFormMutation('clockOut')" />
                   <div class="invalid-feedback">{{ validationErrors.clockOut }}</div>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label" for="source">Source / Device</label>
-                  <select id="source" v-model="form.source" class="form-select premium-input" :class="fieldClass('source')" required @change="handleFormMutation('source')">
-                    <option value="">Select source</option>
-                    <option>Web</option>
-                    <option>Mobile</option>
-                    <option>Biometric</option>
-                  </select>
-                  <div class="invalid-feedback">{{ validationErrors.source }}</div>
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -205,6 +197,7 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
+import EmployeeSearchSelect from "@/components/EmployeeSearchSelect.vue";
 import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
@@ -234,9 +227,9 @@ const form = reactive({
   shiftSchedule: "regular",
   shiftStart: "09:00",
   shiftEnd: "18:00",
+  graceMinutes: 0,
   clockIn: "",
   clockOut: "",
-  source: "",
   breakOut: "",
   breakIn: "",
   logAction: "original",
@@ -344,7 +337,32 @@ function applyShiftPreset() {
 
 function handleEmployeeChange() {
   clearFieldError("employeeSelect");
-  if (!form.employeeSelect && logId.value !== "Pending") return;
+  const selectedEmployee = employeeData.value[form.employeeSelect];
+  if (!selectedEmployee) return;
+  form.shiftSchedule = selectedEmployee.workSchedule || "regular";
+  form.shiftStart = selectedEmployee.defaultShiftStart || "09:00";
+  form.shiftEnd = selectedEmployee.defaultShiftEnd || "18:00";
+  form.graceMinutes = Number(selectedEmployee.defaultGraceMinutes || 0);
+  syncRestDayFromSchedule();
+}
+
+function getDateWorkDay(dateValue) {
+  if (!dateValue) return "";
+  const date = new Date(`${dateValue}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "";
+  return ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][date.getDay()];
+}
+
+function syncRestDayFromSchedule() {
+  const selectedEmployee = employeeData.value[form.employeeSelect];
+  const workDay = getDateWorkDay(form.workDate);
+  if (!selectedEmployee || !workDay) return;
+  form.restDayWork = selectedEmployee.workDays.includes(workDay) ? "no" : "yes";
+}
+
+function handleWorkDateChange() {
+  handleFormMutation("workDate");
+  syncRestDayFromSchedule();
 }
 
 function validateForm() {
@@ -354,10 +372,9 @@ function validateForm() {
   if (!form.workDate) validationErrors.workDate = "Date is required.";
   if (!form.shiftStart) validationErrors.shiftStart = "Shift start is required.";
   if (!form.shiftEnd) validationErrors.shiftEnd = "Shift end is required.";
-  if (!form.clockIn) validationErrors.clockIn = "Clock in is required.";
-  if (!form.clockOut) validationErrors.clockOut = "Clock out is required.";
-  if (!form.source) validationErrors.source = "Source is required.";
-
+  if (!Number.isInteger(form.graceMinutes) || form.graceMinutes < 0 || form.graceMinutes > 120) {
+    validationErrors.graceMinutes = "Grace period must be from 0 to 120 minutes.";
+  }
   if (isCorrection.value) {
     if (!form.correctionType) validationErrors.correctionType = "Correction type is required.";
     if (!form.adjustmentReason.trim()) validationErrors.adjustmentReason = "Reason is required.";
@@ -381,6 +398,7 @@ const metrics = computed(() => {
   const clockOutMin =
     clockInMin !== null && clockOutMinRaw !== null ? normalizeEnd(clockInMin, clockOutMinRaw) : null;
   const breakMinutes = clockInMin !== null ? getBreakMinutes(clockInMin) : 0;
+  const incomplete = clockInMin === null || clockOutMin === null;
 
   if (
     shiftStartMin === null ||
@@ -392,6 +410,7 @@ const metrics = computed(() => {
   ) {
     return {
       valid: false,
+      incomplete,
       breakInvalid: breakMinutes === null || breakMinutes < 0,
       lateMinutes: 0,
       undertimeMinutes: 0,
@@ -411,15 +430,16 @@ const metrics = computed(() => {
 
   const scheduledMinutes = Math.max(0, shiftEndMin - shiftStartMin);
   const workedMinutes = Math.max(0, clockOutMin - clockInMin - breakMinutes);
-  const lateMinutes = clockInMin > shiftStartMin ? clockInMin - shiftStartMin : 0;
+  const lateMinutes = clockInMin > shiftStartMin + form.graceMinutes ? clockInMin - shiftStartMin - form.graceMinutes : 0;
   const undertimeMinutes = clockOutMin < shiftEndMin ? shiftEndMin - clockOutMin : 0;
   const overtimeMinutes = clockOutMin > shiftEndMin ? clockOutMin - shiftEndMin : 0;
   const nightDiffMinutes = calculateNightDifferential(clockInMin, clockOutMin);
-  const payableMinutes = Math.max(0, Math.min(workedMinutes, scheduledMinutes) + overtimeMinutes);
+  const payableMinutes = Math.max(0, Math.min(workedMinutes, scheduledMinutes));
   const sameDayInvalid = clockOutMinRaw < clockInMin && shiftEndMin > shiftStartMin;
 
   return {
     valid: true,
+    incomplete: false,
     breakInvalid: false,
     lateMinutes,
     undertimeMinutes,
@@ -439,6 +459,9 @@ const metrics = computed(() => {
 
 function deriveAttendanceStatus() {
   if (!metrics.value.valid) {
+    if (metrics.value.incomplete && !metrics.value.breakInvalid) {
+      return { label: "Incomplete", class: "bg-light-danger text-danger" };
+    }
     return {
       label: isCorrection.value ? "Correction" : "Draft",
       class: isCorrection.value ? "bg-light-warning text-warning" : "bg-light-primary text-primary",
@@ -464,6 +487,12 @@ const statusBadge = computed(() => deriveAttendanceStatus());
 
 function buildAttendanceAlert() {
   if (!metrics.value.valid) {
+    if (metrics.value.incomplete && !metrics.value.breakInvalid) {
+      return {
+        type: "warning",
+        message: "A missing clock in or clock out will be saved as incomplete attendance.",
+      };
+    }
     if (metrics.value.breakInvalid) {
       return {
         type: "danger",
@@ -543,14 +572,15 @@ function buildAttendancePayload(statusLabel) {
   return {
     log_id: logId.value,
     employee_code: form.employeeSelect,
-    employee_name: employeeData.value[form.employeeSelect] || "Unknown Employee",
+    employee_name: employeeData.value[form.employeeSelect]?.name || "Unknown Employee",
     work_date: form.workDate,
     shift_schedule: form.shiftSchedule,
     shift_start: form.shiftStart,
     shift_end: form.shiftEnd,
+    grace_minutes: form.graceMinutes,
     clock_in: form.clockIn,
     clock_out: form.clockOut,
-    source: form.source,
+    source: "HRIS",
     break_out: form.breakOut || null,
     break_in: form.breakIn || null,
     log_action: form.logAction,
@@ -560,7 +590,7 @@ function buildAttendancePayload(statusLabel) {
     adjustment_reason: form.adjustmentReason.trim() || null,
     status: statusLabel,
     payable_hours: Number(metrics.value.payableHours || 0),
-    notes: `${shiftPresets[form.shiftSchedule]?.label || form.shiftSchedule} via ${form.source}`,
+    notes: shiftPresets[form.shiftSchedule]?.label || form.shiftSchedule,
   };
 }
 
@@ -643,20 +673,22 @@ async function handleSubmit() {
   const statusLabel = isCorrection.value ? "Correction" : statusBadge.value.label;
 
   try {
-    await saveAttendanceToApi(buildAttendancePayload(statusLabel));
+    const savedRecord = await saveAttendanceToApi(buildAttendancePayload(statusLabel));
     if (isCorrection.value) {
-      setAlert("warning", `${logId.value.trim()} saved as an attendance correction.`);
+      setAlert("warning", `${logId.value.trim()} saved as a corrected ${String(savedRecord.status || "attendance").toLowerCase()} record.`);
       return;
     }
 
     setAlert(
       "success",
-      `${logId.value.trim()} saved to the HRIS API. Payroll can reconcile the record against the shift schedule.`
+      `${logId.value.trim()} saved as ${savedRecord.status}. Payable hours: ${Number(savedRecord.payable_hours || 0).toFixed(2)}.`
     );
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       setAlert("danger", "Your session expired. Please sign in again.");
       authStore.logout();
+    } else if (error instanceof ApiError && error.status === 422) {
+      setAlert("danger", error.message);
     } else {
       setAlert("danger", "Could not save the attendance log to the API. Please make sure FastAPI is running.");
     }
@@ -674,7 +706,19 @@ async function fetchEmployees() {
       employee_code: employee.employee_code,
       name: `${employee.first_name} ${employee.last_name}`,
     }));
-    employeeData.value = Object.fromEntries(employeeOptions.value.map((e) => [e.employee_code, e.name]));
+    employeeData.value = Object.fromEntries(
+      response.items.map((employee) => [
+        employee.employee_code,
+        {
+          name: `${employee.first_name} ${employee.last_name}`,
+          workSchedule: employee.work_schedule || "regular",
+          workDays: String(employee.work_days || "mon,tue,wed,thu,fri").split(",").filter(Boolean),
+          defaultShiftStart: employee.default_shift_start || "09:00",
+          defaultShiftEnd: employee.default_shift_end || "18:00",
+          defaultGraceMinutes: Number(employee.default_grace_minutes || 0),
+        },
+      ])
+    );
   } catch {
     employeeOptions.value = [];
     employeeData.value = {};
@@ -701,9 +745,9 @@ watch(
     form.shiftSchedule,
     form.shiftStart,
     form.shiftEnd,
+    form.graceMinutes,
     form.clockIn,
     form.clockOut,
-    form.source,
     form.breakOut,
     form.breakIn,
     form.restDayWork,

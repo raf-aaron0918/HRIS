@@ -8,6 +8,7 @@ import EmployeeNewPage from "@/pages/EmployeeNewPage.vue";
 import AttendancePage from "@/pages/AttendancePage.vue";
 import LeaveManagementPage from "@/pages/LeaveManagementPage.vue";
 import PayrollPage from "@/pages/PayrollPage.vue";
+import PayrollBatchPage from "@/pages/PayrollBatchPage.vue";
 import ReportsPage from "@/pages/ReportsPage.vue";
 import AccountManagementPage from "@/pages/AccountManagementPage.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -101,6 +102,15 @@ const routes = [
     meta: {
       shell: true,
       title: "Payroll",
+    },
+  },
+  {
+    path: "/payroll/batch",
+    name: "payroll-batch",
+    component: PayrollBatchPage,
+    meta: {
+      shell: true,
+      title: "Payroll Batch",
     },
   },
   {

@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_active_user, get_db, require_hr_or_payroll_admin
 from app.models.user import User
 from app.schemas.payroll import PayrollCreate, PayrollListResponse, PayrollResponse, PayrollUpdate
+from app.services.audit import create_audit_log
 from app.services.payroll import create_payroll_run, get_payroll_run_by_id, list_payroll_runs, update_payroll_run
 
 router = APIRouter()
@@ -21,13 +22,21 @@ def get_payroll_runs(
 @router.post("", response_model=PayrollResponse, status_code=status.HTTP_201_CREATED)
 def create_payroll_record(
     payload: PayrollCreate,
-    _: User = Depends(require_hr_or_payroll_admin),
+    current_user: User = Depends(require_hr_or_payroll_admin),
     db: Session = Depends(get_db),
 ) -> PayrollResponse:
     if get_payroll_run_by_id(db, payload.payroll_run_id):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Payroll run ID already exists")
 
     record = create_payroll_run(db, payload.model_dump())
+    create_audit_log(
+        db,
+        module="Payroll",
+        action=f"Create - {record.payslip_status}",
+        record_id=record.payroll_run_id,
+        actor=current_user,
+        summary=f"Created payroll run for {record.employee_name} ({record.cutoff_start} to {record.cutoff_end})",
+    )
     return PayrollResponse.model_validate(record)
 
 
@@ -35,7 +44,7 @@ def create_payroll_record(
 def update_payroll_record(
     payroll_run_id: str,
     payload: PayrollUpdate,
-    _: User = Depends(require_hr_or_payroll_admin),
+    current_user: User = Depends(require_hr_or_payroll_admin),
     db: Session = Depends(get_db),
 ) -> PayrollResponse:
     record = get_payroll_run_by_id(db, payroll_run_id)
@@ -43,6 +52,14 @@ def update_payroll_record(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Payroll run not found")
 
     updated_record = update_payroll_run(db, record, payload.model_dump())
+    create_audit_log(
+        db,
+        module="Payroll",
+        action=f"Update - {updated_record.payslip_status}",
+        record_id=updated_record.payroll_run_id,
+        actor=current_user,
+        summary=f"Updated payroll run for {updated_record.employee_name} ({updated_record.cutoff_start} to {updated_record.cutoff_end})",
+    )
     return PayrollResponse.model_validate(updated_record)
 
 

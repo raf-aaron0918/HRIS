@@ -40,7 +40,12 @@ def get_report_data(
                 "clock_in": log.clock_in,
                 "clock_out": log.clock_out,
                 "status": log.status,
+                "worked_hours": log.worked_hours,
                 "payable_hours": log.payable_hours,
+                "late_minutes": log.late_minutes,
+                "undertime_minutes": log.undertime_minutes,
+                "overtime_minutes": log.overtime_minutes,
+                "night_diff_minutes": log.night_diff_minutes,
             }
             for log in list_attendance_logs(db)
         ]
@@ -85,6 +90,9 @@ def get_report_data(
             "department": employee.department,
             "position": employee.position,
             "branch": employee.branch,
+            "pay_type": employee.pay_type,
+            "base_rate": employee.base_rate,
+            "fixed_allowance": employee.fixed_allowance,
             "employment_status": employee.employment_status,
             "account_status": employee.account_status,
             "email": employee.email,

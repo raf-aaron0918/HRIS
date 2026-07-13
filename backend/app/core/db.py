@@ -1,5 +1,4 @@
 from sqlalchemy import create_engine, inspect, text
-from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -41,6 +40,14 @@ EMPLOYEE_COLUMN_DEFINITIONS = {
     "date_hired": "VARCHAR(20)",
     "branch": "VARCHAR(120)",
     "manager": "VARCHAR(120)",
+    "pay_type": "VARCHAR(40) NOT NULL DEFAULT 'monthly'",
+    "base_rate": "FLOAT NOT NULL DEFAULT 0",
+    "fixed_allowance": "FLOAT NOT NULL DEFAULT 0",
+    "work_schedule": "VARCHAR(80) NOT NULL DEFAULT 'regular'",
+    "work_days": "VARCHAR(80) NOT NULL DEFAULT 'mon,tue,wed,thu,fri'",
+    "default_shift_start": "VARCHAR(10) NOT NULL DEFAULT '09:00'",
+    "default_shift_end": "VARCHAR(10) NOT NULL DEFAULT '18:00'",
+    "default_grace_minutes": "INTEGER NOT NULL DEFAULT 0",
     "account_status": "VARCHAR(50)",
     "onboarding_stage": "VARCHAR(50)",
     "movement_type": "VARCHAR(50)",
@@ -61,6 +68,15 @@ LEAVE_COLUMN_DEFINITIONS = {
     "updated_at": "VARCHAR(40)",
     "attachment_data_url": "TEXT",
     "attachment_mime_type": "VARCHAR(120)",
+}
+
+ATTENDANCE_COLUMN_DEFINITIONS = {
+    "grace_minutes": "INTEGER NOT NULL DEFAULT 0",
+    "worked_hours": "FLOAT NOT NULL DEFAULT 0",
+    "late_minutes": "INTEGER NOT NULL DEFAULT 0",
+    "undertime_minutes": "INTEGER NOT NULL DEFAULT 0",
+    "overtime_minutes": "INTEGER NOT NULL DEFAULT 0",
+    "night_diff_minutes": "INTEGER NOT NULL DEFAULT 0",
 }
 
 
@@ -111,10 +127,68 @@ def ensure_leave_columns() -> None:
         )
 
 
+def ensure_attendance_columns() -> bool:
+    inspector = inspect(engine)
+    if "attendance_logs" not in inspector.get_table_names():
+        return False
+
+    existing_columns = {column["name"] for column in inspector.get_columns("attendance_logs")}
+    missing_columns = {
+        name: definition
+        for name, definition in ATTENDANCE_COLUMN_DEFINITIONS.items()
+        if name not in existing_columns
+    }
+
+    if not missing_columns:
+        return False
+
+    with engine.begin() as connection:
+        for column_name, definition in missing_columns.items():
+            connection.execute(text(f"ALTER TABLE attendance_logs ADD COLUMN {column_name} {definition}"))
+    return True
+
+
+def backfill_attendance_metrics() -> None:
+    from app.models.attendance import AttendanceLog
+    from app.services.attendance import calculate_attendance
+
+    with SessionLocal() as db:
+        records = db.query(AttendanceLog).all()
+        for record in records:
+            try:
+                metrics = calculate_attendance(
+                    {
+                        "shift_start": record.shift_start,
+                        "shift_end": record.shift_end,
+                        "grace_minutes": record.grace_minutes,
+                        "clock_in": record.clock_in,
+                        "clock_out": record.clock_out,
+                        "break_out": record.break_out,
+                        "break_in": record.break_in,
+                    }
+                )
+            except ValueError:
+                metrics = {
+                    "status": "Invalid",
+                    "worked_hours": 0,
+                    "payable_hours": 0,
+                    "late_minutes": 0,
+                    "undertime_minutes": 0,
+                    "overtime_minutes": 0,
+                    "night_diff_minutes": 0,
+                }
+
+            for field, value in metrics.items():
+                setattr(record, field, value)
+        db.commit()
+
+
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
     ensure_employee_columns()
     ensure_leave_columns()
+    if ensure_attendance_columns():
+        backfill_attendance_metrics()
 
     with SessionLocal() as db:
         seed_defaults(db)

@@ -1,23 +1,19 @@
 <template>
-  <div class="me-auto pc-mob-drp">
-    <ul class="list-unstyled">
-      <li class="pc-h-item pc-sidebar-collapse">
-        <a href="#" class="pc-head-link ms-0" aria-label="Toggle sidebar" @click.prevent="$emit('toggleSidebar')">
-          <i class="ti ti-menu-2"></i>
-        </a>
-      </li>
-      <li class="pc-h-item d-none d-md-inline-flex">
-        <form class="header-search">
-          <i class="ti ti-search icon-search"></i>
-          <input type="search" class="form-control border-0 shadow-none" placeholder="Search here..." />
-        </form>
-      </li>
-    </ul>
+  <div class="me-auto topbar-start">
+    <div class="topbar-left-controls">
+      <button type="button" class="topbar-sidebar-toggle" aria-label="Toggle sidebar" @click="$emit('toggleSidebar')">
+        <i class="ti ti-menu-2"></i>
+      </button>
+      <form class="header-search topbar-search d-none d-md-flex">
+        <i class="ti ti-search icon-search"></i>
+        <input type="search" class="form-control border-0 shadow-none" placeholder="Search here..." />
+      </form>
+    </div>
   </div>
   <div class="ms-auto">
     <ul class="list-unstyled">
       <li class="dropdown pc-h-item">
-        <a class="pc-head-link dropdown-toggle arrow-none me-0 notification-trigger" data-bs-toggle="dropdown" href="#" role="button">
+        <a class="pc-head-link dropdown-toggle arrow-none me-0 notification-trigger" data-bs-toggle="dropdown" href="#" role="button" @click="markNotificationsViewed">
           <i class="ti ti-mail"></i>
           <span v-if="notificationCount" class="badge rounded-pill bg-danger pc-h-badge">{{ notificationCount }}</span>
         </a>
@@ -74,18 +70,6 @@
             </div>
           </div>
           <div class="px-3 pb-3">
-            <RouterLink to="/dashboard" class="dropdown-item">
-              <i class="ti ti-dashboard"></i>
-              <span>Dashboard</span>
-            </RouterLink>
-            <RouterLink to="/employees" class="dropdown-item">
-              <i class="ti ti-users"></i>
-              <span>Employee Master</span>
-            </RouterLink>
-            <RouterLink to="/accounts" class="dropdown-item">
-              <i class="ti ti-user-cog"></i>
-              <span>Accounts</span>
-            </RouterLink>
             <a href="#" class="dropdown-item" @click.prevent="handleLogout">
               <i class="ti ti-power"></i>
               <span>Logout</span>
@@ -99,7 +83,6 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
-import { RouterLink } from "vue-router";
 import { useRouter } from "vue-router";
 import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
@@ -112,10 +95,13 @@ const authStore = useAuthStore();
 const notifications = ref([]);
 const notificationsLoading = ref(false);
 const notificationsError = ref("");
+const readNotificationKeys = ref(new Set());
 
 const displayName = computed(() => authStore.currentUser?.full_name || "HRIS User");
 const displayRole = computed(() => authStore.currentUser?.role || "Authorized User");
-const notificationCount = computed(() => notifications.value.length);
+const notificationCount = computed(
+  () => notifications.value.filter((item) => !readNotificationKeys.value.has(item.key)).length
+);
 
 function handleLogout() {
   authStore.logout();
@@ -136,6 +122,38 @@ function toNotificationTime(value) {
   return value;
 }
 
+function notificationStorageKey() {
+  const userKey = authStore.currentUser?.username || authStore.currentUser?.email || "guest";
+  return `hris-read-notifications:${userKey}`;
+}
+
+function makeNotificationKey(parts) {
+  return parts.map((part) => String(part || "").trim().toLowerCase()).join("|");
+}
+
+function loadReadNotificationKeys() {
+  try {
+    readNotificationKeys.value = new Set(JSON.parse(localStorage.getItem(notificationStorageKey()) || "[]"));
+  } catch {
+    readNotificationKeys.value = new Set();
+  }
+}
+
+function saveReadNotificationKeys(keys) {
+  localStorage.setItem(notificationStorageKey(), JSON.stringify([...keys].slice(-100)));
+}
+
+function markNotificationsViewed() {
+  if (!notifications.value.length) return;
+
+  const nextKeys = new Set(readNotificationKeys.value);
+  notifications.value.forEach((item) => {
+    if (item.key) nextKeys.add(item.key);
+  });
+  readNotificationKeys.value = nextKeys;
+  saveReadNotificationKeys(nextKeys);
+}
+
 function buildAttendanceNotifications(logs) {
   const todayDate = getTodayDateValue();
 
@@ -143,10 +161,11 @@ function buildAttendanceNotifications(logs) {
     .filter((log) => log.work_date === todayDate)
     .filter((log) => {
       const status = String(log.status || "").toLowerCase();
-      return status.includes("correction") || status.includes("late") || status.includes("undertime") || status.includes("duplicate");
+      return status.includes("correction") || status.includes("late") || status.includes("undertime") || status.includes("incomplete") || status.includes("duplicate");
     })
     .slice(0, 4)
     .map((log) => ({
+      key: makeNotificationKey(["attendance", log.log_id, log.employee_code, log.work_date, log.status]),
       title: `${log.employee_name || log.employee_code || "Employee"} attendance`,
       subtitle: log.status || "Attendance update",
       time: toNotificationTime(log.work_date),
@@ -162,6 +181,7 @@ function buildLeaveNotifications(summary) {
 
   return [
     {
+      key: makeNotificationKey(["leave", "pending", pendingCount]),
       title: "Pending leave requests",
       subtitle: `${pendingCount} leave request(s) waiting for review.`,
       time: "Today",
@@ -179,6 +199,7 @@ function buildPayrollNotifications(summary, runs) {
 
   if (draftCount) {
     items.push({
+      key: makeNotificationKey(["payroll", "draft", draftCount]),
       title: "Payroll drafts in progress",
       subtitle: `${draftCount} payroll draft(s) still need finalization.`,
       time: "Today",
@@ -190,6 +211,7 @@ function buildPayrollNotifications(summary, runs) {
 
   if (exceptionRuns.length) {
     items.push({
+      key: makeNotificationKey(["payroll", "exception", exceptionRuns.length]),
       title: "Payroll exceptions found",
       subtitle: `${exceptionRuns.length} payroll record(s) need attention.`,
       time: "Today",
@@ -240,18 +262,27 @@ async function loadNotifications() {
 }
 
 function goToNotification(item) {
+  if (item?.key) {
+    const nextKeys = new Set(readNotificationKeys.value);
+    nextKeys.add(item.key);
+    readNotificationKeys.value = nextKeys;
+    saveReadNotificationKeys(nextKeys);
+  }
+
   if (item?.route) {
     router.push(item.route);
   }
 }
 
 onMounted(() => {
+  loadReadNotificationKeys();
   loadNotifications();
 });
 
 watch(
   () => authStore.accessToken,
   () => {
+    loadReadNotificationKeys();
     loadNotifications();
   }
 );

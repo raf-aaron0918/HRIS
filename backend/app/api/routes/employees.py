@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_active_user, get_db, require_hr_admin
 from app.models.user import User
 from app.schemas.employee import EmployeeCreate, EmployeeListResponse, EmployeeResponse, EmployeeUpdate
+from app.services.audit import create_audit_log
 from app.services.employee import create_employee, get_employee_by_code, get_employee_by_email, list_employees, update_employee
 
 router = APIRouter()
@@ -20,7 +21,7 @@ def get_employees(
 @router.post("", response_model=EmployeeResponse, status_code=status.HTTP_201_CREATED)
 def create_employee_record(
     payload: EmployeeCreate,
-    _: User = Depends(require_hr_admin),
+    current_user: User = Depends(require_hr_admin),
     db: Session = Depends(get_db),
 ) -> EmployeeResponse:
     if get_employee_by_code(db, payload.employee_code):
@@ -30,6 +31,14 @@ def create_employee_record(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Employee email already exists")
 
     employee = create_employee(db, payload.model_dump())
+    create_audit_log(
+        db,
+        module="Employee",
+        action="Create",
+        record_id=employee.employee_code,
+        actor=current_user,
+        summary=f"Created employee profile for {employee.first_name} {employee.last_name}",
+    )
     return EmployeeResponse.model_validate(employee)
 
 
@@ -37,7 +46,7 @@ def create_employee_record(
 def update_employee_record(
     employee_code: str,
     payload: EmployeeUpdate,
-    _: User = Depends(require_hr_admin),
+    current_user: User = Depends(require_hr_admin),
     db: Session = Depends(get_db),
 ) -> EmployeeResponse:
     employee = get_employee_by_code(db, employee_code)
@@ -49,4 +58,12 @@ def update_employee_record(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Employee email already exists")
 
     updated_employee = update_employee(db, employee, payload.model_dump())
+    create_audit_log(
+        db,
+        module="Employee",
+        action="Update",
+        record_id=updated_employee.employee_code,
+        actor=current_user,
+        summary=f"Updated employee profile for {updated_employee.first_name} {updated_employee.last_name}",
+    )
     return EmployeeResponse.model_validate(updated_employee)

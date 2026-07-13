@@ -32,12 +32,16 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label" for="employee">Employee</label>
-                  <select id="employee" v-model="form.employee" class="form-select" :class="fieldClass('employee')" required @change="handleFormMutation('employee')">
-                    <option value="">Select employee</option>
-                    <option v-for="employee in employeeOptions" :key="employee.employee_code" :value="employee.name">
-                      {{ employee.name }}
-                    </option>
-                  </select>
+                  <EmployeeSearchSelect
+                    v-model="form.employee"
+                    input-id="employee"
+                    :options="employeeOptions"
+                    value-key="name"
+                    :invalid="Boolean(validationErrors.employee)"
+                    placeholder="Type employee name or code"
+                    required
+                    @change="handleFormMutation('employee')"
+                  />
                   <div class="invalid-feedback">{{ validationErrors.employee }}</div>
                 </div>
                 <div class="col-md-6 mb-3">
@@ -83,8 +87,8 @@
               </div>
 
               <div class="mt-2 mb-3">
-                <h6 class="mb-1">2. Request reason and approval details</h6>
-                <p class="text-muted mb-0 small">Add the request explanation, supporting document, and supervisor route.</p>
+                <h6 class="mb-1">2. Request reason and HR review details</h6>
+                <p class="text-muted mb-0 small">Add the request explanation, supporting document, and HR review context.</p>
               </div>
 
               <div class="row">
@@ -99,19 +103,9 @@
                   <small class="text-muted">Attach a medical certificate or supporting file when policy requires it.</small>
                 </div>
                 <div class="col-md-3 mb-3">
-                  <label class="form-label" for="approver">Immediate Supervisor</label>
-                  <select id="approver" v-model="form.approver" class="form-select" :class="fieldClass('approver')" @change="handleFormMutation('approver')">
-                    <option value="">Select approver</option>
-                    <option v-for="employee in employeeOptions" :key="`approver-${employee.employee_code}`" :value="employee.name">
-                      {{ employee.name }}
-                    </option>
-                  </select>
-                  <div class="invalid-feedback">{{ validationErrors.approver }}</div>
-                </div>
-                <div class="col-md-3 mb-3">
                   <label class="form-label" for="status">Submission Status</label>
                   <input id="status" :value="submissionStatusLabel" type="text" class="form-control" readonly>
-                  <small class="text-muted">Leave requests are submitted as pending, then approved or rejected by HR.</small>
+                  <small class="text-muted">Leave requests are submitted as pending, then reviewed by HR.</small>
                 </div>
               </div>
 
@@ -136,7 +130,7 @@
               </div>
 
               <div v-if="!canManageLeaveRequests" class="alert alert-light-info border-info mt-3 mb-0">
-                You can submit leave here. Approval actions are available to `HR Admin` and `Immediate Supervisor` accounts in the queue below.
+                You can submit leave here. Approval actions are available to `HR Admin` accounts in the queue below.
               </div>
 
               <div class="alert mt-3 mb-0" :class="policyAlert.class" role="alert">
@@ -209,8 +203,8 @@
                   </div>
                   <div class="col-md-6">
                     <div class="premium-review-item">
-                      <div class="premium-review-label">Approver</div>
-                      <div class="premium-review-value">{{ selectedLeaveRequest.approver || "Not assigned" }}</div>
+                      <div class="premium-review-label">Reviewed By</div>
+                      <div class="premium-review-value">{{ selectedLeaveRequest.approver || "Awaiting HR review" }}</div>
                     </div>
                   </div>
                   <div class="col-md-12">
@@ -238,11 +232,11 @@
                   </div>
                 </div>
 
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <div v-if="canApproveRequest(selectedLeaveRequest)" class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
                   <button
                     type="button"
                     class="btn btn-outline-success"
-                    :disabled="!canApproveRequest(selectedLeaveRequest) || decisionRequestId === selectedLeaveRequest.request_id"
+                    :disabled="decisionRequestId === selectedLeaveRequest.request_id"
                     @click="applyLeaveDecision(selectedLeaveRequest, 'Approved')"
                   >
                     {{ decisionRequestId === selectedLeaveRequest.request_id && decisionStatus === 'Approved' ? "Saving..." : "Approve" }}
@@ -250,7 +244,7 @@
                   <button
                     type="button"
                     class="btn btn-outline-danger"
-                    :disabled="!canApproveRequest(selectedLeaveRequest) || decisionRequestId === selectedLeaveRequest.request_id"
+                    :disabled="decisionRequestId === selectedLeaveRequest.request_id"
                     @click="applyLeaveDecision(selectedLeaveRequest, 'Rejected')"
                   >
                     {{ decisionRequestId === selectedLeaveRequest.request_id && decisionStatus === 'Rejected' ? "Saving..." : "Reject" }}
@@ -266,7 +260,6 @@
                       <th>Employee</th>
                       <th>Leave Type</th>
                       <th>Dates</th>
-                      <th>Approver</th>
                       <th>Status</th>
                       <th class="text-end">Action</th>
                     </tr>
@@ -277,7 +270,6 @@
                       <td>{{ request.employee_name }}</td>
                       <td>{{ formatLeaveType(request.leave_type) }}</td>
                       <td>{{ request.start_date }} to {{ request.end_date }}</td>
-                      <td>{{ request.approver }}</td>
                       <td>
                         <span class="badge" :class="getRequestStatusBadge(request.status).class">
                           {{ request.status }}
@@ -292,22 +284,24 @@
                           >
                             View
                           </button>
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-outline-success"
-                            :disabled="!canApproveRequest(request) || decisionRequestId === request.request_id"
-                            @click="applyLeaveDecision(request, 'Approved')"
-                          >
-                            {{ decisionRequestId === request.request_id && decisionStatus === 'Approved' ? "Saving..." : "Approve" }}
-                          </button>
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-outline-danger"
-                            :disabled="!canApproveRequest(request) || decisionRequestId === request.request_id"
-                            @click="applyLeaveDecision(request, 'Rejected')"
-                          >
-                            {{ decisionRequestId === request.request_id && decisionStatus === 'Rejected' ? "Saving..." : "Reject" }}
-                          </button>
+                          <template v-if="canApproveRequest(request)">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-success"
+                              :disabled="decisionRequestId === request.request_id"
+                              @click="applyLeaveDecision(request, 'Approved')"
+                            >
+                              {{ decisionRequestId === request.request_id && decisionStatus === 'Approved' ? "Saving..." : "Approve" }}
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-danger"
+                              :disabled="decisionRequestId === request.request_id"
+                              @click="applyLeaveDecision(request, 'Rejected')"
+                            >
+                              {{ decisionRequestId === request.request_id && decisionStatus === 'Rejected' ? "Saving..." : "Reject" }}
+                            </button>
+                          </template>
                         </div>
                       </td>
                     </tr>
@@ -329,7 +323,7 @@
                   </div>
                   <div class="small text-muted mt-2">Type: {{ formatLeaveType(request.leave_type) }}</div>
                   <div class="small text-muted">Dates: {{ request.start_date }} to {{ request.end_date }}</div>
-                  <div class="small text-muted">Approver: {{ request.approver }}</div>
+                  <div class="small text-muted">Reviewed by: {{ request.approver || "Awaiting HR review" }}</div>
                   <div class="d-grid gap-2 mt-3">
                     <button
                       type="button"
@@ -338,22 +332,24 @@
                     >
                       View
                     </button>
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline-success"
-                      :disabled="!canApproveRequest(request) || decisionRequestId === request.request_id"
-                      @click="applyLeaveDecision(request, 'Approved')"
-                    >
-                      {{ decisionRequestId === request.request_id && decisionStatus === 'Approved' ? "Saving..." : "Approve" }}
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline-danger"
-                      :disabled="!canApproveRequest(request) || decisionRequestId === request.request_id"
-                      @click="applyLeaveDecision(request, 'Rejected')"
-                    >
-                      {{ decisionRequestId === request.request_id && decisionStatus === 'Rejected' ? "Saving..." : "Reject" }}
-                    </button>
+                    <template v-if="canApproveRequest(request)">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-success"
+                        :disabled="decisionRequestId === request.request_id"
+                        @click="applyLeaveDecision(request, 'Approved')"
+                      >
+                        {{ decisionRequestId === request.request_id && decisionStatus === 'Approved' ? "Saving..." : "Approve" }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-danger"
+                        :disabled="decisionRequestId === request.request_id"
+                        @click="applyLeaveDecision(request, 'Rejected')"
+                      >
+                        {{ decisionRequestId === request.request_id && decisionStatus === 'Rejected' ? "Saving..." : "Reject" }}
+                      </button>
+                    </template>
                   </div>
                 </div>
 
@@ -370,6 +366,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
+import EmployeeSearchSelect from "@/components/EmployeeSearchSelect.vue";
 import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
@@ -394,7 +391,6 @@ const form = reactive({
   leaveMode: "full",
   reason: "",
   attachment: null,
-  approver: "",
   status: "Draft",
 });
 
@@ -488,7 +484,7 @@ const filteredLeaveRequests = computed(() => {
 const emptyQueueMessage = computed(() => `No ${activeQueueCategory.value.toLowerCase()} leave requests available.`);
 const canManageLeaveRequests = computed(() => {
   const role = authStore.currentUser?.role || "";
-  return role === "HR Admin" || role === "Immediate Supervisor";
+  return role === "HR Admin";
 });
 const submissionStatusLabel = computed(() => (form.status === "Draft" ? "Draft" : "Pending"));
 const statusBadge = computed(() => {
@@ -648,7 +644,6 @@ function validateForm() {
     validationErrors.endDate = "End date cannot be earlier than the start date.";
   }
   if (!form.reason.trim()) validationErrors.reason = "Reason is required.";
-  if (!form.approver) validationErrors.approver = "Approver is required.";
 
   if (Object.keys(validationErrors).length) {
     setPolicyAlert("danger", "Please complete the highlighted required fields. Optional blank fields can be skipped.");
@@ -678,7 +673,7 @@ async function buildLeavePayload(status) {
     attachment_name: form.attachment?.name || null,
     attachment_data_url: attachmentDataUrl,
     attachment_mime_type: form.attachment?.type || null,
-    approver: form.approver,
+    approver: "",
     status,
     leave_days: leaveDays.value,
     credits_used: creditsUsed.value,
@@ -686,7 +681,7 @@ async function buildLeavePayload(status) {
     notes:
       form.leaveType === "unpaid"
         ? "Employee filed leave without pay. Once approved, payroll should reflect the deduction."
-        : "Employee filed leave and it is waiting for HR or supervisor approval.",
+        : "Employee filed leave and it is waiting for HR approval.",
   };
 }
 
@@ -800,7 +795,6 @@ watch(
     form.endDate,
     form.leaveMode,
     form.reason,
-    form.approver,
     form.status,
     form.attachment,
   ],

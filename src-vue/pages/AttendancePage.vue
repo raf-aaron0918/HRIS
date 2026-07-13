@@ -49,13 +49,13 @@
           <div class="col-6 col-md-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100 premium-metric">
               <div class="card-body">
-                <small class="text-muted d-block mb-2">Corrections</small>
+                <small class="text-muted d-block mb-2">On Leave</small>
                 <div class="d-flex align-items-end justify-content-between gap-2">
                   <div>
-                    <h3 class="mb-1">{{ overview.correctionCount }}</h3>
-                    <span class="text-muted small">Corrections on selected day</span>
+                    <h3 class="mb-1">{{ overview.onLeaveCount }}</h3>
+                    <span class="text-muted small">Approved leave today</span>
                   </div>
-                  <span class="badge bg-light-info text-info">Correction</span>
+                  <span class="badge bg-light-info text-info">Leave</span>
                 </div>
               </div>
             </div>
@@ -64,13 +64,13 @@
           <div class="col-6 col-md-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100 premium-metric">
               <div class="card-body">
-                <small class="text-muted d-block mb-2">Premium Work</small>
+                <small class="text-muted d-block mb-2">Absent</small>
                 <div class="d-flex align-items-end justify-content-between gap-2">
                   <div>
-                    <h3 class="mb-1">{{ overview.premiumCount }}</h3>
-                    <span class="text-muted small">Premium work on selected day</span>
+                    <h3 class="mb-1">{{ overview.absentCount }}</h3>
+                    <span class="text-muted small">Scheduled but no log</span>
                   </div>
-                  <span class="badge bg-light-primary text-primary">Pay</span>
+                  <span class="badge bg-light-danger text-danger">Check</span>
                 </div>
               </div>
             </div>
@@ -85,6 +85,7 @@
               <div>
                 <h5 class="mb-0">Daily Attendance Logs</h5>
                 <small class="text-muted">Review attendance for the selected day so you can quickly see who is present.</small>
+                <div class="text-muted small mt-1">{{ overview.expectedCount }} expected employees</div>
               </div>
 
               <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch align-items-md-center flex-grow-1 justify-content-md-end">
@@ -139,9 +140,8 @@
                       <th>Date</th>
                       <th>Shift</th>
                       <th>Status</th>
-                      <th>Late / OT</th>
+                      <th>Variance</th>
                       <th>Payable</th>
-                      <th>Source</th>
                       <th class="text-end">Action</th>
                     </tr>
                   </thead>
@@ -154,10 +154,10 @@
                       <td>{{ row.shift }}</td>
                       <td>
                         <span class="badge" :class="row.statusClass">{{ row.statusLabel }}</span>
+                        <span v-if="row.isCorrection" class="badge bg-light-info text-info ms-1">Corrected</span>
                       </td>
                       <td>{{ row.lateOt }}</td>
                       <td>{{ row.payable }}</td>
-                      <td>{{ row.source }}</td>
                       <td class="text-end">
                         <a href="#" class="btn btn-sm btn-outline-primary" @click.prevent="noopView(row)">
                           View
@@ -166,7 +166,7 @@
                     </tr>
 
                     <tr v-if="!filteredAttendanceRows.length">
-                      <td colspan="9" class="text-center text-muted py-4">
+                      <td colspan="8" class="text-center text-muted py-4">
                         No attendance log matches the current search or filter.
                       </td>
                     </tr>
@@ -186,9 +186,9 @@
                 </div>
                 <div class="small text-muted mt-2">Shift: {{ row.shift }}</div>
                 <div class="small text-muted">Date: {{ row.workDate }}</div>
-                <div class="small text-muted">Late / OT: {{ row.lateOt }}</div>
+                <div v-if="row.isCorrection" class="small text-info">Corrected attendance entry</div>
+                <div class="small text-muted">Variance: {{ row.lateOt }}</div>
                 <div class="small text-muted">Payable: {{ row.payable }}</div>
-                <div class="small text-muted">Source: {{ row.source }}</div>
               </div>
 
               <div v-if="!filteredAttendanceRows.length" class="text-center text-muted py-4">
@@ -203,7 +203,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import BreadcrumbBar from "@/components/BreadcrumbBar.vue";
 import { RouterLink } from "vue-router";
 import { apiRequest } from "@/lib/api";
@@ -212,11 +212,15 @@ import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
 
 const attendanceRows = ref([]);
+const rosterRows = ref([]);
 const attendanceDate = ref(getTodayDateValue());
 
 const attendanceFilters = [
   { value: "all", label: "All" },
   { value: "late", label: "Late" },
+  { value: "incomplete", label: "Incomplete" },
+  { value: "on_leave", label: "On Leave" },
+  { value: "absent", label: "Absent" },
   { value: "correction", label: "Correction" },
   { value: "night", label: "Night Shift" },
   { value: "premium", label: "Premium Work" },
@@ -226,26 +230,33 @@ const attendanceSearch = ref("");
 const activeAttendanceFilter = ref("all");
 
 const dayAttendanceRows = computed(() =>
-  attendanceRows.value.filter((row) => !attendanceDate.value || row.workDate === attendanceDate.value)
+  [
+    ...attendanceRows.value.filter((row) => !attendanceDate.value || row.workDate === attendanceDate.value),
+    ...rosterRows.value.filter((row) => !attendanceDate.value || row.workDate === attendanceDate.value),
+  ]
 );
 
 const overview = computed(() => ({
+  expectedCount: dayAttendanceRows.value.filter((row) => row.isExpected).length,
   presentCount: dayAttendanceRows.value.filter((row) => row.isPresent).length,
   lateCount: dayAttendanceRows.value.filter((row) => row.status.includes("late")).length,
-  correctionCount: dayAttendanceRows.value.filter((row) => row.status.includes("correction")).length,
-  premiumCount: dayAttendanceRows.value.filter((row) => row.premium === "yes").length,
+  onLeaveCount: dayAttendanceRows.value.filter((row) => row.status === "on leave").length,
+  absentCount: dayAttendanceRows.value.filter((row) => row.status === "absent").length,
 }));
 
 const filteredAttendanceRows = computed(() => {
   const query = attendanceSearch.value.trim().toLowerCase();
 
   return dayAttendanceRows.value.filter((row) => {
-    const haystack = `${row.logId} ${row.employee} ${row.workDate} ${row.shift} ${row.statusLabel} ${row.source}`.toLowerCase();
+    const haystack = `${row.logId} ${row.employee} ${row.workDate} ${row.shift} ${row.statusLabel}`.toLowerCase();
     if (query && !haystack.includes(query)) return false;
 
     if (activeAttendanceFilter.value === "all") return true;
     if (activeAttendanceFilter.value === "late") return row.status.includes("late");
-    if (activeAttendanceFilter.value === "correction") return row.status.includes("correction");
+    if (activeAttendanceFilter.value === "incomplete") return row.status.includes("incomplete");
+    if (activeAttendanceFilter.value === "on_leave") return row.status === "on leave";
+    if (activeAttendanceFilter.value === "absent") return row.status === "absent";
+    if (activeAttendanceFilter.value === "correction") return row.isCorrection;
     if (activeAttendanceFilter.value === "night") return row.shiftFilter === "night";
     if (activeAttendanceFilter.value === "premium") return row.premium === "yes";
 
@@ -261,6 +272,7 @@ const attendanceCountLabel = computed(() => {
 function normalizeAttendanceRow(log) {
   const rawStatus = String(log.status || "saved");
   const status = rawStatus.toLowerCase();
+  const isCorrection = String(log.log_action || "").toLowerCase() === "correction";
   let statusLabel = rawStatus || "Saved";
 
   if (status.includes("for payroll review") || status.includes("approved") || status.includes("saved")) {
@@ -286,6 +298,8 @@ function normalizeAttendanceRow(log) {
     workDate: log.work_date,
     shift: log.shift_schedule || "Shift",
     status,
+    isCorrection,
+    isExpected: true,
     isPresent,
     shiftFilter: log.shift_schedule === "night" ? "night" : "day",
     premium: log.rest_day_work === "yes" || log.holiday_work === "yes" ? "yes" : "no",
@@ -295,6 +309,8 @@ function normalizeAttendanceRow(log) {
         ? "bg-light-warning text-warning"
         : status.includes("undertime")
           ? "bg-light-danger text-danger"
+        : status.includes("incomplete") || status.includes("invalid")
+          ? "bg-light-danger text-danger"
         : status.includes("correction")
           ? "bg-light-info text-info"
           : status.includes("overtime") || status.includes("night differential") || status.includes("rest day work") || status.includes("holiday work")
@@ -302,21 +318,56 @@ function normalizeAttendanceRow(log) {
           : isPresent
             ? "bg-light-success text-success"
             : "bg-light-primary text-primary",
-    lateOt: "-",
+    lateOt: [
+      Number(log.late_minutes || 0) ? `${Number(log.late_minutes)}m late` : "",
+      Number(log.undertime_minutes || 0) ? `${Number(log.undertime_minutes)}m undertime` : "",
+      Number(log.overtime_minutes || 0) ? `${Number(log.overtime_minutes)}m OT` : "",
+    ].filter(Boolean).join(" / ") || "On schedule",
     payable: `${Number(log.payable_hours || 0).toFixed(2)} hrs`,
-    source: log.source,
     raw: log,
   };
 }
 
-async function fetchAttendanceLogs() {
+function normalizeRosterRow(row) {
+  const status = String(row.status || "Absent").toLowerCase();
+  const isOnLeave = status === "on leave";
+  const leaveType = row.leave_type || "Approved leave";
+
+  return {
+    logId: `ROSTER-${row.employee_code}`,
+    employeeId: row.employee_code,
+    employee: row.employee_name,
+    workDate: row.work_date,
+    shift: row.shift_schedule || "Shift",
+    status,
+    isCorrection: false,
+    isExpected: true,
+    isPresent: false,
+    shiftFilter: row.shift_schedule === "night" ? "night" : "day",
+    premium: "no",
+    statusLabel: isOnLeave ? `On Leave (${leaveType})` : "Absent",
+    statusClass: isOnLeave ? "bg-light-info text-info" : "bg-light-danger text-danger",
+    lateOt: isOnLeave ? leaveType : "No attendance log",
+    payable: "0.00 hrs",
+    raw: row,
+  };
+}
+
+async function fetchAttendanceData() {
   if (!authStore.accessToken) return;
 
   try {
-    const response = await apiRequest("/attendance", { token: authStore.accessToken });
-    attendanceRows.value = (response.items || []).map(normalizeAttendanceRow);
+    const [logsResponse, summaryResponse] = await Promise.all([
+      apiRequest("/attendance", { token: authStore.accessToken }),
+      apiRequest(`/attendance/summary?work_date=${encodeURIComponent(attendanceDate.value)}`, { token: authStore.accessToken }),
+    ]);
+    attendanceRows.value = (logsResponse.items || []).map(normalizeAttendanceRow);
+    rosterRows.value = (summaryResponse.daily_roster || [])
+      .filter((row) => String(row.status || "").toLowerCase() !== "logged")
+      .map(normalizeRosterRow);
   } catch {
     attendanceRows.value = [];
+    rosterRows.value = [];
   }
 }
 
@@ -332,7 +383,11 @@ function getTodayDateValue() {
 }
 
 onMounted(() => {
-  fetchAttendanceLogs();
+  fetchAttendanceData();
+});
+
+watch(attendanceDate, () => {
+  fetchAttendanceData();
 });
 </script>
 

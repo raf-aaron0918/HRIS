@@ -30,19 +30,6 @@
                 {{ isSubmitting ? "Signing In..." : "Sign In" }}
               </button>
             </div>
-            <div class="saprator mt-3">
-              <span>Or continue with</span>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <div class="d-grid">
-                  <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                    <img :src="googleIcon" alt="Google" />
-                    <span class="d-none d-sm-inline-block">Google</span>
-                  </button>
-                </div>
-              </div>
-            </div>
             <div v-if="message" class="alert mt-4 mb-0" :class="messageClass">{{ message }}</div>
           </div>
         </div>
@@ -59,7 +46,6 @@
 <script setup>
 import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import googleIcon from "../../src/assets/images/authentication/google.svg";
 import { ApiError } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 

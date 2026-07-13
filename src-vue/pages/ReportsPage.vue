@@ -214,7 +214,7 @@ const reportDefinitions = {
   },
   employee: {
     label: "Employee Masterlist",
-    columns: ["Employee ID", "Employee Name", "Department", "Branch", "Status", "Personal Email"],
+    columns: ["Employee ID", "Employee Name", "Department", "Branch", "Pay Type", "Base Rate", "Fixed Allowance", "Status", "Personal Email"],
     rows: [],
   },
   payroll: {
@@ -508,6 +508,42 @@ async function loadBackendReportRows() {
       token: authStore.accessToken,
     });
     const rows = response.rows || [];
+
+    if (form.reportType === "attendance") {
+      backendReport.value = {
+        reportType: form.reportType,
+        columns: currentDefinition.value.columns,
+        rows: rows.map((row) => [
+          row.work_date || "",
+          row.employee_name || row.employee_code || "",
+          `${Number(row.late_minutes || 0)} min`,
+          `${Number(row.undertime_minutes || 0)} min`,
+          `${Number(row.overtime_minutes || 0)} min`,
+          `${Number(row.night_diff_minutes || 0)} min`,
+          row.department || "",
+        ]),
+      };
+      return true;
+    }
+
+    if (form.reportType === "lateUndertime") {
+      backendReport.value = {
+        reportType: form.reportType,
+        columns: currentDefinition.value.columns,
+        rows: rows
+          .filter((row) => Number(row.late_minutes || 0) > 0 || Number(row.undertime_minutes || 0) > 0)
+          .map((row) => [
+            row.work_date || "",
+            row.employee_name || row.employee_code || "",
+            `${Number(row.late_minutes || 0)} min`,
+            `${Number(row.undertime_minutes || 0)} min`,
+            row.department || "",
+            row.branch || "",
+          ]),
+      };
+      return true;
+    }
+
     const keys = rows.length ? Object.keys(rows[0]) : [];
     backendReport.value = {
       reportType: form.reportType,

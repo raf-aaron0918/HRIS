@@ -8,7 +8,7 @@
       </div>
       <div class="navbar-content">
         <ul class="pc-navbar">
-          <li v-for="item in navItems" :key="item.to" class="pc-item" :class="{ active: route.path === item.to }">
+          <li v-for="item in navItems" :key="item.to" class="pc-item" :class="{ active: isActiveRoute(item.to) }">
             <RouterLink :to="item.to" class="pc-link">
               <span class="pc-micon"><i :class="item.icon"></i></span>
               <span class="pc-mtext">{{ item.label }}</span>
@@ -38,6 +38,11 @@ defineProps({
 defineEmits(["closeMobile"]);
 
 const route = useRoute();
+
+function isActiveRoute(path) {
+  if (path === "/payroll") return route.path === path || route.path.startsWith("/payroll/");
+  return route.path === path;
+}
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: "ti ti-dashboard" },

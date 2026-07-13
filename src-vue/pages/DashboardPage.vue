@@ -28,6 +28,7 @@
                 <div class="premium-metric h-100">
                   <small class="text-muted d-block mb-1">Present Today</small>
                   <h4 class="mb-0">{{ presentTodayCount }}</h4>
+                  <small class="text-muted">{{ expectedTodayCount }} expected</small>
                 </div>
               </div>
               <div class="col-6 col-lg-3">
@@ -72,7 +73,7 @@
       <div class="col-lg-7">
         <div class="card h-100 border-0 shadow-sm premium-panel">
           <div class="card-header d-flex align-items-center justify-content-between premium-panel-header">
-            <h5 class="mb-0">Recent Activity</h5>
+            <h5 class="mb-0">Recent Audit Trail</h5>
             <RouterLink to="/reports" class="btn btn-sm btn-light-primary">View Reports</RouterLink>
           </div>
           <div class="card-body p-0 premium-panel-body">
@@ -122,11 +123,13 @@ const dashboardLoading = ref(false);
 const dashboardError = ref("");
 const employeeCount = ref(0);
 const presentTodayCount = ref(0);
+const expectedTodayCount = ref(0);
 const leavePendingCount = ref(0);
 const attendanceCorrectionsCount = ref(0);
 const payrollExceptionCount = ref(0);
 const payrollDraftCount = ref(0);
 const recentActivities = ref([]);
+const auditActivities = ref([]);
 
 const approvals = computed(() => [
   {
@@ -146,7 +149,7 @@ const approvals = computed(() => [
   },
 ]);
 
-const recentActivity = computed(() => recentActivities.value);
+const recentActivity = computed(() => auditActivities.value.length ? auditActivities.value : recentActivities.value);
 const approvalQueueTotal = computed(() => leavePendingCount.value + attendanceCorrectionsCount.value + payrollExceptionCount.value);
 
 function normalizeEmployeeCount(items) {
@@ -158,7 +161,10 @@ function normalizeAttendanceSummary(summary, logs) {
   const attendanceLogs = logs || [];
   const todaysLogs = attendanceLogs.filter((log) => log.work_date === todayDate);
 
-  presentTodayCount.value = todaysLogs.filter((log) => isPresentAttendanceStatus(log.status)).length;
+  expectedTodayCount.value = Number(summary?.today?.expected || 0);
+  presentTodayCount.value = Number(
+    summary?.today?.present ?? todaysLogs.filter((log) => isPresentAttendanceStatus(log.status)).length
+  );
   attendanceCorrectionsCount.value = todaysLogs.filter(
     (log) => String(log.status || "").toLowerCase().includes("correction") || String(log.log_action || "").toLowerCase() === "correction"
   ).length;
@@ -237,6 +243,17 @@ function normalizePayrollSummary(summary, runs) {
 
 }
 
+function normalizeAuditLogs(logs) {
+  auditActivities.value = (logs || []).slice(0, 8).map((log) => ({
+    activity: `${log.action} ${log.record_id}`,
+    employee: log.actor || "-",
+    module: log.module || "Audit",
+    status: log.actor_role || "Recorded",
+    badgeClass: "bg-light-primary text-primary",
+    time: log.created_at || "-",
+  }));
+}
+
 async function loadDashboardData() {
   if (!authStore.accessToken) return;
 
@@ -244,20 +261,22 @@ async function loadDashboardData() {
   dashboardError.value = "";
 
   try {
-    const [employees, attendanceSummary, attendanceLogs, leaveSummary, leaveRequests, payrollSummary, payrollRuns] = await Promise.all([
+    const [employees, attendanceSummary, attendanceLogs, leaveSummary, leaveRequests, payrollSummary, payrollRuns, auditLogs] = await Promise.all([
       apiRequest("/employees", { token: authStore.accessToken }),
-      apiRequest("/attendance/summary", { token: authStore.accessToken }),
+      apiRequest(`/attendance/summary?work_date=${encodeURIComponent(getTodayDateValue())}`, { token: authStore.accessToken }),
       apiRequest("/attendance", { token: authStore.accessToken }),
       apiRequest("/leave/summary", { token: authStore.accessToken }),
       apiRequest("/leave", { token: authStore.accessToken }),
       apiRequest("/payroll/summary", { token: authStore.accessToken }),
       apiRequest("/payroll", { token: authStore.accessToken }),
+      apiRequest("/audit-logs?limit=8", { token: authStore.accessToken }).catch(() => ({ items: [] })),
     ]);
 
     normalizeEmployeeCount(employees.items || []);
     normalizeAttendanceSummary(attendanceSummary, attendanceLogs.items || []);
     normalizeLeaveSummary(leaveSummary, leaveRequests.items || []);
     normalizePayrollSummary(payrollSummary, payrollRuns.items || []);
+    normalizeAuditLogs(auditLogs.items || []);
   } catch (error) {
     dashboardError.value = error?.message || "Unable to load dashboard data.";
   } finally {

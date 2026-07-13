@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_active_user, get_db
 from app.models.user import User
 from app.schemas.leave import LeaveCreate, LeaveListResponse, LeaveResponse, LeaveUpdate
+from app.services.audit import create_audit_log
 from app.services.leave import create_leave_request, get_leave_request_by_id, list_leave_requests, update_leave_request
 
 router = APIRouter()
@@ -21,13 +22,21 @@ def get_leave_requests(
 @router.post("", response_model=LeaveResponse, status_code=status.HTTP_201_CREATED)
 def create_leave_record(
     payload: LeaveCreate,
-    _: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ) -> LeaveResponse:
     if get_leave_request_by_id(db, payload.request_id):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Leave request ID already exists")
 
     record = create_leave_request(db, payload.model_dump())
+    create_audit_log(
+        db,
+        module="Leave",
+        action="Create",
+        record_id=record.request_id,
+        actor=current_user,
+        summary=f"Created {record.leave_type} request for {record.employee_name}",
+    )
     return LeaveResponse.model_validate(record)
 
 
@@ -35,7 +44,7 @@ def create_leave_record(
 def update_leave_record(
     request_id: str,
     payload: LeaveUpdate,
-    _: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ) -> LeaveResponse:
     record = get_leave_request_by_id(db, request_id)
@@ -43,6 +52,14 @@ def update_leave_record(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Leave request not found")
 
     updated_record = update_leave_request(db, record, payload.model_dump())
+    create_audit_log(
+        db,
+        module="Leave",
+        action=f"Update - {updated_record.status}",
+        record_id=updated_record.request_id,
+        actor=current_user,
+        summary=f"Updated {updated_record.leave_type} request for {updated_record.employee_name}",
+    )
     return LeaveResponse.model_validate(updated_record)
 
 

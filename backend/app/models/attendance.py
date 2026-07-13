@@ -1,4 +1,4 @@
-from sqlalchemy import Float, String
+from sqlalchemy import Float, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -15,6 +15,7 @@ class AttendanceLog(Base):
     shift_schedule: Mapped[str] = mapped_column(String(80), default="regular")
     shift_start: Mapped[str] = mapped_column(String(10))
     shift_end: Mapped[str] = mapped_column(String(10))
+    grace_minutes: Mapped[int] = mapped_column(Integer, default=0)
     clock_in: Mapped[str] = mapped_column(String(10))
     clock_out: Mapped[str] = mapped_column(String(10))
     source: Mapped[str] = mapped_column(String(50))
@@ -26,5 +27,10 @@ class AttendanceLog(Base):
     correction_type: Mapped[str] = mapped_column(String(80), nullable=True)
     adjustment_reason: Mapped[str] = mapped_column(String(500), nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="Draft")
+    worked_hours: Mapped[float] = mapped_column(Float, default=0)
     payable_hours: Mapped[float] = mapped_column(Float, default=0)
+    late_minutes: Mapped[int] = mapped_column(Integer, default=0)
+    undertime_minutes: Mapped[int] = mapped_column(Integer, default=0)
+    overtime_minutes: Mapped[int] = mapped_column(Integer, default=0)
+    night_diff_minutes: Mapped[int] = mapped_column(Integer, default=0)
     notes: Mapped[str] = mapped_column(String(500), nullable=True)
