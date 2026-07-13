@@ -10,6 +10,8 @@ class LeaveBase(BaseModel):
     leave_mode: str = "full"
     reason: str
     attachment_name: str | None = None
+    attachment_data_url: str | None = None
+    attachment_mime_type: str | None = None
     approver: str
     status: str = "Draft"
     leave_days: float = 0
@@ -30,6 +32,8 @@ class LeaveUpdate(BaseModel):
     leave_mode: str = "full"
     reason: str
     attachment_name: str | None = None
+    attachment_data_url: str | None = None
+    attachment_mime_type: str | None = None
     approver: str
     status: str = "Draft"
     leave_days: float = 0
@@ -42,6 +46,7 @@ class LeaveResponse(LeaveBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    updated_at: str | None = None
 
 
 class LeaveListResponse(BaseModel):

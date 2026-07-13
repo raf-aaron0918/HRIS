@@ -57,6 +57,12 @@ EMPLOYEE_COLUMN_DEFINITIONS = {
     "notes": "VARCHAR(500)",
 }
 
+LEAVE_COLUMN_DEFINITIONS = {
+    "updated_at": "VARCHAR(40)",
+    "attachment_data_url": "TEXT",
+    "attachment_mime_type": "VARCHAR(120)",
+}
+
 
 def ensure_employee_columns() -> None:
     inspector = inspect(engine)
@@ -78,9 +84,37 @@ def ensure_employee_columns() -> None:
             connection.execute(text(f"ALTER TABLE employees ADD COLUMN {column_name} {definition}"))
 
 
+def ensure_leave_columns() -> None:
+    inspector = inspect(engine)
+    if "leave_requests" not in inspector.get_table_names():
+        return
+
+    existing_columns = {column["name"] for column in inspector.get_columns("leave_requests")}
+    missing_columns = {
+        name: definition
+        for name, definition in LEAVE_COLUMN_DEFINITIONS.items()
+        if name not in existing_columns
+    }
+
+    if not missing_columns:
+        return
+
+    with engine.begin() as connection:
+        for column_name, definition in missing_columns.items():
+            connection.execute(text(f"ALTER TABLE leave_requests ADD COLUMN {column_name} {definition}"))
+        connection.execute(
+            text(
+                "UPDATE leave_requests "
+                "SET updated_at = CURRENT_TIMESTAMP "
+                "WHERE updated_at IS NULL OR updated_at = ''"
+            )
+        )
+
+
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
     ensure_employee_columns()
+    ensure_leave_columns()
 
     with SessionLocal() as db:
         seed_defaults(db)

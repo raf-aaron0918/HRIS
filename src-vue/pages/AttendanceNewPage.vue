@@ -247,7 +247,12 @@ const form = reactive({
 });
 
 const logId = ref("Pending");
-const lastSubmission = ref(null);
+const duplicateCheck = reactive({
+  isDuplicate: false,
+  matchedLogId: "",
+  isChecking: false,
+});
+let duplicateCheckRequestId = 0;
 
 function setAlert(type, message) {
   alertState.class = `alert-light-${type} border-${type}`;
@@ -432,87 +437,97 @@ const metrics = computed(() => {
   };
 });
 
-const statusBadge = computed(() => {
+function deriveAttendanceStatus() {
   if (!metrics.value.valid) {
     return {
-      label: isCorrection.value ? "Pending Correction" : "Draft",
+      label: isCorrection.value ? "Correction" : "Draft",
       class: isCorrection.value ? "bg-light-warning text-warning" : "bg-light-primary text-primary",
     };
   }
-  if (isCorrection.value) return { label: "Pending Correction", class: "bg-light-warning text-warning" };
+  if (isCorrection.value) return { label: "Correction", class: "bg-light-warning text-warning" };
   if (metrics.value.sameDayInvalid) return { label: "Invalid", class: "bg-light-danger text-danger" };
 
-  if (
-    lastSubmission.value &&
-    lastSubmission.value.employeeId === form.employeeSelect &&
-    lastSubmission.value.clockIn === form.clockIn &&
-    lastSubmission.value.clockOut === form.clockOut &&
-    lastSubmission.value.workDate === form.workDate
-  ) {
+  if (duplicateCheck.isDuplicate) {
     return { label: "Duplicate Check", class: "bg-light-warning text-warning" };
+  }
+
+  if (metrics.value.lateMinutes > 0 && metrics.value.undertimeMinutes > 0) {
+    return { label: "Late / Undertime", class: "bg-light-danger text-danger" };
   }
 
   if (metrics.value.lateMinutes > 0) return { label: "Late", class: "bg-light-warning text-warning" };
   if (metrics.value.undertimeMinutes > 0) return { label: "Undertime", class: "bg-light-danger text-danger" };
-  if (metrics.value.overtimeMinutes > 0 || form.restDayWork === "yes" || form.holidayWork === "yes") {
-    return { label: "For Payroll Review", class: "bg-light-info text-info" };
-  }
-  if (metrics.value.nightDiffMinutes > 0) return { label: "Night Differential", class: "bg-light-info text-info" };
   return { label: "Present", class: "bg-light-success text-success" };
-});
+}
 
-function syncAlertFromMetrics() {
+const statusBadge = computed(() => deriveAttendanceStatus());
+
+function buildAttendanceAlert() {
   if (!metrics.value.valid) {
     if (metrics.value.breakInvalid) {
-      setAlert("danger", "Break Out and Break In must be completed together in the correct order.");
-    } else {
-      setAlert("primary", "Enter clock in and clock out to calculate late, undertime, overtime, night differential, and payable hours.");
+      return {
+        type: "danger",
+        message: "Break Out and Break In must be completed together in the correct order.",
+      };
     }
-    return;
+
+    return {
+      type: "primary",
+      message: "Enter clock in and clock out to calculate late, undertime, overtime, night differential, and payable hours.",
+    };
   }
 
   if (isCorrection.value) {
-    setAlert("warning", "Correction request will need supervisor approval before payroll can use it.");
-    return;
+    return {
+      type: "warning",
+      message: "This record is marked as a correction. Review the details before finalizing attendance.",
+    };
   }
 
   if (metrics.value.sameDayInvalid) {
-    setAlert("danger", "Clock Out cannot be earlier than Clock In for a same-day shift.");
-    return;
+    return {
+      type: "danger",
+      message: "Clock Out cannot be earlier than Clock In for a same-day shift.",
+    };
   }
 
-  if (
-    lastSubmission.value &&
-    lastSubmission.value.employeeId === form.employeeSelect &&
-    lastSubmission.value.clockIn === form.clockIn &&
-    lastSubmission.value.clockOut === form.clockOut &&
-    lastSubmission.value.workDate === form.workDate
-  ) {
-    setAlert("warning", "This submission looks like a duplicate inside the same minute. Review before saving.");
-    return;
+  if (duplicateCheck.isDuplicate) {
+    return {
+      type: "warning",
+      message: `A matching attendance log already exists${duplicateCheck.matchedLogId ? ` (${duplicateCheck.matchedLogId})` : ""}. Review before saving.`,
+    };
+  }
+
+  if (metrics.value.lateMinutes > 0 && metrics.value.undertimeMinutes > 0) {
+    return {
+      type: "warning",
+      message: `Late arrival and undertime detected. ${metrics.value.lateLabel} late and ${metrics.value.undertimeLabel} undertime will affect payable hours.`,
+    };
   }
 
   if (metrics.value.lateMinutes > 0) {
-    setAlert("warning", `Late arrival detected. ${metrics.value.lateLabel} will affect payable hours.`);
-    return;
+    return {
+      type: "warning",
+      message: `Late arrival detected. ${metrics.value.lateLabel} will affect payable hours.`,
+    };
   }
 
   if (metrics.value.undertimeMinutes > 0) {
-    setAlert("warning", `Undertime detected. ${metrics.value.undertimeLabel} will reduce payable hours.`);
-    return;
+    return {
+      type: "warning",
+      message: `Undertime detected. ${metrics.value.undertimeLabel} will reduce payable hours.`,
+    };
   }
 
-  if (metrics.value.overtimeMinutes > 0 || form.restDayWork === "yes" || form.holidayWork === "yes") {
-    setAlert("info", "Premium work detected. Overtime, rest day, or holiday tags are ready for payroll review.");
-    return;
-  }
+  return {
+    type: "success",
+    message: "Attendance log looks valid and will be recorded as present.",
+  };
+}
 
-  if (metrics.value.nightDiffMinutes > 0) {
-    setAlert("info", "Night differential detected for work inside the 10:00 PM to 6:00 AM window.");
-    return;
-  }
-
-  setAlert("success", "Attendance log looks valid and ready for payroll reconciliation.");
+function syncAlertFromMetrics() {
+  const attendanceAlert = buildAttendanceAlert();
+  setAlert(attendanceAlert.type, attendanceAlert.message);
 }
 
 function saveDraft() {
@@ -570,6 +585,51 @@ async function saveAttendanceToApi(payload) {
   }
 }
 
+async function checkDuplicateAttendance() {
+  const hasRequiredFields = form.employeeSelect && form.workDate && form.clockIn && form.clockOut;
+  const canCheck =
+    hasRequiredFields &&
+    metrics.value.valid &&
+    !metrics.value.sameDayInvalid &&
+    !isCorrection.value &&
+    Boolean(authStore.accessToken);
+
+  duplicateCheckRequestId += 1;
+  const requestId = duplicateCheckRequestId;
+
+  if (!canCheck) {
+    duplicateCheck.isDuplicate = false;
+    duplicateCheck.matchedLogId = "";
+    duplicateCheck.isChecking = false;
+    return;
+  }
+
+  duplicateCheck.isChecking = true;
+
+  try {
+    const response = await apiRequest(
+      `/attendance/duplicate-check?employee_code=${encodeURIComponent(form.employeeSelect)}&work_date=${encodeURIComponent(form.workDate)}&clock_in=${encodeURIComponent(form.clockIn)}&clock_out=${encodeURIComponent(form.clockOut)}`,
+      {
+        token: authStore.accessToken,
+      }
+    );
+
+    if (requestId !== duplicateCheckRequestId) return;
+
+    duplicateCheck.isDuplicate = Boolean(response.is_duplicate);
+    duplicateCheck.matchedLogId = response.matched_log_id || "";
+  } catch {
+    if (requestId !== duplicateCheckRequestId) return;
+
+    duplicateCheck.isDuplicate = false;
+    duplicateCheck.matchedLogId = "";
+  } finally {
+    if (requestId === duplicateCheckRequestId) {
+      duplicateCheck.isChecking = false;
+    }
+  }
+}
+
 async function handleSubmit() {
   syncAlertFromMetrics();
 
@@ -577,20 +637,15 @@ async function handleSubmit() {
     return;
   }
 
+  await checkDuplicateAttendance();
+  syncAlertFromMetrics();
   ensureLogId();
-  lastSubmission.value = {
-    employeeId: form.employeeSelect,
-    clockIn: form.clockIn,
-    clockOut: form.clockOut,
-    workDate: form.workDate,
-  };
-
-  const statusLabel = isCorrection.value ? "Pending Correction" : statusBadge.value.label;
+  const statusLabel = isCorrection.value ? "Correction" : statusBadge.value.label;
 
   try {
     await saveAttendanceToApi(buildAttendancePayload(statusLabel));
     if (isCorrection.value) {
-      setAlert("warning", `${logId.value.trim()} submitted for supervisor approval.`);
+      setAlert("warning", `${logId.value.trim()} saved as an attendance correction.`);
       return;
     }
 
@@ -656,7 +711,8 @@ watch(
     form.correctionType,
     form.adjustmentReason,
   ],
-  () => {
+  async () => {
+    await checkDuplicateAttendance();
     syncAlertFromMetrics();
   },
   { deep: true }

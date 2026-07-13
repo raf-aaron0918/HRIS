@@ -2,8 +2,43 @@ body {
   background: #f8f9fa;
 }
 
+html,
+body,
+#app,
+.vue-shell {
+  min-height: 100%;
+  height: auto;
+  scroll-behavior: auto !important;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 #app {
   min-height: 100vh;
+}
+
+.pc-header {
+  position: sticky !important;
+  top: 0;
+}
+
+.pc-container,
+.pc-content {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  touch-action: pan-y pinch-zoom;
+}
+
+.pc-container {
+  top: 0 !important;
+  min-height: 100vh !important;
+  padding-top: 84px;
+}
+
+.pc-content {
+  min-height: calc(100vh - 84px);
 }
 
 .pc-item.active>.pc-link {

@@ -154,17 +154,54 @@ function normalizeEmployeeCount(items) {
 }
 
 function normalizeAttendanceSummary(summary, logs) {
-  const today = summary?.today || {};
-  presentTodayCount.value = Number(today.present || 0);
-  attendanceCorrectionsCount.value = Number(today.corrections || 0);
+  const todayDate = getTodayDateValue();
+  const attendanceLogs = logs || [];
+  const todaysLogs = attendanceLogs.filter((log) => log.work_date === todayDate);
+
+  presentTodayCount.value = todaysLogs.filter((log) => isPresentAttendanceStatus(log.status)).length;
+  attendanceCorrectionsCount.value = todaysLogs.filter(
+    (log) => String(log.status || "").toLowerCase().includes("correction") || String(log.log_action || "").toLowerCase() === "correction"
+  ).length;
   recentActivities.value = (logs || []).slice(0, 5).map((log) => ({
-    activity: log.status || "Attendance update",
+    activity: normalizeAttendanceStatusLabel(log.status),
     employee: log.employee_name || log.employee_code || "-",
     module: "Attendance",
-    status: log.status || "Saved",
+    status: normalizeAttendanceStatusLabel(log.status),
     badgeClass: "bg-light-info text-info",
     time: log.work_date || "-",
   }));
+}
+
+function normalizeAttendanceStatusLabel(statusValue) {
+  const rawStatus = String(statusValue || "Saved");
+  const normalizedStatus = rawStatus.toLowerCase();
+
+  if (normalizedStatus.includes("for payroll review") || normalizedStatus.includes("approved") || normalizedStatus.includes("saved")) {
+    return "Present";
+  }
+
+  if (normalizedStatus.includes("pending correction")) {
+    return "Correction";
+  }
+
+  return rawStatus;
+}
+
+function isPresentAttendanceStatus(statusValue) {
+  const normalizedStatus = normalizeAttendanceStatusLabel(statusValue).toLowerCase();
+  return (
+    normalizedStatus.includes("present") ||
+    normalizedStatus.includes("late") ||
+    normalizedStatus.includes("undertime")
+  );
+}
+
+function getTodayDateValue() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function normalizeLeaveSummary(summary, requests) {

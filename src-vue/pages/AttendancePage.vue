@@ -23,7 +23,7 @@
                 <div class="d-flex align-items-end justify-content-between gap-2">
                   <div>
                     <h3 class="mb-1">{{ overview.presentCount }}</h3>
-                    <span class="text-muted small">Recent present logs</span>
+                    <span class="text-muted small">Present on selected day</span>
                   </div>
                   <span class="badge bg-light-success text-success">OK</span>
                 </div>
@@ -38,7 +38,7 @@
                 <div class="d-flex align-items-end justify-content-between gap-2">
                   <div>
                     <h3 class="mb-1">{{ overview.lateCount }}</h3>
-                    <span class="text-muted small">Late arrivals</span>
+                    <span class="text-muted small">Late on selected day</span>
                   </div>
                   <span class="badge bg-light-warning text-warning">Alert</span>
                 </div>
@@ -53,9 +53,9 @@
                 <div class="d-flex align-items-end justify-content-between gap-2">
                   <div>
                     <h3 class="mb-1">{{ overview.correctionCount }}</h3>
-                    <span class="text-muted small">Correction items</span>
+                    <span class="text-muted small">Corrections on selected day</span>
                   </div>
-                  <span class="badge bg-light-info text-info">Review</span>
+                  <span class="badge bg-light-info text-info">Correction</span>
                 </div>
               </div>
             </div>
@@ -68,7 +68,7 @@
                 <div class="d-flex align-items-end justify-content-between gap-2">
                   <div>
                     <h3 class="mb-1">{{ overview.premiumCount }}</h3>
-                    <span class="text-muted small">Overtime / rest / holiday</span>
+                    <span class="text-muted small">Premium work on selected day</span>
                   </div>
                   <span class="badge bg-light-primary text-primary">Pay</span>
                 </div>
@@ -83,11 +83,17 @@
           <div class="card-header bg-white border-bottom-0 pt-4 pb-0 premium-panel-header">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
               <div>
-                <h5 class="mb-0">Recent Attendance Logs</h5>
-                <small class="text-muted">Review live logs, premium work, and correction items in one list.</small>
+                <h5 class="mb-0">Daily Attendance Logs</h5>
+                <small class="text-muted">Review attendance for the selected day so you can quickly see who is present.</small>
               </div>
 
               <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch align-items-md-center flex-grow-1 justify-content-md-end">
+                <input
+                  v-model="attendanceDate"
+                  type="date"
+                  class="form-control premium-date-filter"
+                />
+
                 <div class="input-group w-100 premium-search">
                   <span class="input-group-text bg-light border-end-0">
                     <i class="ti ti-search"></i>
@@ -130,6 +136,7 @@
                     <tr>
                       <th>Log ID</th>
                       <th>Employee</th>
+                      <th>Date</th>
                       <th>Shift</th>
                       <th>Status</th>
                       <th>Late / OT</th>
@@ -143,6 +150,7 @@
                     <tr v-for="row in filteredAttendanceRows" :key="row.logId">
                       <td>{{ row.logId }}</td>
                       <td>{{ row.employee }}</td>
+                      <td>{{ row.workDate }}</td>
                       <td>{{ row.shift }}</td>
                       <td>
                         <span class="badge" :class="row.statusClass">{{ row.statusLabel }}</span>
@@ -158,7 +166,7 @@
                     </tr>
 
                     <tr v-if="!filteredAttendanceRows.length">
-                      <td colspan="8" class="text-center text-muted py-4">
+                      <td colspan="9" class="text-center text-muted py-4">
                         No attendance log matches the current search or filter.
                       </td>
                     </tr>
@@ -168,7 +176,7 @@
             </div>
 
             <div class="d-md-none px-3 pb-3">
-              <div v-for="row in filteredAttendanceRows" :key="`mobile-${row.logId}`" class="border rounded-4 p-3 mb-2 shadow-sm premium-mobile-card">
+              <div v-for="row in filteredAttendanceRows" :key="`mobile-${row.logId}`" class="border p-3 mb-2 shadow-sm premium-mobile-card">
                 <div class="d-flex justify-content-between gap-2 align-items-start">
                   <div>
                     <div class="fw-semibold">{{ row.employee }}</div>
@@ -177,6 +185,7 @@
                   <span class="badge" :class="row.statusClass">{{ row.statusLabel }}</span>
                 </div>
                 <div class="small text-muted mt-2">Shift: {{ row.shift }}</div>
+                <div class="small text-muted">Date: {{ row.workDate }}</div>
                 <div class="small text-muted">Late / OT: {{ row.lateOt }}</div>
                 <div class="small text-muted">Payable: {{ row.payable }}</div>
                 <div class="small text-muted">Source: {{ row.source }}</div>
@@ -203,6 +212,7 @@ import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
 
 const attendanceRows = ref([]);
+const attendanceDate = ref(getTodayDateValue());
 
 const attendanceFilters = [
   { value: "all", label: "All" },
@@ -215,23 +225,27 @@ const attendanceFilters = [
 const attendanceSearch = ref("");
 const activeAttendanceFilter = ref("all");
 
+const dayAttendanceRows = computed(() =>
+  attendanceRows.value.filter((row) => !attendanceDate.value || row.workDate === attendanceDate.value)
+);
+
 const overview = computed(() => ({
-  presentCount: attendanceRows.value.filter((row) => row.status === "present").length,
-  lateCount: attendanceRows.value.filter((row) => row.status === "late").length,
-  correctionCount: attendanceRows.value.filter((row) => row.status === "correction").length,
-  premiumCount: attendanceRows.value.filter((row) => row.premium === "yes").length,
+  presentCount: dayAttendanceRows.value.filter((row) => row.isPresent).length,
+  lateCount: dayAttendanceRows.value.filter((row) => row.status.includes("late")).length,
+  correctionCount: dayAttendanceRows.value.filter((row) => row.status.includes("correction")).length,
+  premiumCount: dayAttendanceRows.value.filter((row) => row.premium === "yes").length,
 }));
 
 const filteredAttendanceRows = computed(() => {
   const query = attendanceSearch.value.trim().toLowerCase();
 
-  return attendanceRows.value.filter((row) => {
-    const haystack = `${row.logId} ${row.employee} ${row.shift} ${row.statusLabel} ${row.source}`.toLowerCase();
+  return dayAttendanceRows.value.filter((row) => {
+    const haystack = `${row.logId} ${row.employee} ${row.workDate} ${row.shift} ${row.statusLabel} ${row.source}`.toLowerCase();
     if (query && !haystack.includes(query)) return false;
 
     if (activeAttendanceFilter.value === "all") return true;
-    if (activeAttendanceFilter.value === "late") return row.status === "late";
-    if (activeAttendanceFilter.value === "correction") return row.status === "correction";
+    if (activeAttendanceFilter.value === "late") return row.status.includes("late");
+    if (activeAttendanceFilter.value === "correction") return row.status.includes("correction");
     if (activeAttendanceFilter.value === "night") return row.shiftFilter === "night";
     if (activeAttendanceFilter.value === "premium") return row.premium === "yes";
 
@@ -245,23 +259,47 @@ const attendanceCountLabel = computed(() => {
 });
 
 function normalizeAttendanceRow(log) {
-  const status = String(log.status || "saved").toLowerCase();
+  const rawStatus = String(log.status || "saved");
+  const status = rawStatus.toLowerCase();
+  let statusLabel = rawStatus || "Saved";
+
+  if (status.includes("for payroll review") || status.includes("approved") || status.includes("saved")) {
+    statusLabel = "Present";
+  } else if (status.includes("pending correction")) {
+    statusLabel = "Correction";
+  }
+
+  const isPresent =
+    status.includes("present") ||
+    status.includes("saved") ||
+    status.includes("late") ||
+    status.includes("undertime") ||
+    status.includes("overtime") ||
+    status.includes("night differential") ||
+    status.includes("rest day work") ||
+    status.includes("holiday work");
 
   return {
     logId: log.log_id,
     employeeId: log.employee_code,
     employee: log.employee_name,
+    workDate: log.work_date,
     shift: log.shift_schedule || "Shift",
     status,
+    isPresent,
     shiftFilter: log.shift_schedule === "night" ? "night" : "day",
     premium: log.rest_day_work === "yes" || log.holiday_work === "yes" ? "yes" : "no",
-    statusLabel: log.status || "Saved",
+    statusLabel,
     statusClass:
       status.includes("late")
         ? "bg-light-warning text-warning"
+        : status.includes("undertime")
+          ? "bg-light-danger text-danger"
         : status.includes("correction")
           ? "bg-light-info text-info"
-          : status.includes("present") || status.includes("saved")
+          : status.includes("overtime") || status.includes("night differential") || status.includes("rest day work") || status.includes("holiday work")
+            ? "bg-light-info text-info"
+          : isPresent
             ? "bg-light-success text-success"
             : "bg-light-primary text-primary",
     lateOt: "-",
@@ -284,6 +322,14 @@ async function fetchAttendanceLogs() {
 
 // Entry form was removed from this page; keep handler safe.
 function noopView() {}
+
+function getTodayDateValue() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 onMounted(() => {
   fetchAttendanceLogs();
@@ -358,6 +404,16 @@ onMounted(() => {
   border-color: rgba(148, 163, 184, 0.22);
 }
 
+.premium-date-filter {
+  min-width: 180px;
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.premium-date-filter:focus {
+  box-shadow: none;
+  border-color: #0d6efd;
+}
+
 .premium-search .form-control:focus {
   box-shadow: none;
   border-color: #0d6efd;
@@ -392,6 +448,7 @@ onMounted(() => {
 }
 
 .premium-mobile-card {
+  border-radius: 0;
   border-color: rgba(148, 163, 184, 0.18) !important;
   background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
 }

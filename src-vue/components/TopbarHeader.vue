@@ -17,25 +17,37 @@
   <div class="ms-auto">
     <ul class="list-unstyled">
       <li class="dropdown pc-h-item">
-        <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button">
+        <a class="pc-head-link dropdown-toggle arrow-none me-0 notification-trigger" data-bs-toggle="dropdown" href="#" role="button">
           <i class="ti ti-mail"></i>
+          <span v-if="notificationCount" class="badge rounded-pill bg-danger pc-h-badge">{{ notificationCount }}</span>
         </a>
         <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
           <div class="dropdown-header d-flex align-items-center justify-content-between">
-            <h5 class="m-0">Message</h5>
+            <h5 class="m-0">Notifications</h5>
             <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-x text-danger"></i></a>
           </div>
           <div class="dropdown-divider"></div>
           <div class="dropdown-header px-0 text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-            <div class="list-group list-group-flush w-100">
-              <a class="list-group-item list-group-item-action" v-for="item in messages" :key="item.title">
+            <div v-if="notificationsLoading" class="px-3 py-3 text-muted small">Loading notifications...</div>
+            <div v-else-if="notificationsError" class="px-3 py-3 text-danger small">{{ notificationsError }}</div>
+            <div v-else-if="!notifications.length" class="px-3 py-3 text-muted small">No notifications right now.</div>
+            <div v-else class="list-group list-group-flush w-100">
+              <a
+                v-for="item in notifications"
+                :key="`${item.title}-${item.time}`"
+                href="#"
+                class="list-group-item list-group-item-action"
+                @click.prevent="goToNotification(item)"
+              >
                 <div class="d-flex">
                   <div class="flex-shrink-0">
-                    <img :src="item.avatar" alt="user-image" class="user-avtar" />
+                    <div class="user-avtar notification-avatar" :class="item.avatarClass">
+                      <i :class="item.icon"></i>
+                    </div>
                   </div>
                   <div class="flex-grow-1 ms-1">
                     <span class="float-end text-muted">{{ item.time }}</span>
-                    <p class="text-body mb-1" v-html="item.title"></p>
+                    <p class="text-body mb-1">{{ item.title }}</p>
                     <span class="text-muted">{{ item.subtitle }}</span>
                   </div>
                 </div>
@@ -86,45 +98,184 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { RouterLink } from "vue-router";
 import { useRouter } from "vue-router";
+import { ApiError, apiRequest } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
-import avatar1 from "../../src/assets/images/user/avatar-1.jpg";
 import avatar2 from "../../src/assets/images/user/avatar-2.jpg";
-import avatar3 from "../../src/assets/images/user/avatar-3.jpg";
 
 defineEmits(["toggleSidebar"]);
 const router = useRouter();
 const authStore = useAuthStore();
+const notifications = ref([]);
+const notificationsLoading = ref(false);
+const notificationsError = ref("");
 
 const displayName = computed(() => authStore.currentUser?.full_name || "HRIS User");
 const displayRole = computed(() => authStore.currentUser?.role || "Authorized User");
+const notificationCount = computed(() => notifications.value.length);
 
 function handleLogout() {
   authStore.logout();
   router.push("/login");
 }
 
-const messages = [
-  {
-    avatar: avatar2,
-    time: "3:00 AM",
-    title: "It's <b>Cristina Danny's</b> birthday today.",
-    subtitle: "2 min ago",
-  },
-  {
-    avatar: avatar1,
-    time: "6:00 PM",
-    title: "<b>Aida Burg</b> commented on your post.",
-    subtitle: "5 August",
-  },
-  {
-    avatar: avatar3,
-    time: "2:45 PM",
-    title: "<b>There was a failure in your setup.</b>",
-    subtitle: "7 hours ago",
-  },
-];
+function getTodayDateValue() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function toNotificationTime(value) {
+  if (!value) return "Today";
+  if (value === getTodayDateValue()) return "Today";
+  return value;
+}
+
+function buildAttendanceNotifications(logs) {
+  const todayDate = getTodayDateValue();
+
+  return (logs || [])
+    .filter((log) => log.work_date === todayDate)
+    .filter((log) => {
+      const status = String(log.status || "").toLowerCase();
+      return status.includes("correction") || status.includes("late") || status.includes("undertime") || status.includes("duplicate");
+    })
+    .slice(0, 4)
+    .map((log) => ({
+      title: `${log.employee_name || log.employee_code || "Employee"} attendance`,
+      subtitle: log.status || "Attendance update",
+      time: toNotificationTime(log.work_date),
+      route: "/attendance",
+      icon: "ti ti-clock-exclamation",
+      avatarClass: "bg-light-warning text-warning",
+    }));
+}
+
+function buildLeaveNotifications(summary) {
+  const pendingCount = Number(summary?.pending_requests || 0);
+  if (!pendingCount) return [];
+
+  return [
+    {
+      title: "Pending leave requests",
+      subtitle: `${pendingCount} leave request(s) waiting for review.`,
+      time: "Today",
+      route: "/leave",
+      icon: "ti ti-calendar-time",
+      avatarClass: "bg-light-info text-info",
+    },
+  ];
+}
+
+function buildPayrollNotifications(summary, runs) {
+  const draftCount = Number(summary?.draft_runs || 0);
+  const exceptionRuns = (runs || []).filter((run) => String(run.payslip_status || "").toLowerCase() === "exception");
+  const items = [];
+
+  if (draftCount) {
+    items.push({
+      title: "Payroll drafts in progress",
+      subtitle: `${draftCount} payroll draft(s) still need finalization.`,
+      time: "Today",
+      route: "/payroll",
+      icon: "ti ti-file-invoice",
+      avatarClass: "bg-light-primary text-primary",
+    });
+  }
+
+  if (exceptionRuns.length) {
+    items.push({
+      title: "Payroll exceptions found",
+      subtitle: `${exceptionRuns.length} payroll record(s) need attention.`,
+      time: "Today",
+      route: "/payroll",
+      icon: "ti ti-alert-circle",
+      avatarClass: "bg-light-danger text-danger",
+    });
+  }
+
+  return items;
+}
+
+async function loadNotifications() {
+  if (!authStore.accessToken) {
+    notifications.value = [];
+    notificationsError.value = "";
+    return;
+  }
+
+  notificationsLoading.value = true;
+  notificationsError.value = "";
+
+  try {
+    const [attendanceLogs, leaveSummary, payrollSummary, payrollRuns] = await Promise.all([
+      apiRequest("/attendance", { token: authStore.accessToken }),
+      apiRequest("/leave/summary", { token: authStore.accessToken }),
+      apiRequest("/payroll/summary", { token: authStore.accessToken }),
+      apiRequest("/payroll", { token: authStore.accessToken }),
+    ]);
+
+    notifications.value = [
+      ...buildAttendanceNotifications(attendanceLogs.items || []),
+      ...buildLeaveNotifications(leaveSummary),
+      ...buildPayrollNotifications(payrollSummary, payrollRuns.items || []),
+    ].slice(0, 6);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      authStore.logout();
+      router.push("/login");
+      return;
+    }
+
+    notifications.value = [];
+    notificationsError.value = "Could not load notifications.";
+  } finally {
+    notificationsLoading.value = false;
+  }
+}
+
+function goToNotification(item) {
+  if (item?.route) {
+    router.push(item.route);
+  }
+}
+
+onMounted(() => {
+  loadNotifications();
+});
+
+watch(
+  () => authStore.accessToken,
+  () => {
+    loadNotifications();
+  }
+);
 </script>
+
+<style scoped>
+.notification-trigger {
+  position: relative;
+}
+
+.pc-h-badge {
+  position: absolute;
+  top: 2px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.65rem;
+  line-height: 18px;
+}
+
+.notification-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

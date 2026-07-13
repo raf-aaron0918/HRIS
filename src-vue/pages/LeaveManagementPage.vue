@@ -109,12 +109,9 @@
                   <div class="invalid-feedback">{{ validationErrors.approver }}</div>
                 </div>
                 <div class="col-md-3 mb-3">
-                  <label class="form-label" for="status">Status</label>
-                  <select id="status" v-model="form.status" class="form-select">
-                    <option>Draft</option>
-                    <option>Pending</option>
-                    <option>For HR Review</option>
-                  </select>
+                  <label class="form-label" for="status">Submission Status</label>
+                  <input id="status" :value="submissionStatusLabel" type="text" class="form-control" readonly>
+                  <small class="text-muted">Leave requests are submitted as pending, then approved or rejected by HR.</small>
                 </div>
               </div>
 
@@ -138,6 +135,10 @@
                 <button type="submit" class="btn btn-primary">Submit Leave Request</button>
               </div>
 
+              <div v-if="!canManageLeaveRequests" class="alert alert-light-info border-info mt-3 mb-0">
+                You can submit leave here. Approval actions are available to `HR Admin` and `Immediate Supervisor` accounts in the queue below.
+              </div>
+
               <div class="alert mt-3 mb-0" :class="policyAlert.class" role="alert">
                 {{ policyAlert.message }}
               </div>
@@ -146,6 +147,222 @@
         </div>
       </div>
 
+      <div class="col-12">
+        <div class="card border-0 shadow-sm premium-panel">
+          <div class="card-header d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3 bg-white border-bottom-0 pt-4 pb-0 premium-panel-header">
+            <div>
+              <h5 class="mb-1">Leave Approval Queue</h5>
+              <small class="text-muted">Review submitted leave requests and approve or reject them directly from HR.</small>
+            </div>
+            <span class="badge bg-light-warning text-warning">{{ pendingLeaveCount }} pending</span>
+          </div>
+          <div class="card-body premium-panel-body">
+            <div v-if="queueError" class="alert alert-warning mb-3">{{ queueError }}</div>
+            <div v-if="queueLoading" class="text-muted small">Loading leave requests...</div>
+            <template v-else>
+              <div class="queue-category-row mb-4">
+                <button
+                  v-for="category in queueCategories"
+                  :key="category.value"
+                  type="button"
+                  class="btn btn-sm queue-category-button"
+                  :class="activeQueueCategory === category.value ? category.activeClass : 'btn-outline-secondary'"
+                  @click="activeQueueCategory = category.value"
+                >
+                  {{ category.label }}
+                  <span class="ms-1">{{ category.count }}</span>
+                </button>
+              </div>
+
+              <div v-if="selectedLeaveRequest" class="border p-3 p-md-4 mb-4 premium-review-panel">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-3">
+                  <div>
+                    <h6 class="mb-1">Leave Request Review</h6>
+                    <div class="text-muted small">{{ selectedLeaveRequest.employee_name }} - {{ selectedLeaveRequest.request_id }}</div>
+                  </div>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge" :class="getRequestStatusBadge(selectedLeaveRequest.status).class">
+                      {{ selectedLeaveRequest.status }}
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="selectedLeaveRequest = null">Close</button>
+                  </div>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="premium-review-item">
+                      <div class="premium-review-label">Leave Type</div>
+                      <div class="premium-review-value">{{ formatLeaveType(selectedLeaveRequest.leave_type) }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="premium-review-item">
+                      <div class="premium-review-label">Date Range</div>
+                      <div class="premium-review-value">{{ selectedLeaveRequest.start_date }} to {{ selectedLeaveRequest.end_date }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="premium-review-item">
+                      <div class="premium-review-label">Leave Mode</div>
+                      <div class="premium-review-value">{{ formatLeaveType(selectedLeaveRequest.leave_mode) }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="premium-review-item">
+                      <div class="premium-review-label">Approver</div>
+                      <div class="premium-review-value">{{ selectedLeaveRequest.approver || "Not assigned" }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="premium-review-item">
+                      <div class="premium-review-label">Reason</div>
+                      <div class="premium-review-value">{{ selectedLeaveRequest.reason || "No reason provided." }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="premium-review-item">
+                      <div class="premium-review-label">Proof / Attachment</div>
+                      <div class="premium-review-value">{{ selectedLeaveRequest.attachment_name || "No attachment submitted." }}</div>
+                      <div v-if="selectedLeaveRequest.attachment_data_url" class="mt-2">
+                        <a
+                          class="btn btn-sm btn-outline-primary"
+                          :href="selectedLeaveRequest.attachment_data_url"
+                          :download="selectedLeaveRequest.attachment_name || 'leave-attachment'"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          View attachment
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-outline-success"
+                    :disabled="!canApproveRequest(selectedLeaveRequest) || decisionRequestId === selectedLeaveRequest.request_id"
+                    @click="applyLeaveDecision(selectedLeaveRequest, 'Approved')"
+                  >
+                    {{ decisionRequestId === selectedLeaveRequest.request_id && decisionStatus === 'Approved' ? "Saving..." : "Approve" }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    :disabled="!canApproveRequest(selectedLeaveRequest) || decisionRequestId === selectedLeaveRequest.request_id"
+                    @click="applyLeaveDecision(selectedLeaveRequest, 'Rejected')"
+                  >
+                    {{ decisionRequestId === selectedLeaveRequest.request_id && decisionStatus === 'Rejected' ? "Saving..." : "Reject" }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="d-none d-md-block table-responsive">
+                <table class="table table-hover align-middle mb-0 premium-table">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Request ID</th>
+                      <th>Employee</th>
+                      <th>Leave Type</th>
+                      <th>Dates</th>
+                      <th>Approver</th>
+                      <th>Status</th>
+                      <th class="text-end">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="request in filteredLeaveRequests" :key="request.request_id">
+                      <td>{{ request.request_id }}</td>
+                      <td>{{ request.employee_name }}</td>
+                      <td>{{ formatLeaveType(request.leave_type) }}</td>
+                      <td>{{ request.start_date }} to {{ request.end_date }}</td>
+                      <td>{{ request.approver }}</td>
+                      <td>
+                        <span class="badge" :class="getRequestStatusBadge(request.status).class">
+                          {{ request.status }}
+                        </span>
+                      </td>
+                      <td class="text-end">
+                        <div class="d-inline-flex gap-2">
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            @click="selectedLeaveRequest = request"
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-success"
+                            :disabled="!canApproveRequest(request) || decisionRequestId === request.request_id"
+                            @click="applyLeaveDecision(request, 'Approved')"
+                          >
+                            {{ decisionRequestId === request.request_id && decisionStatus === 'Approved' ? "Saving..." : "Approve" }}
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            :disabled="!canApproveRequest(request) || decisionRequestId === request.request_id"
+                            @click="applyLeaveDecision(request, 'Rejected')"
+                          >
+                            {{ decisionRequestId === request.request_id && decisionStatus === 'Rejected' ? "Saving..." : "Reject" }}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-if="!filteredLeaveRequests.length">
+                      <td colspan="7" class="text-center text-muted py-4">{{ emptyQueueMessage }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="d-grid gap-3 d-md-none">
+                <div v-for="request in filteredLeaveRequests" :key="`mobile-${request.request_id}`" class="border p-3 shadow-sm premium-mobile-card">
+                  <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                      <div class="fw-semibold">{{ request.employee_name }}</div>
+                      <div class="small text-muted">{{ request.request_id }}</div>
+                    </div>
+                    <span class="badge" :class="getRequestStatusBadge(request.status).class">{{ request.status }}</span>
+                  </div>
+                  <div class="small text-muted mt-2">Type: {{ formatLeaveType(request.leave_type) }}</div>
+                  <div class="small text-muted">Dates: {{ request.start_date }} to {{ request.end_date }}</div>
+                  <div class="small text-muted">Approver: {{ request.approver }}</div>
+                  <div class="d-grid gap-2 mt-3">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary"
+                      @click="selectedLeaveRequest = request"
+                    >
+                      View
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-success"
+                      :disabled="!canApproveRequest(request) || decisionRequestId === request.request_id"
+                      @click="applyLeaveDecision(request, 'Approved')"
+                    >
+                      {{ decisionRequestId === request.request_id && decisionStatus === 'Approved' ? "Saving..." : "Approve" }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger"
+                      :disabled="!canApproveRequest(request) || decisionRequestId === request.request_id"
+                      @click="applyLeaveDecision(request, 'Rejected')"
+                    >
+                      {{ decisionRequestId === request.request_id && decisionStatus === 'Rejected' ? "Saving..." : "Reject" }}
+                    </button>
+                  </div>
+                </div>
+
+                <div v-if="!filteredLeaveRequests.length" class="text-center text-muted py-4">{{ emptyQueueMessage }}</div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -158,6 +375,13 @@ import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 const employeeOptions = ref([]);
+const leaveRequests = ref([]);
+const queueLoading = ref(false);
+const queueError = ref("");
+const decisionRequestId = ref("");
+const decisionStatus = ref("");
+const selectedLeaveRequest = ref(null);
+const activeQueueCategory = ref("Pending");
 
 const availableCredits = ref(18);
 const holidaySet = new Set(["2026-07-04", "2026-12-25", "2026-01-01"]);
@@ -181,6 +405,7 @@ const policyAlert = reactive({
 const validationErrors = reactive({});
 
 const leaveTypesRequiringCredits = new Set(["vacation", "sick", "emergency"]);
+const approvalEligibleStatuses = new Set(["Pending", "For HR Review"]);
 
 function generateLeaveRequestId() {
   const date = new Date();
@@ -227,6 +452,45 @@ const leaveDays = computed(() => {
 const creditsUsed = computed(() => (leaveTypesRequiringCredits.has(form.leaveType) ? leaveDays.value : 0));
 const payrollImpact = computed(() => (form.leaveType === "unpaid" ? leaveDays.value : 0));
 const balanceAfter = computed(() => Math.max(availableCredits.value - creditsUsed.value, 0));
+const pendingLeaveCount = computed(() =>
+  leaveRequests.value.filter((request) => approvalEligibleStatuses.has(request.status)).length
+);
+const approvedLeaveCount = computed(() =>
+  leaveRequests.value.filter((request) => String(request.status || "").toLowerCase() === "approved").length
+);
+const rejectedLeaveCount = computed(() =>
+  leaveRequests.value.filter((request) => String(request.status || "").toLowerCase() === "rejected").length
+);
+const queueCategories = computed(() => [
+  {
+    value: "Pending",
+    label: "Pending",
+    count: pendingLeaveCount.value,
+    activeClass: "btn-warning",
+  },
+  {
+    value: "Approved",
+    label: "Approved",
+    count: approvedLeaveCount.value,
+    activeClass: "btn-success",
+  },
+  {
+    value: "Rejected",
+    label: "Rejected",
+    count: rejectedLeaveCount.value,
+    activeClass: "btn-danger",
+  },
+]);
+const filteredLeaveRequests = computed(() => {
+  const activeCategory = activeQueueCategory.value.toLowerCase();
+  return leaveRequests.value.filter((request) => String(request.status || "").toLowerCase() === activeCategory);
+});
+const emptyQueueMessage = computed(() => `No ${activeQueueCategory.value.toLowerCase()} leave requests available.`);
+const canManageLeaveRequests = computed(() => {
+  const role = authStore.currentUser?.role || "";
+  return role === "HR Admin" || role === "Immediate Supervisor";
+});
+const submissionStatusLabel = computed(() => (form.status === "Draft" ? "Draft" : "Pending"));
 const statusBadge = computed(() => {
   if (form.status === "Pending") return { class: "bg-light-warning text-warning" };
   if (form.status === "For HR Review") return { class: "bg-light-danger text-danger" };
@@ -301,6 +565,39 @@ function handleAttachmentChange(event) {
   form.attachment = files && files.length ? files[0] : null;
 }
 
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      resolve(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : null);
+    reader.onerror = () => reject(new Error("Could not read attachment."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function getRequestStatusBadge(status) {
+  if (status === "Approved") return { class: "bg-light-success text-success" };
+  if (status === "Rejected") return { class: "bg-light-danger text-danger" };
+  if (status === "Pending") return { class: "bg-light-warning text-warning" };
+  if (status === "For HR Review") return { class: "bg-light-info text-info" };
+  return { class: "bg-light-secondary text-secondary" };
+}
+
+function formatLeaveType(value) {
+  return String(value || "")
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function canApproveRequest(request) {
+  return canManageLeaveRequests.value && approvalEligibleStatuses.has(request.status);
+}
+
 async function fetchEmployees() {
   if (!authStore.accessToken) return;
 
@@ -314,6 +611,29 @@ async function fetchEmployees() {
     }));
   } catch {
     employeeOptions.value = [];
+  }
+}
+
+async function fetchLeaveRequests() {
+  if (!authStore.accessToken) return;
+
+  queueLoading.value = true;
+  queueError.value = "";
+
+  try {
+    const response = await apiRequest("/leave", {
+      token: authStore.accessToken,
+    });
+    leaveRequests.value = response.items || [];
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      authStore.logout();
+    } else {
+      queueError.value = "Could not load leave requests.";
+    }
+    leaveRequests.value = [];
+  } finally {
+    queueLoading.value = false;
   }
 }
 
@@ -344,7 +664,9 @@ function saveDraft() {
   setPolicyAlert("primary", "Leave request draft saved locally.");
 }
 
-function buildLeavePayload(status) {
+async function buildLeavePayload(status) {
+  const attachmentDataUrl = await readFileAsDataUrl(form.attachment);
+
   return {
     request_id: generateLeaveRequestId(),
     employee_name: form.employee,
@@ -354,6 +676,8 @@ function buildLeavePayload(status) {
     leave_mode: form.leaveMode,
     reason: form.reason.trim(),
     attachment_name: form.attachment?.name || null,
+    attachment_data_url: attachmentDataUrl,
+    attachment_mime_type: form.attachment?.type || null,
     approver: form.approver,
     status,
     leave_days: leaveDays.value,
@@ -361,8 +685,8 @@ function buildLeavePayload(status) {
     payroll_impact: payrollImpact.value,
     notes:
       form.leaveType === "unpaid"
-        ? "Employee files leave, supervisor approves, and payroll reflects leave without pay."
-        : "Employee files leave, supervisor approves, and HR reviews when policy requires it.",
+        ? "Employee filed leave without pay. Once approved, payroll should reflect the deduction."
+        : "Employee filed leave and it is waiting for HR or supervisor approval.",
   };
 }
 
@@ -373,13 +697,15 @@ async function handleSubmit() {
     return;
   }
 
-  const nextStatus = form.leaveType === "sick" ? "For HR Review" : "Pending";
+  const nextStatus = "Pending";
 
   try {
+    const payload = await buildLeavePayload(nextStatus);
+
     await apiRequest("/leave", {
       method: "POST",
       token: authStore.accessToken,
-      body: JSON.stringify(buildLeavePayload(nextStatus)),
+      body: JSON.stringify(payload),
     });
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
@@ -398,7 +724,72 @@ async function handleSubmit() {
     availableCredits.value = Math.max(0, availableCredits.value - leaveDays.value);
   }
 
+  await fetchLeaveRequests();
   updatePolicyAlert();
+}
+
+async function applyLeaveDecision(request, status) {
+  if (!canApproveRequest(request)) return;
+
+  decisionRequestId.value = request.request_id;
+  decisionStatus.value = status;
+
+  try {
+    await apiRequest(`/leave/${encodeURIComponent(request.request_id)}`, {
+      method: "PUT",
+      token: authStore.accessToken,
+      body: JSON.stringify({
+        employee_name: request.employee_name,
+        leave_type: request.leave_type,
+        start_date: request.start_date,
+        end_date: request.end_date,
+        leave_mode: request.leave_mode,
+        reason: request.reason,
+        attachment_name: request.attachment_name || null,
+        attachment_data_url: request.attachment_data_url || null,
+        attachment_mime_type: request.attachment_mime_type || null,
+        approver: authStore.currentUser?.full_name || request.approver,
+        status,
+        leave_days: request.leave_days,
+        credits_used: request.credits_used,
+        payroll_impact: request.payroll_impact,
+        notes: request.notes || null,
+      }),
+    });
+
+    leaveRequests.value = leaveRequests.value.map((item) =>
+      item.request_id === request.request_id
+        ? {
+            ...item,
+            status,
+            approver: authStore.currentUser?.full_name || item.approver,
+          }
+        : item
+    );
+
+    if (selectedLeaveRequest.value?.request_id === request.request_id) {
+      selectedLeaveRequest.value = {
+        ...selectedLeaveRequest.value,
+        status,
+        approver: authStore.currentUser?.full_name || selectedLeaveRequest.value.approver,
+      };
+    }
+
+    setPolicyAlert(
+      status === "Approved" ? "success" : "warning",
+      `${request.employee_name} leave request was marked as ${status.toLowerCase()}.`
+    );
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      authStore.logout();
+      return;
+    }
+
+    setPolicyAlert("danger", `Could not update the leave request to ${status.toLowerCase()}.`);
+  } finally {
+    decisionRequestId.value = "";
+    decisionStatus.value = "";
+  }
 }
 
 watch(
@@ -419,10 +810,23 @@ watch(
   { deep: true }
 );
 
+watch(
+  () => [activeQueueCategory.value, filteredLeaveRequests.value.map((request) => request.request_id).join("|")],
+  () => {
+    if (
+      selectedLeaveRequest.value &&
+      !filteredLeaveRequests.value.some((request) => request.request_id === selectedLeaveRequest.value.request_id)
+    ) {
+      selectedLeaveRequest.value = null;
+    }
+  }
+);
+
 updatePolicyAlert();
 
 onMounted(() => {
   fetchEmployees();
+  fetchLeaveRequests();
 });
 </script>
 
@@ -484,6 +888,59 @@ onMounted(() => {
 
 .premium-action {
   border-color: rgba(13, 110, 253, 0.22);
+}
+
+.premium-table thead th {
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom-color: rgba(148, 163, 184, 0.2);
+}
+
+.premium-mobile-card {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+}
+
+.premium-review-panel {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  background: linear-gradient(180deg, rgba(13, 110, 253, 0.03) 0%, #fff 100%);
+}
+
+.premium-review-item {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  padding: 0.9rem 1rem;
+  background: #fff;
+}
+
+.premium-review-label {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.premium-review-value {
+  color: #0f172a;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.queue-category-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+}
+
+.queue-category-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 @media (max-width: 767.98px) {

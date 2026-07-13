@@ -129,16 +129,60 @@
             </div>
 
             <div class="d-md-none">
-              <div v-for="(row, rowIndex) in filteredRows" :key="`mobile-row-${rowIndex}`" class="border rounded-4 p-3 mb-2 shadow-sm premium-mobile-card">
-                <div class="fw-semibold mb-2">{{ currentDefinition.label }}</div>
-                <div v-for="(cell, cellIndex) in row" :key="`mobile-${rowIndex}-${cellIndex}`" class="d-flex justify-content-between gap-3 py-1 border-bottom">
-                  <span class="text-muted small">{{ currentColumns[cellIndex] }}</span>
-                  <span class="small text-end">{{ cell }}</span>
+              <div class="premium-mobile-grid">
+                <div
+                  v-for="(row, rowIndex) in filteredRows"
+                  :key="`mobile-row-${rowIndex}`"
+                  class="border shadow-sm premium-mobile-card"
+                >
+                  <div class="premium-mobile-card-header">
+                    <div class="premium-mobile-card-heading">
+                      <div class="fw-semibold premium-mobile-card-title">{{ currentDefinition.label }}</div>
+                      <div class="premium-mobile-card-subtitle">{{ mobileCardPrimaryValue(row) }}</div>
+                    </div>
+                  </div>
+
+                  <div class="premium-mobile-card-actions">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary premium-mobile-view-btn"
+                      @click="toggleMobileRow(rowIndex)"
+                    >
+                      {{ isMobileRowExpanded(rowIndex) ? "Hide details" : "View details" }}
+                    </button>
+                  </div>
+
+                  <div class="premium-mobile-summary">
+                    <div
+                      v-for="({ label, value }, summaryIndex) in getMobileSummaryEntries(row)"
+                      :key="`mobile-summary-${rowIndex}-${summaryIndex}`"
+                      class="premium-mobile-summary-item"
+                    >
+                      <span class="premium-mobile-summary-label">{{ label }}</span>
+                      <span class="premium-mobile-summary-value">{{ value }}</span>
+                    </div>
+                  </div>
+
+                  <div v-if="isMobileRowExpanded(rowIndex)" class="premium-mobile-row">
+                    <div
+                      v-for="(cell, cellIndex) in row"
+                      :key="`mobile-${rowIndex}-${cellIndex}`"
+                      class="premium-mobile-cell-row py-2 border-bottom"
+                    >
+                      <span class="text-muted small premium-mobile-cell-label">
+                        {{ currentColumns[cellIndex] }}
+                      </span>
+                      <span class="small text-end premium-mobile-cell-value">
+                        {{ cell }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div v-if="!filteredRows.length" class="text-center text-muted py-4">
-                <div class="fw-semibold mb-1">No rows found</div>
-                <div class="small">Try widening the date range or clearing filters, then preview again.</div>
+
+                <div v-if="!filteredRows.length" class="text-center text-muted py-4">
+                  <div class="fw-semibold mb-1">No rows found</div>
+                  <div class="small">Try widening the date range or clearing filters, then preview again.</div>
+                </div>
               </div>
             </div>
           </div>
@@ -213,6 +257,7 @@ const backendReport = ref({
   columns: [],
   rows: [],
 });
+const expandedMobileRows = ref({});
 
 function generateReportId() {
   const date = new Date();
@@ -397,6 +442,57 @@ const filteredRows = computed(() =>
     : currentDefinition.value.rows.filter((row) => matchesFilter(row, currentDefinition.value))
 );
 
+function mobileCardPrimaryValue(row) {
+  const priorityColumns = ["Employee", "Employee Name", "Employee Code", "Log Id", "Payroll Run", "Leave Type"];
+
+  for (const columnName of priorityColumns) {
+    const index = currentColumns.value.indexOf(columnName);
+    if (index >= 0 && row[index]) {
+      return String(row[index]);
+    }
+  }
+
+  return row.find((cell) => String(cell || "").trim()) || "Preview details";
+}
+
+function getMobileSummaryEntries(row) {
+  const preferredColumns = ["Log Id", "Employee Code", "Employee", "Employee Name", "Work Date", "Date", "Status"];
+  const seenColumns = new Set();
+  const entries = [];
+
+  preferredColumns.forEach((columnName) => {
+    const index = currentColumns.value.indexOf(columnName);
+    if (index >= 0 && row[index] !== undefined && !seenColumns.has(columnName) && entries.length < 3) {
+      entries.push({
+        label: columnName,
+        value: String(row[index] ?? "--"),
+      });
+      seenColumns.add(columnName);
+    }
+  });
+
+  currentColumns.value.forEach((columnName, index) => {
+    if (entries.length >= 3 || seenColumns.has(columnName)) return;
+    entries.push({
+      label: columnName,
+      value: String(row[index] ?? "--"),
+    });
+  });
+
+  return entries;
+}
+
+function isMobileRowExpanded(rowIndex) {
+  return Boolean(expandedMobileRows.value[rowIndex]);
+}
+
+function toggleMobileRow(rowIndex) {
+  expandedMobileRows.value = {
+    ...expandedMobileRows.value,
+    [rowIndex]: !expandedMobileRows.value[rowIndex],
+  };
+}
+
 function formatBackendColumn(column) {
   return column
     .split("_")
@@ -575,6 +671,7 @@ watch(
     form.exportTarget,
   ],
   () => {
+    expandedMobileRows.value = {};
     refreshPreview();
   },
   { deep: true }
@@ -662,11 +759,176 @@ refreshPreview();
 }
 
 .premium-mobile-card {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 1rem;
+  border-radius: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  align-self: stretch;
   border-color: rgba(148, 163, 184, 0.18) !important;
   background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
 }
 
+.premium-mobile-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.premium-mobile-card-heading {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.premium-mobile-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 1.25rem;
+}
+
+.premium-mobile-card-title {
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.premium-mobile-card-subtitle {
+  margin-top: 0.3rem;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.premium-mobile-card-actions {
+  margin: 0.9rem 0 0.95rem;
+}
+
+.premium-mobile-view-btn {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+}
+
+.premium-mobile-summary {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+  min-width: 0;
+}
+
+.premium-mobile-summary-item {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.9rem;
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.premium-mobile-summary-label {
+  min-width: 0;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.premium-mobile-summary-value {
+  min-width: 0;
+  flex: 1 1 auto;
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.premium-mobile-row {
+  min-width: 0;
+  padding-top: 0.25rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.premium-mobile-cell-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: start;
+  column-gap: 0.85rem;
+  min-width: 0;
+}
+
+.premium-mobile-cell-label {
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+
+.premium-mobile-cell-value {
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.premium-mobile-row .premium-mobile-cell-row:last-child {
+  border-bottom: 0 !important;
+}
+
 @media (max-width: 767.98px) {
+  .premium-mobile-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .premium-mobile-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 14px;
+  }
+
+  .premium-mobile-grid,
+  .premium-mobile-card-header,
+  .premium-mobile-summary-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .premium-mobile-view-btn {
+    width: 100%;
+  }
+
+  .premium-mobile-summary-value {
+    text-align: left;
+  }
+
+  .premium-mobile-cell-row {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.25rem;
+  }
+
+  .premium-mobile-cell-value {
+    text-align: left;
+  }
+
   .premium-hero {
     padding: 1rem 1.1rem;
     border-radius: 1.15rem;

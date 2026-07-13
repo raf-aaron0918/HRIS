@@ -136,7 +136,7 @@
                 No user accounts found yet.
               </div>
 
-              <div v-for="account in accounts" :key="`mobile-${account.id}`" class="border rounded-4 p-3 mb-2 shadow-sm premium-mobile-card">
+              <div v-for="account in accounts" :key="`mobile-${account.id}`" class="border p-3 mb-2 shadow-sm premium-mobile-card">
                 <div class="d-flex justify-content-between align-items-start gap-2">
                   <div>
                     <div class="fw-semibold">{{ account.full_name }}</div>
@@ -433,6 +433,7 @@ onMounted(() => {
 }
 
 .premium-mobile-card {
+  border-radius: 0;
   border-color: rgba(148, 163, 184, 0.18) !important;
   background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
 }

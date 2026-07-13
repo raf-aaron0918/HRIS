@@ -52,7 +52,8 @@ def get_leave_summary(
     db: Session = Depends(get_db),
 ) -> dict:
     requests = list_leave_requests(db)
-    pending_count = len([request for request in requests if request.status.lower() == "pending"])
+    pending_statuses = {"pending", "for hr review"}
+    pending_count = len([request for request in requests if request.status.lower() in pending_statuses])
     approved_count = len([request for request in requests if request.status.lower() == "approved"])
     payroll_impact = sum(request.payroll_impact for request in requests)
     credits_used = sum(request.credits_used for request in requests)
